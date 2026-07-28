@@ -5,66 +5,105 @@ import org.junit.Test
 
 class LaunchDetectorTest {
 
-    private val instagram = "com.instagram.android"
-    private val tiktok = "com.zhiliaoapp.musically"
+    private val youtube = "com.google.android.youtube"
+    private val chrome = "com.android.chrome"
     private val self = "com.blocksocial.spike.a01"
-    private val launcher = "com.android.launcher3"
+    private val launcher = "com.google.android.apps.nexuslauncher"
     private val settings = "com.android.settings"
-    private val unlisted = "com.example.notes"
+    private val unlisted = "com.google.android.contacts"
 
     private fun detector(debounceWindowMillis: Long = 1_000L) = LaunchDetector(
-        targetPackages = setOf(instagram, tiktok),
+        targetPackages = setOf(youtube, chrome),
         selfPackage = self,
         systemPackages = setOf(launcher, settings),
         debounceWindowMillis = debounceWindowMillis
     )
 
+    private fun LaunchDetector.activityWindow(packageName: String?, atMillis: Long) =
+        onForegroundPackageChanged(packageName, isActivityWindow = true, atMillis = atMillis)
+
+    private fun LaunchDetector.otherWindow(packageName: String?, atMillis: Long) =
+        onForegroundPackageChanged(packageName, isActivityWindow = false, atMillis = atMillis)
+
     @Test
     fun `entering a target application is detected`() {
         assertEquals(
             TransitionDecision.TARGET_ENTERED,
-            detector().onForegroundPackageChanged(instagram, 1_000L)
+            detector().activityWindow(youtube, 1_000L)
         )
     }
 
     @Test
-    fun `repeated events for the same target inside the window are debounced`() {
-        val detector = detector()
-        detector.onForegroundPackageChanged(instagram, 1_000L)
-
+    fun `a non-activity window of a target is not an entry`() {
         assertEquals(
-            TransitionDecision.IGNORED_DEBOUNCED,
-            detector.onForegroundPackageChanged(instagram, 1_100L)
-        )
-        assertEquals(
-            TransitionDecision.IGNORED_DEBOUNCED,
-            detector.onForegroundPackageChanged(instagram, 1_999L)
+            TransitionDecision.IGNORED_NOT_AN_ACTIVITY,
+            detector().otherWindow(youtube, 1_000L)
         )
     }
 
     @Test
-    fun `the same target is detected again once the window has passed`() {
+    fun `a non-activity window while backgrounding does not start a visit`() {
         val detector = detector()
-        detector.onForegroundPackageChanged(instagram, 1_000L)
 
         assertEquals(
             TransitionDecision.TARGET_ENTERED,
-            detector.onForegroundPackageChanged(instagram, 2_000L)
+            detector.activityWindow(youtube, 1_000L)
+        )
+        assertEquals(
+            TransitionDecision.IGNORED_SYSTEM,
+            detector.activityWindow(launcher, 5_000L)
+        )
+        assertEquals(
+            TransitionDecision.IGNORED_NOT_AN_ACTIVITY,
+            detector.otherWindow(youtube, 6_400L)
+        )
+        assertEquals(
+            TransitionDecision.TARGET_ENTERED,
+            detector.activityWindow(youtube, 12_000L)
+        )
+    }
+
+    @Test
+    fun `further windows inside the same target are one visit`() {
+        val detector = detector()
+        detector.activityWindow(youtube, 1_000L)
+
+        assertEquals(
+            TransitionDecision.IGNORED_ALREADY_FOREGROUND,
+            detector.activityWindow(youtube, 1_100L)
+        )
+    }
+
+    @Test
+    fun `a splash screen and the main activity are one visit even seconds apart`() {
+        val detector = detector()
+
+        assertEquals(
+            TransitionDecision.TARGET_ENTERED,
+            detector.activityWindow(youtube, 1_000L)
+        )
+        assertEquals(
+            TransitionDecision.IGNORED_ALREADY_FOREGROUND,
+            detector.activityWindow(youtube, 4_073L)
+        )
+        assertEquals(
+            TransitionDecision.IGNORED_ALREADY_FOREGROUND,
+            detector.activityWindow(youtube, 9_000L)
         )
     }
 
     @Test
     fun `leaving to a non-target allows immediate re-entry to be detected`() {
         val detector = detector()
-        detector.onForegroundPackageChanged(instagram, 1_000L)
+        detector.activityWindow(youtube, 1_000L)
 
         assertEquals(
             TransitionDecision.IGNORED_SYSTEM,
-            detector.onForegroundPackageChanged(launcher, 1_100L)
+            detector.activityWindow(launcher, 1_100L)
         )
         assertEquals(
             TransitionDecision.TARGET_ENTERED,
-            detector.onForegroundPackageChanged(instagram, 1_200L)
+            detector.activityWindow(youtube, 1_200L)
         )
     }
 
@@ -74,30 +113,30 @@ class LaunchDetectorTest {
 
         assertEquals(
             TransitionDecision.TARGET_ENTERED,
-            detector.onForegroundPackageChanged(instagram, 1_000L)
+            detector.activityWindow(youtube, 1_000L)
         )
         assertEquals(
             TransitionDecision.TARGET_ENTERED,
-            detector.onForegroundPackageChanged(tiktok, 1_100L)
+            detector.activityWindow(chrome, 4_000L)
         )
         assertEquals(
             TransitionDecision.TARGET_ENTERED,
-            detector.onForegroundPackageChanged(instagram, 1_200L)
+            detector.activityWindow(youtube, 7_000L)
         )
     }
 
     @Test
-    fun `own package is ignored and does not reset the debounce window`() {
+    fun `own package does not end the current visit`() {
         val detector = detector()
-        detector.onForegroundPackageChanged(instagram, 1_000L)
+        detector.activityWindow(youtube, 1_000L)
 
         assertEquals(
             TransitionDecision.IGNORED_SELF,
-            detector.onForegroundPackageChanged(self, 1_100L)
+            detector.activityWindow(self, 1_100L)
         )
         assertEquals(
-            TransitionDecision.IGNORED_DEBOUNCED,
-            detector.onForegroundPackageChanged(instagram, 1_200L)
+            TransitionDecision.IGNORED_ALREADY_FOREGROUND,
+            detector.activityWindow(youtube, 1_200L)
         )
     }
 
@@ -107,11 +146,11 @@ class LaunchDetectorTest {
 
         assertEquals(
             TransitionDecision.IGNORED_SYSTEM,
-            detector.onForegroundPackageChanged(launcher, 1_000L)
+            detector.activityWindow(launcher, 1_000L)
         )
         assertEquals(
             TransitionDecision.IGNORED_SYSTEM,
-            detector.onForegroundPackageChanged(settings, 1_100L)
+            detector.activityWindow(settings, 1_100L)
         )
     }
 
@@ -119,7 +158,7 @@ class LaunchDetectorTest {
     fun `packages outside the target set are ignored`() {
         assertEquals(
             TransitionDecision.IGNORED_NOT_TARGET,
-            detector().onForegroundPackageChanged(unlisted, 1_000L)
+            detector().activityWindow(unlisted, 1_000L)
         )
     }
 
@@ -129,11 +168,11 @@ class LaunchDetectorTest {
 
         assertEquals(
             TransitionDecision.IGNORED_UNKNOWN_PACKAGE,
-            detector.onForegroundPackageChanged(null, 1_000L)
+            detector.activityWindow(null, 1_000L)
         )
         assertEquals(
             TransitionDecision.IGNORED_UNKNOWN_PACKAGE,
-            detector.onForegroundPackageChanged("", 1_100L)
+            detector.activityWindow("", 1_100L)
         )
     }
 
@@ -141,10 +180,29 @@ class LaunchDetectorTest {
     fun `an event flood on one target produces a single detection`() {
         val detector = detector()
         val decisions = (0 until 50).map { index ->
-            detector.onForegroundPackageChanged(instagram, 1_000L + index * 10L)
+            detector.activityWindow(youtube, 1_000L + index * 200L)
         }
 
         assertEquals(1, decisions.count { it == TransitionDecision.TARGET_ENTERED })
-        assertEquals(49, decisions.count { it == TransitionDecision.IGNORED_DEBOUNCED })
+        assertEquals(49, decisions.count { it == TransitionDecision.IGNORED_ALREADY_FOREGROUND })
+    }
+
+    @Test
+    fun `two separate visits to the same target are two detections`() {
+        val detector = detector()
+        val decisions = listOf(
+            detector.activityWindow(youtube, 1_000L),
+            detector.activityWindow(launcher, 5_000L),
+            detector.activityWindow(youtube, 9_000L)
+        )
+
+        assertEquals(
+            listOf(
+                TransitionDecision.TARGET_ENTERED,
+                TransitionDecision.IGNORED_SYSTEM,
+                TransitionDecision.TARGET_ENTERED
+            ),
+            decisions
+        )
     }
 }
