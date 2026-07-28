@@ -127,7 +127,7 @@ Android and iOS tracks run independently after phase 14. Either may pause withou
 
 ## Phase 00 — Git Baseline and Repository Setup
 
-**Status:** not started
+**Status:** in progress
 
 **Goal.** Put the repository under version control with the branch model this plan depends on, so every later phase has a commit to reference.
 
@@ -139,12 +139,12 @@ Android and iOS tracks run independently after phase 14. Either may pause withou
 
 ### Tasks
 
-- [ ] Initialize the git repository
-- [ ] Verify `.gitignore` covers Android, Xcode, secrets, and local tooling
-- [ ] Commit the current documentation state as the initial commit on `main`
-- [ ] Create `dev` from `main`
-- [ ] Create `phase/00-git-baseline` from `dev` and record the branch model in `README.md`
-- [ ] Add a short "Working on a phase" section to `README.md` describing the session protocol
+- [x] Initialize the git repository
+- [x] Verify `.gitignore` covers Android, Xcode, secrets, and local tooling
+- [x] Commit the current documentation state as the initial commit on `main`
+- [x] Create `dev` from `main`
+- [x] Create `phase/00-git-baseline` from `dev` and record the branch model in `README.md`
+- [x] Add a short "Working on a phase" section to `README.md` describing the session protocol
 
 **Expected result.** A repository with `main`, `dev`, and one phase branch, an initial commit containing all current documentation, and a README that explains how phases are executed.
 
