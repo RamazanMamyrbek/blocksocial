@@ -1,0 +1,56 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE and local tooling
+.idea/
+.vscode/
+.claude/
+*.iml
+*.swp
+*.swo
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+*.cer
+*.provisionprofile
+local.properties
+
+# Android
+.gradle/
+build/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# iOS / Xcode
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+.build/
+Pods/
+Carthage/Build/
+.swiftpm/
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+.cache/
+
+# Archives
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip

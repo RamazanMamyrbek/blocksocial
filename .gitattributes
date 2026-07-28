@@ -1,0 +1,21 @@
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.pdf binary
+*.jks binary
+*.keystore binary
+*.apk binary
+*.aab binary
+*.ipa binary
+*.jar binary
+*.zip binary
+*.ttf binary
+*.otf binary
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+gradlew text eol=lf
+*.pbxproj text -merge
