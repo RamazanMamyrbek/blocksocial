@@ -282,7 +282,7 @@ Result document exists with a decision, checks pass, owner confirms the eight sc
 
 ## Phase 02 — Android Spike: Accessibility Overlay
 
-**Status:** not started
+**Status:** done — decision `GO`, verified on an Android 16 emulator. Three items stay open: the back key is an unrecorded bypass, rotation could not be exercised on this AVD, and screen-reader operation is unconfirmed.
 
 **Goal.** Prove an interactive full-screen `TYPE_ACCESSIBILITY_OVERLAY` works without `SYSTEM_ALERT_WINDOW`, and that it can always be removed.
 
@@ -294,31 +294,31 @@ Result document exists with a decision, checks pass, owner confirms the eight sc
 
 ### Tasks
 
-- [ ] Extend the phase 01 spike to show an overlay on detection
-- [ ] Render the block-screen baseline direction chosen in `design/DESIGN_EXPORT_ANALYSIS.md`, not a placeholder
-- [ ] Implement two working buttons with distinct outcomes
-- [ ] Implement `GLOBAL_ACTION_HOME` for the primary action
-- [ ] Implement a watchdog timeout that removes a stuck overlay
-- [ ] Remove the overlay on package change
-- [ ] Test with `ComposeView`; fall back to a View implementation if unstable, and record which
+- [x] Extend the phase 01 spike to show an overlay on detection
+- [x] Render the block-screen baseline direction chosen in `design/DESIGN_EXPORT_ANALYSIS.md`, not a placeholder — direction 1b
+- [x] Implement two working buttons with distinct outcomes
+- [x] Implement `GLOBAL_ACTION_HOME` for the primary action
+- [x] Implement a watchdog timeout that removes a stuck overlay
+- [x] Remove the overlay on package change
+- [x] Test with `ComposeView`; fall back to a View implementation if unstable, and record which — ComposeView, no fallback needed
 - [ ] Write the result document with the decision
 
 **Expected result.** An overlay that appears over the target app, accepts touch, and always disappears.
 
 ### Automated checks
 
-- [ ] `./gradlew :a02:assembleDebug` succeeds — agent runs
-- [ ] `./gradlew :a02:lint` reports no errors — agent runs
-- [ ] Manifest contains no `SYSTEM_ALERT_WINDOW` — agent greps
-- [ ] Instrumented test asserting overlay attach and detach — agent runs on the emulator
+- [x] `./gradlew :a02:assembleDebug` succeeds — agent runs
+- [x] `./gradlew :a02:lint` reports no errors — agent runs
+- [x] Manifest contains no `SYSTEM_ALERT_WINDOW` — agent greps
+- [x] Instrumented test asserting overlay attach and detach — agent runs on the emulator
 
 ### Agent checklist
 
-- [ ] Overlay does not imitate system UI
-- [ ] No countdown gate before the primary action becomes usable
-- [ ] Settings, launcher, phone, and system UI are allowlisted and never covered
-- [ ] Focus order is title, primary, secondary
-- [ ] Contrast and touch targets match the brief
+- [x] Overlay does not imitate system UI
+- [x] No countdown gate before the primary action becomes usable
+- [x] Settings, launcher, phone, and system UI are allowlisted and never covered
+- [x] Focus order is title, primary, secondary
+- [x] Contrast and touch targets match the brief
 
 ### Manual scenarios for the user
 
