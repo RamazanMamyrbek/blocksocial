@@ -186,7 +186,7 @@ Android uses categorized Logcat; iOS uses OSLog. Debug builds include the commit
 
 ## Build and Delivery
 
-Android is built on Windows by the project owner and tested on real devices from several manufacturers.
+Android is built on Windows and verified on an Android emulator. No physical Android device is used; OEM behaviour is therefore unmeasured until beta, as recorded in `docs/TECHNICAL_SPECIFICATION.md` section 9.
 
 iOS is written without local Xcode access and built by the teammate on macOS. Each handoff carries a commit hash, Xcode and iOS versions, affected targets, exact build steps, expected behavior, numbered test cases, required screenshots or recordings, log-export instructions, and known limitations. One system mechanism per handoff; unverified Swift never accumulates.
 

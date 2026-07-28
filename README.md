@@ -28,7 +28,9 @@ blocksocial/
     └── files/                        the design export itself
 ```
 
-`docs/PLAN.md` holds 46 phases from git setup to store submission. Its first phases are technical validation: they prove the mechanisms listed in `docs/TECHNICAL_SPECIFICATION.md` section 8 on real devices. Implementation phases follow and are re-scoped at the phase 14 gate.
+`docs/PLAN.md` holds 46 phases from git setup to store submission. Its first phases are technical validation: they prove the mechanisms listed in `docs/TECHNICAL_SPECIFICATION.md` section 8, on an Android emulator and on a real iPhone. Implementation phases follow and are re-scoped at the phase 14 gate.
+
+Android uses no physical device at any point. What that costs, and who carries the risk instead, is stated in `docs/TECHNICAL_SPECIFICATION.md` section 9.
 
 ## Branch Model
 
@@ -56,7 +58,7 @@ If a phase cannot be finished, the agent stops, says where and why, and leaves t
 
 | Platform | Stack | Built and tested by |
 |---|---|---|
-| Android | Kotlin, Jetpack Compose, Material 3, `minSdk 26`, `targetSdk 36` | project owner, on Windows |
+| Android | Kotlin, Jetpack Compose, Material 3, `minSdk 26`, `targetSdk 36` | agent, on an Android emulator |
 | iOS | Swift, SwiftUI, iOS 17+, Screen Time frameworks | teammate, on macOS with a real iPhone |
 
 No backend, no accounts, no synchronization. Every feature works offline.

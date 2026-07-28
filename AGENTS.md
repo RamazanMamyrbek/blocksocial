@@ -15,7 +15,9 @@ Whole applications are blocked, never individual feeds or tabs. Everything is lo
 - **Backend:** none
 - **Testing:** JUnit, Turbine, Compose UI Test on Android; XCTest or Swift Testing on iOS
 
-Android is built and tested by the project owner on Windows. iOS is built and tested by a teammate on macOS with a real iPhone.
+Android is built on Windows and verified on an Android emulator driven over `adb`. No physical Android device is used in any phase. iOS is built and tested by a teammate on macOS with a real iPhone.
+
+Emulator evidence does not cover OEM firmware behaviour. See `docs/TECHNICAL_SPECIFICATION.md` section 9.
 
 ## Current State
 
@@ -105,12 +107,14 @@ Complete only when:
 - the code is implemented
 - tests were actually run
 - success criteria were checked
-- Android behavior was verified by the owner on a real device
+- Android behavior was verified on an emulator by the agent
 - iOS behavior was verified by the teammate when affected
 - documentation was updated
 - failures are reported honestly
 
-Never claim completion without verification. Use precise language: "implemented but not built on macOS", "compiled on Android", "verified on a Samsung device", "awaiting entitlement", "check failed, fallback required".
+Never write a task, checklist, or completion criterion that requires the owner to operate a phone by hand. Android scenarios are driven from the host: install with `adb install`, enable the accessibility service with `settings put secure`, act with `input keyevent` and `monkey`, read `logcat`.
+
+Never claim completion without verification. Use precise language: "implemented but not built on macOS", "compiled on Android", "verified on an Android 16 emulator", "awaiting entitlement", "check failed, fallback required". Never shorten "verified on an emulator" to "verified on a device".
 
 Compilation is not verification. For iOS, nothing is confirmed until the teammate returns evidence from Xcode or a real device.
 

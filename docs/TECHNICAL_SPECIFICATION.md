@@ -186,7 +186,8 @@ None of the following may be presented as a guaranteed capability until a spike 
 
 | Assumption | Status |
 |---|---|
-| The accessibility overlay is stable on API 36 across OEMs | unverified |
+| The accessibility overlay is stable on API 36 across OEMs | unverified, and cannot be verified before beta: no physical device is used |
+| Accessibility events are delivered the same way on OEM firmware as on stock Android | unverified, and cannot be verified before beta |
 | Google Play accepts the Accessibility use case | unverified |
 | The curated catalog covers enough applications | unverified |
 | Apple grants the Family Controls distribution entitlement | unverified |
@@ -204,7 +205,8 @@ None of the following may be presented as a guaranteed capability until a spike 
 | R-01 | Google Play rejects the Accessibility use case | critical | prominent disclosure, affirmative consent, Play Console declaration, demo video, `isAccessibilityTool=false`, no unnecessary tree inspection |
 | R-02 | Apple does not grant the Family Controls entitlement | critical | request it before any broad iOS work; a rejection forces an Android-first decision |
 | R-03 | The iOS bypass cannot be made predictable | high | real-device proof; fallback to a fifteen-minute wall-clock grant; keep the duration a variable in all copy |
-| R-04 | The Android overlay is unstable on API 36 | high | prove the overlay before building UI on it; keep a simpler fallback design |
+| R-04 | The Android overlay is unstable on API 36 | high | prove the overlay before building UI on it; keep a simpler fallback design; emulator proof only, so OEM instability surfaces first in beta |
+| R-06 | OEM firmware breaks detection or kills the service, and nothing catches it before release | high | accepted deliberately: development uses an emulator only; the protection health screen must surface a dead service, and the Android beta must recruit Samsung and Xiaomi testers |
 | R-05 | App selection turns out to require `QUERY_ALL_PACKAGES` | high | curated catalog plus targeted `<queries>`; the product promises supported applications only |
 
 Secondary risks with known mitigations: OEM background termination, handled by a protection health screen and honest positioning; duplicate accessibility events, handled by debounce and a state machine; overlay covering critical system UI, handled by a system allowlist, a watchdog timeout, and removal on package change.
@@ -215,7 +217,7 @@ Risks that no amount of code removes: store review decisions, OEM differences, f
 
 ## 8. Validation Before Development
 
-Feature implementation does not begin until the central mechanisms are proven on real devices. The checks themselves are the first phases of `PLAN.md` and do involve minimal, throwaway code.
+Feature implementation does not begin until the central mechanisms are proven: on an Android emulator, and on a real iPhone for iOS. The checks themselves are the first phases of `PLAN.md` and do involve minimal, throwaway code.
 
 Each check produces a short result document with an environment, a commit hash, evidence, and a `GO`, `CHANGE`, or `STOP` decision. Code that compiles is not a passed check.
 
@@ -227,7 +229,7 @@ Each check produces a short result document with an environment, a commit hash, 
 | A-02 | Does an interactive accessibility overlay work without `SYSTEM_ALERT_WINDOW`? |
 | A-03 | Does an app-specific grant suppress repeated blocks correctly, including after reboot? |
 | A-04 | Does the curated catalog work without `QUERY_ALL_PACKAGES`? |
-| A-05 | Is usage data good enough for approximate statistics and for daily limits, across OEMs and Android 10, 13, and 16? |
+| A-05 | Is usage data good enough for approximate statistics and for daily limits, across emulator images for Android 10, 13, and 16? OEM variation stays unmeasured until beta. |
 | A-06 | Is the Play policy package consistent with what the code actually does? |
 
 ### iOS
@@ -258,7 +260,13 @@ iOS proceeds when the entitlement is available or its process is confirmed, all 
 
 **Unit.** Schedule evaluator, overnight intervals, DST, rule priority, bypass expiry, daily-limit accumulation and midnight reset, statistics, permission state reducers. Both platforms run against the shared fixtures.
 
-**Android devices.** Pixel or AOSP-like, Samsung, and Xiaomi or Redmi, on Android 10, 13, and 16.
+**Android.** Emulator only. No physical Android device is used in any development phase.
+
+Every Android scenario is driven from the host over `adb`, with no manual interaction: `adb install`, `settings put secure` to enable the accessibility service, `input keyevent` and `monkey` to act, `logcat` to read the result. Coverage across API levels comes from separate emulator images; Android 10, 13, and 16 remain the target levels.
+
+This is a deliberate limitation, not an oversight. An emulator runs stock Android, so it cannot show how Samsung, Xiaomi, or Huawei firmware terminates background services, restricts autostart, or delivers accessibility events. Those differences are risks `R-04` and `R-06`. They are carried by the Android beta, which must recruit testers on at least Samsung and Xiaomi hardware, and by the protection health screen, which must make a dead service visible to the user rather than silently failing.
+
+Never describe emulator evidence as device evidence.
 
 **iOS device.** A real iPhone on iOS 17 or later, both a development build and TestFlight, covering reboot, revoked authorization, time-zone change, and low memory.
 
@@ -266,4 +274,4 @@ iOS proceeds when the entitlement is available or its process is confirmed, all 
 
 ## 10. Definition of Done
 
-A feature is complete when requirements are documented, code is implemented, unit tests pass, platform tests pass, Android is verified by the owner, iOS is verified by the teammate when affected, permissions are tested, documentation is updated, no critical or major defects remain, and a reproducible commit exists.
+A feature is complete when requirements are documented, code is implemented, unit tests pass, platform tests pass, Android is verified on an emulator, iOS is verified by the teammate when affected, permissions are tested, documentation is updated, no critical or major defects remain, and a reproducible commit exists.

@@ -56,11 +56,23 @@ These apply to every phase in addition to its own list.
 
 | Role | Does |
 |---|---|
-| Agent | writes code and documents, runs everything it can run, fills checklists, reports |
-| Owner | Windows machine, Android devices, approves merges, verifies manually |
+| Agent | writes code and documents, runs everything it can run including every Android scenario on the emulator, fills checklists, reports |
+| Owner | Windows machine, approves merges, reviews reports and evidence |
 | Teammate | macOS and a real iPhone, builds and verifies every iOS phase, returns evidence |
 
 The agent cannot build or run iOS. For every iOS phase the agent prepares the handoff document and the teammate's test checklist itself; the teammate executes it and returns results. The user does not write these checklists.
+
+### Android test environment
+
+**Android verification uses an emulator. No physical Android device is used in any phase.**
+
+The agent drives everything from the host over `adb` — install, enable the accessibility service through `settings put secure`, act with `input keyevent` and `monkey`, read `logcat`. The owner is never asked to operate a phone.
+
+This applies to Android only. iOS is verified by the teammate on a real iPhone, and every mention of a real device in an iOS phase means exactly that.
+
+The cost is real and is not written off: an emulator runs stock Android and cannot expose how Samsung or Xiaomi firmware kills background services, restricts autostart, or delivers accessibility events. That is risk `R-06` in `docs/TECHNICAL_SPECIFICATION.md`. It is carried by the protection health screen in phase 25, which must make a dead service visible, and by the Android beta in phase 42, which must recruit testers on that hardware. Phase 28 is re-scoped accordingly.
+
+Evidence wording is not negotiable: "verified on an Android 16 emulator", never "verified on a device".
 
 ### Phase status legend
 
@@ -100,7 +112,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 25 | Android: onboarding, permissions, protection health | Android MVP | 24 |
 | 26 | Android: recovery and reliability hardening | Android MVP | 25 |
 | 27 | Android: accessibility and localization | Android MVP | 26 |
-| 28 | Android: device matrix and defect fixing | Android MVP | 27 |
+| 28 | Android: API-level matrix and defect fixing | Android MVP | 27 |
 | 29 | iOS: production skeleton | iOS MVP | 14 |
 | 30 | iOS: domain and persistence | iOS MVP | 29 |
 | 31 | iOS: authorization and picker | iOS MVP | 30 |
@@ -195,7 +207,7 @@ Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing env
 
 ## Phase 01 — Android Spike: Launch Detection
 
-**Status:** done on an emulator — decision `GO`; the Definition of Done asks for a real device, so physical confirmation of the eight scenarios is carried by phase 28
+**Status:** done — decision `GO`, verified on an Android 16 emulator. Physical-hardware confirmation is not planned during development; the OEM gap is carried by phases 25 and 42.
 
 **Goal.** Prove that an `AccessibilityService` on `targetSdk 36` reliably detects a transition into a target application, with no false or runaway detections.
 
@@ -235,7 +247,7 @@ Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing env
 
 ### Manual scenarios for the user
 
-Install on a real device, enable the service, then check each case and confirm the log:
+Install on the emulator, enable the service, then check each case and confirm the log:
 
 1. Cold launch of a target app from the launcher.
 2. Return to a target app from recents.
@@ -248,13 +260,13 @@ Install on a real device, enable the service, then check each case and confirm t
 
 ### Definition of Done
 
-All eight scenarios behave correctly on at least one real device, no repeated detection storms, latency is subjectively acceptable, result document written with a decision.
+All eight scenarios behave correctly on the emulator, no repeated detection storms, latency is subjectively acceptable, result document written with a decision.
 
 ### Risks
 
 | Risk | Response |
 |---|---|
-| OEM delivers events differently | note the device and OEM in the result; retest in phase 28 |
+| OEM delivers events differently | unmeasurable here; record the emulator image and hand the question to phase 42 |
 | Event floods on rapid switching | debounce window is tunable and its value is recorded |
 | Detection latency feels slow | record measured delay; if unacceptable, decision is `CHANGE` |
 
@@ -298,7 +310,7 @@ Result document exists with a decision, checks pass, owner confirms the eight sc
 - [ ] `./gradlew :a02:assembleDebug` succeeds — agent runs
 - [ ] `./gradlew :a02:lint` reports no errors — agent runs
 - [ ] Manifest contains no `SYSTEM_ALERT_WINDOW` — agent greps
-- [ ] Instrumented test asserting overlay attach and detach — owner runs on a device
+- [ ] Instrumented test asserting overlay attach and detach — agent runs on the emulator
 
 ### Agent checklist
 
@@ -391,7 +403,7 @@ All scenarios pass, no soft-lock observed, decision recorded.
 
 ### Definition of Done
 
-Installed catalog apps detected on a real device, merged manifest clean, missing apps handled, decision recorded.
+Installed catalog apps detected on the emulator, merged manifest clean, missing apps handled, decision recorded.
 
 ### Risks
 
@@ -459,7 +471,7 @@ Merged manifest verified clean, detection works on a device, decision recorded.
 
 ### Definition of Done
 
-All eight scenarios pass on a real device, unit tests green, decision recorded.
+All eight scenarios pass on the emulator, unit tests green, decision recorded.
 
 ### Risks
 
@@ -498,7 +510,7 @@ Scenarios pass, tests green, decision recorded.
 - [ ] Test the day boundary and the local-midnight reset
 - [ ] Test with the screen off and with rapid switching
 - [ ] Handle an empty or partial result without crashing
-- [ ] Record measured error margin per device and OEM
+- [ ] Record measured error margin per emulator image and API level
 - [ ] Decide and record the source of the time-in-app metric
 - [ ] Write the result document with the decision
 
@@ -523,11 +535,11 @@ Scenarios pass, tests green, decision recorded.
 3. Switch rapidly between three apps and compare totals.
 4. Cross local midnight and confirm the counter resets.
 5. Revoke usage access and confirm the app reports the state without crashing.
-6. Repeat steps 1 and 4 on a second OEM device.
+6. Repeat steps 1 and 4 on a second emulator image at a different API level.
 
 ### Definition of Done
 
-Accuracy margin recorded on at least two OEM devices, day boundary correct, denial handled, both decisions recorded.
+Accuracy margin recorded on at least two emulator images, day boundary correct, denial handled, both decisions recorded.
 
 ### Risks
 
@@ -1381,7 +1393,7 @@ All fixture tests green, no Android dependency in the domain modules.
 - [ ] Room schema is exported to the repository — agent verifies the file exists
 - [ ] Migration test passes — agent runs
 - [ ] No `fallbackToDestructiveMigration` in the release configuration — agent greps
-- [ ] Instrumented DAO tests pass — owner runs on a device
+- [ ] Instrumented DAO tests pass — agent runs on the emulator
 
 ### Agent checklist
 
@@ -1446,7 +1458,7 @@ Tests green, schema exported, owner confirms data survives restart.
 
 - [ ] `./gradlew test` passes, covering the decision state machine — agent runs
 - [ ] No blocking database call on the callback path — agent inspects and adds a test with a strict-mode assertion
-- [ ] Instrumented test asserting the allowlist is never blocked — owner runs
+- [ ] Instrumented test asserting the allowlist is never blocked — agent runs on the emulator
 - [ ] `./gradlew lint` clean — agent runs
 
 ### Agent checklist
@@ -1515,7 +1527,7 @@ Tests green, five scenarios verified by the owner.
 - [ ] `./gradlew test` passes, covering event recording for both actions — agent runs
 - [ ] Compose UI tests for both themes and the largest font scale — agent runs
 - [ ] Accessibility test asserting every interactive element has a label — agent runs
-- [ ] Instrumented test asserting the overlay always detaches — owner runs
+- [ ] Instrumented test asserting the overlay always detaches — agent runs on the emulator
 
 ### Agent checklist
 
@@ -1586,7 +1598,7 @@ Tests green, eight scenarios verified.
 
 - [ ] `./gradlew test` passes, covering expiry boundary, second-app isolation, and clock rollback — agent runs
 - [ ] Fixture cases for bypass all pass — agent runs
-- [ ] Instrumented test for grant survival across process death — owner runs
+- [ ] Instrumented test for grant survival across process death — agent runs on the emulator
 
 ### Agent checklist
 
@@ -1806,11 +1818,11 @@ Tests green, six scenarios verified.
 3. Cross local midnight and confirm the counter resets.
 4. Revoke usage access and confirm schedule rules still block.
 5. Reboot mid-day and confirm accumulated usage is not lost.
-6. Repeat step one on a second OEM device.
+6. Repeat step one on a second emulator image at a different API level.
 
 ### Definition of Done
 
-Six scenarios pass on two OEM devices, fixtures green, denial path safe.
+Six scenarios pass on two emulator images, fixtures green, denial path safe.
 
 ### Risks
 
@@ -1947,7 +1959,7 @@ Tests green, six scenarios verified.
 3. Grant it later from protection health and confirm blocking starts.
 4. Revoke accessibility access while the app runs; confirm the health screen updates without a crash.
 5. Deny usage access and confirm schedules still work while limits are disabled.
-6. Follow the OEM guidance on a Xiaomi or Samsung device and confirm it matches reality.
+6. Read the OEM guidance and confirm it is labelled as written from vendor documentation, not observed.
 
 ### Definition of Done
 
@@ -1958,7 +1970,7 @@ Six scenarios pass, no crash on any revocation, disclosure matches the policy pa
 | Risk | Response |
 |---|---|
 | Users refuse permissions | value explained before the request; measured in beta |
-| OEM guidance inaccurate | verified on a real device of that brand in scenario six |
+| OEM guidance inaccurate | cannot be checked without that hardware; it ships labelled unverified and is corrected from phase 42 reports |
 
 ### Documents to update
 
@@ -1966,7 +1978,7 @@ Six scenarios pass, no crash on any revocation, disclosure matches the policy pa
 
 ### Merge into `dev` when
 
-Tests green, six scenarios verified including one OEM device.
+Tests green, six scenarios verified on the emulator, OEM guidance labelled unverified.
 
 ---
 
@@ -2000,7 +2012,7 @@ Tests green, six scenarios verified including one OEM device.
 - [ ] `./gradlew test` passes including new regression tests — agent runs
 - [ ] Test asserting no overlay is shown twice for one launch — agent runs
 - [ ] Time-zone and DST runtime tests — agent runs
-- [ ] Instrumented reboot-recovery test — owner runs
+- [ ] Instrumented reboot-recovery test — agent runs on the emulator
 - [ ] Battery usage recorded from system statistics — owner records
 
 ### Agent checklist
@@ -2114,30 +2126,31 @@ Tests green, five scenarios verified.
 
 **Status:** not started
 
-**Goal.** Verify the full application across the required device matrix and fix what it exposes.
+**Goal.** Verify the full application across every API level an emulator can provide, fix what it exposes, and state in writing what remains unverified because no physical device is used.
 
 **Depends on.** Phase 27.
 
-**Branch.** `phase/28-android-device-matrix`
+**Branch.** `phase/28-android-api-matrix`
 
-**Out of scope.** New features. Store submission.
+**Out of scope.** New features. Store submission. Any claim about OEM firmware behaviour.
+
+This phase was originally a three-brand physical device matrix. It is not, because Android verification uses an emulator only. What it cannot cover does not disappear; it moves to the protection health screen and to the beta in phase 42, and this phase's job includes saying so precisely.
 
 ### Tasks
 
-- [ ] Run the full manual suite on a Pixel or AOSP-like device
-- [ ] Run it on a Samsung device
-- [ ] Run it on a Xiaomi or Redmi device
-- [ ] Cover Android 10, 13, and 16
-- [ ] Record every defect with device, OS version, and reproduction steps
+- [ ] Create emulator images for Android 10, 13, and 16
+- [ ] Run the full manual suite on each image
+- [ ] Record every defect with API level and reproduction steps
 - [ ] Add a regression test for every defect fixed
-- [ ] Record OEM-specific background behavior in the protection health guidance
-- [ ] Produce a compatibility summary
+- [ ] Write the OEM background-restriction guidance from vendor documentation, marked as unverified
+- [ ] Produce a compatibility summary that separates what was tested from what was not
+- [ ] List the OEM behaviours the beta must confirm, and hand that list to phase 42
 
-**Expected result.** A written compatibility matrix and a defect list with no critical or major items remaining.
+**Expected result.** A written compatibility summary covering three API levels, a defect list with no critical or major items remaining, and an explicit statement of the OEM gap.
 
 ### Automated checks
 
-- [ ] Full unit and instrumented suites pass on every tested device — owner runs, agent records
+- [ ] Full unit and instrumented suites pass on every emulator image — agent runs
 - [ ] Every fixed defect has a regression test — agent verifies the mapping
 - [ ] `./gradlew build` clean — agent runs
 
@@ -2145,33 +2158,34 @@ Tests green, five scenarios verified.
 
 - [ ] Every defect is recorded before it is fixed
 - [ ] No defect is closed without a test
-- [ ] OEM guidance updated from what was actually observed
-- [ ] The compatibility summary names devices and OS versions explicitly
+- [ ] The compatibility summary names API levels, and never implies device coverage
+- [ ] OEM guidance is labelled as written from documentation, not observation
+- [ ] The list handed to phase 42 is concrete enough for a tester to execute
 
 ### Manual scenarios for the user
 
-1. Execute the full block, bypass, limit, and recovery flows on each device.
-2. Confirm the OEM guidance matches what you had to do on each brand.
-3. Confirm no device is left in an unusable state at any point.
+1. Read the compatibility summary and confirm it claims nothing about physical hardware.
+2. Confirm the OEM gap is stated plainly enough to accept.
 
 ### Definition of Done
 
-Three brands and three OS versions covered, defects recorded and fixed, no critical or major defects open, compatibility summary written.
+Three API levels covered on emulator images, defects recorded and fixed, no critical or major defects open, compatibility summary written, OEM gap documented and handed to phase 42.
 
 ### Risks
 
 | Risk | Response |
 |---|---|
-| One OEM proves unreliable | document the limitation honestly rather than claiming universal support |
-| Late defects reshape the design | fix or document; do not ship an unstated limitation |
+| The summary reads as if devices were tested | the agent checklist forbids it; the owner checks it in scenario one |
+| OEM defects surface only in beta | expected and accepted; protection health must fail visibly rather than silently |
+| Emulator passes hide a real defect | fix what beta finds; do not claim universal support in store copy |
 
 ### Documents to update
 
-`docs/COMPATIBILITY.md`, protection health guidance strings
+`docs/COMPATIBILITY.md`, protection health guidance strings, phase 42 tester recruitment criteria
 
 ### Merge into `dev` when
 
-Matrix complete, no critical or major defects open.
+API-level matrix complete, no critical or major defects open, OEM gap written down.
 
 ---
 
@@ -2215,7 +2229,7 @@ Teammate-side:
 
 - [ ] All targets build
 - [ ] Unit tests pass
-- [ ] Token preview renders in both themes on a real device
+- [ ] Token preview renders in both themes on the emulator
 
 ### Agent checklist
 
@@ -3122,7 +3136,7 @@ Archive validated by the teammate, declarations complete.
 
 **Status:** not started
 
-**Goal.** Put the Android build in front of real users and collect structured feedback.
+**Goal.** Put the Android build in front of real users and collect structured feedback. This is also the **first contact with physical hardware and OEM firmware**, because development uses an emulator only.
 
 **Depends on.** Phase 40.
 
@@ -3133,7 +3147,9 @@ Archive validated by the teammate, declarations complete.
 ### Tasks
 
 - [ ] Configure the closed testing track
-- [ ] Recruit testers covering at least three device brands
+- [ ] Recruit testers on at least Samsung and Xiaomi or Redmi hardware, plus one Pixel or AOSP-like device
+- [ ] Execute the OEM behaviour list handed over by phase 28
+- [ ] Confirm on each brand: the service survives a reboot, survives background restriction, and protection health reports the truth when it does not
 - [ ] Write the tester instructions and the feedback form
 - [ ] Instrument the early metrics locally, with no third-party SDK
 - [ ] Collect onboarding completion, permission grant, and first-rule rates
@@ -3155,6 +3171,8 @@ Archive validated by the teammate, declarations complete.
 - [ ] No user content leaves the device
 - [ ] Tester instructions state clearly what is being tested
 - [ ] Every report is triaged, none silently dropped
+- [ ] The phase 28 OEM list is fully executed, and every item is marked confirmed or failed
+- [ ] Any OEM defect found is recorded as a defect, never as an acceptable quirk
 
 ### Manual scenarios for the user
 
@@ -3417,6 +3435,6 @@ Feature requests collected during beta are recorded here without commitment.
 | The Android overlay is unstable on API 36 | phases 02, 19, 28 |
 | App selection requires broad package visibility | phases 03, 21, 40 |
 | Usage measurement too poor for daily limits | phases 05, 23, 35 |
-| OEM background termination | phases 25, 26, 28 |
+| OEM background termination | unmeasurable on an emulator; surfaced by protection health in phase 25, confirmed by beta testers in phase 42 |
 | iOS verification cadence too slow | one mechanism per handoff, every iOS phase |
 | Scope growth from beta feedback | phase 44 routes requests to the backlog |
