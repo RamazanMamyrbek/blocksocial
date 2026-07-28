@@ -424,7 +424,7 @@ Merged manifest verified clean, detection works on a device, decision recorded.
 
 ## Phase 04 — Android Spike: Temporary Bypass Persistence
 
-**Status:** not started
+**Status:** done — decision `GO`, verified on an Android 16 emulator. Grants are sound; the spike instead exposed that force-stop and app update can leave blocking dead, which moves to phase 25.
 
 **Goal.** Prove that a per-application grant suppresses repeated blocks correctly and survives process death and reboot.
 
@@ -436,27 +436,27 @@ Merged manifest verified clean, detection works on a device, decision recorded.
 
 ### Tasks
 
-- [ ] Add minimal persistence for grants with an absolute expiry
-- [ ] Suppress the overlay for the granted application until expiry
-- [ ] Keep other restricted applications blocked
-- [ ] Recompute grant state on service start
-- [ ] Remove expired grants
-- [ ] Handle a device clock change without granting infinite access
-- [ ] Write the result document with the decision
+- [x] Add minimal persistence for grants with an absolute expiry
+- [x] Suppress the overlay for the granted application until expiry
+- [x] Keep other restricted applications blocked
+- [x] Recompute grant state on service start
+- [x] Remove expired grants
+- [x] Handle a device clock change without granting infinite access
+- [x] Write the result document with the decision
 
 **Expected result.** A grant that applies to exactly one application, expires correctly, and survives restarts.
 
 ### Automated checks
 
-- [ ] `./gradlew :a04:test` passes, covering expiry boundary, clock change, and second-app isolation — agent runs
-- [ ] `./gradlew :a04:assembleDebug` succeeds — agent runs
+- [x] `./gradlew :a04:test` passes, covering expiry boundary, clock change, and second-app isolation — agent runs
+- [x] `./gradlew :a04:assembleDebug` succeeds — agent runs
 
 ### Agent checklist
 
-- [ ] Grants store an absolute expiry, never a countdown in memory
-- [ ] Expiry evaluated on every detection, not on a timer
-- [ ] No grant leaks across applications
-- [ ] Clock moved backwards does not extend a grant
+- [x] Grants store an absolute expiry, never a countdown in memory
+- [x] Expiry evaluated on every detection, not on a timer
+- [x] No grant leaks across applications
+- [x] Clock moved backwards does not extend a grant
 
 ### Manual scenarios for the user
 
@@ -1589,9 +1589,9 @@ Tests green, eight scenarios verified.
 - [ ] Create a `TemporaryAccessGrant` from the secondary action
 - [ ] Persist the grant with an absolute expiry
 - [ ] Suppress the block for that application until expiry
-- [ ] Keep other restricted applications blocked
+- [x] Keep other restricted applications blocked
 - [ ] Recompute grants on service start and after reboot
-- [ ] Remove expired grants
+- [x] Remove expired grants
 - [ ] Detect a backwards clock change and refuse to extend a grant
 - [ ] Record `BYPASSED` with the granted duration
 
@@ -1938,6 +1938,9 @@ Tests green, six scenarios verified.
 - [ ] Add OEM background-restriction guidance
 - [ ] Handle revocation at any time without a crash
 - [ ] Persist the permission snapshot and surface changes on the dashboard
+- [ ] Detect that the accessibility service is enabled in settings but delivering no events, and report it as broken rather than healthy — carried over from spike A-03, where a reinstall left the service listed under `Bound services` with a live process and no event delivery
+- [ ] Detect that force-stop has killed the service, and say so — carried over from spike A-03, where `am force-stop` left `Bound services:{}` with no rebind and blocking silently stopped
+- [ ] State plainly what a dead service means: rules stay saved, blocking does not run
 
 **Expected result.** A first run that earns permissions honestly and a health screen that explains and repairs any degraded state.
 
