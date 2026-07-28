@@ -1519,6 +1519,9 @@ Tests green, five scenarios verified by the owner.
 - [ ] Record a `BlockEvent` for each decision
 - [ ] Implement the watchdog timeout and removal on package change
 - [ ] Support light and dark, landscape, and the largest font scale
+- [ ] Decide and implement what the system back key does, then record it like any other outcome — carried over from spike A-02, where back removed the overlay silently and recorded nothing
+- [ ] Verify rotation on an AVD configured to rotate — carried over from spike A-02, where the AVD could not rotate at all
+- [ ] Decide deliberately whether the status bar and notification shade stay reachable above the block screen — spike A-02 left them reachable by default
 
 **Expected result.** A working block screen that appears on a real launch and records the decision.
 
@@ -2068,6 +2071,8 @@ Tests green, six scenarios verified, battery figure recorded.
 
 - [ ] Add content descriptions to every interactive element
 - [ ] Verify focus order on every screen, starting with the block screen
+- [ ] Confirm a screen reader can read and operate the block overlay, and that the decision can be completed with it alone — carried over from spike A-02, where the overlay window was exposed with a title but its node tree could not be retrieved with adb tooling
+- [ ] Keep an accessibility title on the overlay window; `WindowManager.LayoutParams.accessibilityTitle` is not public, so `setTitle` is the working route
 - [ ] Support Dynamic Type up to the largest scale without truncation
 - [ ] Verify contrast in both themes against the token tests
 - [ ] Honor Reduce Motion everywhere
