@@ -24,3 +24,4 @@ rootProject.name = "blocksocial-spikes"
 
 include(":a01")
 include(":a02")
+include(":a03")

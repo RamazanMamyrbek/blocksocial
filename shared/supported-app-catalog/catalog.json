@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "apps": [
+    {
+      "id": "instagram",
+      "displayName": "Instagram",
+      "packageNames": ["com.instagram.android"]
+    },
+    {
+      "id": "tiktok",
+      "displayName": "TikTok",
+      "packageNames": ["com.zhiliaoapp.musically", "com.ss.android.ugc.trill"]
+    },
+    {
+      "id": "youtube",
+      "displayName": "YouTube",
+      "packageNames": ["com.google.android.youtube"]
+    },
+    {
+      "id": "facebook",
+      "displayName": "Facebook",
+      "packageNames": ["com.facebook.katana"]
+    },
+    {
+      "id": "x",
+      "displayName": "X",
+      "packageNames": ["com.twitter.android"]
+    },
+    {
+      "id": "reddit",
+      "displayName": "Reddit",
+      "packageNames": ["com.reddit.frontpage"]
+    },
+    {
+      "id": "snapchat",
+      "displayName": "Snapchat",
+      "packageNames": ["com.snapchat.android"]
+    },
+    {
+      "id": "telegram",
+      "displayName": "Telegram",
+      "packageNames": ["org.telegram.messenger", "org.telegram.messenger.web"]
+    },
+    {
+      "id": "discord",
+      "displayName": "Discord",
+      "packageNames": ["com.discord"]
+    },
+    {
+      "id": "vk",
+      "displayName": "VK",
+      "packageNames": ["com.vkontakte.android"]
+    }
+  ]
+}

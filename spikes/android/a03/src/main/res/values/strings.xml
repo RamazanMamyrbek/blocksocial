@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BlockSocial Spike A-03</string>
+    <string name="catalog_title">Supported applications</string>
+    <string name="catalog_subtitle">%1$d of %2$d supported applications are installed on this device</string>
+    <string name="catalog_installed">Installed and ready to select</string>
+    <string name="catalog_not_installed">Not installed on this device</string>
+    <string name="catalog_mark_installed">[x]</string>
+    <string name="catalog_mark_absent">N/A</string>
+</resources>
