@@ -194,7 +194,8 @@ None of the following may be presented as a guaranteed capability until a spike 
 | A five-minute bypass is achievable on iOS | unverified, fallback is fifteen minutes |
 | Screen Time extensions behave correctly through TestFlight | unverified |
 | Schedule capacity has a workable UX on iOS | unverified |
-| Usage measurement is accurate enough to drive daily limits on both platforms | unverified |
+| Usage measurement is accurate enough to drive daily limits on Android | **verified** on emulator images for API 33 and 36 by spike `A-05`: error under 0.1 percent over five minutes, local-midnight boundary exact |
+| Usage measurement is accurate enough to drive daily limits on iOS | unverified |
 
 ---
 
