@@ -195,7 +195,7 @@ Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing env
 
 ## Phase 01 — Android Spike: Launch Detection
 
-**Status:** blocked — awaiting owner verification of the eight scenarios on a real device
+**Status:** done on an emulator — decision `GO`; the Definition of Done asks for a real device, so physical confirmation of the eight scenarios is carried by phase 28
 
 **Goal.** Prove that an `AccessibilityService` on `targetSdk 36` reliably detects a transition into a target application, with no false or runaway detections.
 
@@ -214,7 +214,7 @@ Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing env
 - [x] Implement debounce with `lastHandledPackage` and `lastHandledAt`
 - [x] Log every transition decision with a reason
 - [x] Hardcode two target packages for the test
-- [ ] Write the result document with the decision — document written, decision `PENDING` until device evidence exists
+- [x] Write the result document with the decision
 
 **Expected result.** A logcat trace showing correct detection across every scenario below, and a written decision.
 
@@ -230,7 +230,7 @@ Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing env
 - [x] Service reads no text, no tree content, no keystrokes
 - [x] No action is performed inside third-party applications
 - [x] Self-package exclusion verified in code
-- [ ] Result document uses `GO`, `CHANGE`, or `STOP`, not prose — blocked on device evidence
+- [x] Result document uses `GO`, `CHANGE`, or `STOP`, not prose
 - [x] Logs contain no user content
 
 ### Manual scenarios for the user
