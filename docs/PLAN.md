@@ -127,7 +127,7 @@ Android and iOS tracks run independently after phase 14. Either may pause withou
 
 ## Phase 00 — Git Baseline and Repository Setup
 
-**Status:** not started
+**Status:** done
 
 **Goal.** Put the repository under version control with the branch model this plan depends on, so every later phase has a commit to reference.
 
@@ -139,28 +139,28 @@ Android and iOS tracks run independently after phase 14. Either may pause withou
 
 ### Tasks
 
-- [ ] Initialize the git repository
-- [ ] Verify `.gitignore` covers Android, Xcode, secrets, and local tooling
-- [ ] Commit the current documentation state as the initial commit on `main`
-- [ ] Create `dev` from `main`
-- [ ] Create `phase/00-git-baseline` from `dev` and record the branch model in `README.md`
-- [ ] Add a short "Working on a phase" section to `README.md` describing the session protocol
+- [x] Initialize the git repository
+- [x] Verify `.gitignore` covers Android, Xcode, secrets, and local tooling
+- [x] Commit the current documentation state as the initial commit on `main`
+- [x] Create `dev` from `main`
+- [x] Create `phase/00-git-baseline` from `dev` and record the branch model in `README.md`
+- [x] Add a short "Working on a phase" section to `README.md` describing the session protocol
 
 **Expected result.** A repository with `main`, `dev`, and one phase branch, an initial commit containing all current documentation, and a README that explains how phases are executed.
 
 ### Automated checks
 
-- [ ] `git log --oneline` returns the initial commit — agent runs
-- [ ] `git branch -a` shows `main` and `dev` — agent runs
-- [ ] `git status` is clean after commit — agent runs
-- [ ] No file matching `.gitignore` patterns is tracked — agent runs `git ls-files`
+- [x] `git log --oneline` returns the initial commit — agent runs
+- [x] `git branch -a` shows `main` and `dev` — agent runs
+- [x] `git status` is clean after commit — agent runs
+- [x] No file matching `.gitignore` patterns is tracked — agent runs `git ls-files`
 
 ### Agent checklist
 
-- [ ] No secrets, keystores, or provisioning profiles are committed
-- [ ] `.claude/` is ignored
-- [ ] Line endings do not mangle existing Markdown
-- [ ] Commit message follows the convention in `AGENTS.md`
+- [x] No secrets, keystores, or provisioning profiles are committed
+- [x] `.claude/` is ignored
+- [x] Line endings do not mangle existing Markdown
+- [x] Commit message follows the convention in `AGENTS.md`
 
 ### Manual scenarios for the user
 

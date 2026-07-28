@@ -30,6 +30,16 @@ blocksocial/
 
 `docs/PLAN.md` holds 46 phases from git setup to store submission. Its first phases are technical validation: they prove the mechanisms listed in `docs/TECHNICAL_SPECIFICATION.md` section 8 on real devices. Implementation phases follow and are re-scoped at the phase 14 gate.
 
+## Branch Model
+
+| Branch | Purpose |
+|---|---|
+| `main` | stable release states only; never receives direct work |
+| `dev` | integration branch; every finished phase merges here |
+| `phase/<number>-<short-name>` | one branch per phase, created from `dev` |
+
+Branch from the current `dev`, never from `main`. One phase per branch. Merge into `dev` only when that phase's merge conditions in `docs/PLAN.md` are all true. Never rewrite published history.
+
 ## Working on a Phase
 
 One phase is one session. Start it with a single instruction:
@@ -38,7 +48,9 @@ One phase is one session. Start it with a single instruction:
 Начни Phase 4
 ```
 
-The agent creates the branch, does the work, runs the phase's automated checks, fills in the checkboxes in `docs/PLAN.md`, and reports. You then verify by hand using that phase's manual scenarios and approve the merge into `dev`. `main` receives only release states.
+The agent creates the branch, does the work, runs the phase's automated checks, fills in the checkboxes in `docs/PLAN.md`, and reports. You then verify by hand using that phase's manual scenarios and approve the merge into `dev`. You never fill in a checkbox yourself.
+
+If a phase cannot be finished, the agent stops, says where and why, and leaves the remaining checkboxes unchecked. A partially finished phase is never reported as done.
 
 ## Stack
 
