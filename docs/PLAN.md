@@ -195,7 +195,7 @@ Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing env
 
 ## Phase 01 — Android Spike: Launch Detection
 
-**Status:** not started
+**Status:** done on an emulator — decision `GO`; the Definition of Done asks for a real device, so physical confirmation of the eight scenarios is carried by phase 28
 
 **Goal.** Prove that an `AccessibilityService` on `targetSdk 36` reliably detects a transition into a target application, with no false or runaway detections.
 
@@ -207,31 +207,31 @@ Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing env
 
 ### Tasks
 
-- [ ] Create a minimal Gradle project under `spikes/android/a01/`
-- [ ] Implement one `AccessibilityService` handling `TYPE_WINDOW_STATE_CHANGED`
-- [ ] Read only `event.packageName` and the timestamp
-- [ ] Exclude BlockSocial's own package and system packages
-- [ ] Implement debounce with `lastHandledPackage` and `lastHandledAt`
-- [ ] Log every transition decision with a reason
-- [ ] Hardcode two target packages for the test
-- [ ] Write the result document with the decision
+- [x] Create a minimal Gradle project under `spikes/android/a01/`
+- [x] Implement one `AccessibilityService` handling `TYPE_WINDOW_STATE_CHANGED`
+- [x] Read only `event.packageName` and the timestamp
+- [x] Exclude BlockSocial's own package and system packages
+- [x] Implement debounce with `lastHandledPackage` and `lastHandledAt`
+- [x] Log every transition decision with a reason
+- [x] Hardcode two target packages for the test
+- [x] Write the result document with the decision
 
 **Expected result.** A logcat trace showing correct detection across every scenario below, and a written decision.
 
 ### Automated checks
 
-- [ ] `./gradlew :a01:assembleDebug` succeeds — agent runs
-- [ ] `./gradlew :a01:lint` reports no errors — agent runs
-- [ ] Manifest contains no `SYSTEM_ALERT_WINDOW` and no `QUERY_ALL_PACKAGES` — agent greps
-- [ ] Unit test of the debounce state machine passes — agent runs `./gradlew :a01:test`
+- [x] `./gradlew :a01:assembleDebug` succeeds — agent runs
+- [x] `./gradlew :a01:lint` reports no errors — agent runs
+- [x] Manifest contains no `SYSTEM_ALERT_WINDOW` and no `QUERY_ALL_PACKAGES` — agent greps
+- [x] Unit test of the debounce state machine passes — agent runs `./gradlew :a01:test`
 
 ### Agent checklist
 
-- [ ] Service reads no text, no tree content, no keystrokes
-- [ ] No action is performed inside third-party applications
-- [ ] Self-package exclusion verified in code
-- [ ] Result document uses `GO`, `CHANGE`, or `STOP`, not prose
-- [ ] Logs contain no user content
+- [x] Service reads no text, no tree content, no keystrokes
+- [x] No action is performed inside third-party applications
+- [x] Self-package exclusion verified in code
+- [x] Result document uses `GO`, `CHANGE`, or `STOP`, not prose
+- [x] Logs contain no user content
 
 ### Manual scenarios for the user
 
