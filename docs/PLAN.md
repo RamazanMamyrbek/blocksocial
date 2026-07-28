@@ -492,7 +492,7 @@ Scenarios pass, tests green, decision recorded.
 
 ## Phase 05 — Android Spike: Usage Data and Daily-Limit Feasibility
 
-**Status:** not started
+**Status:** done — decision `GO`, measured on Android 16 and Android 13 emulator images. Daily limits are viable; `Q-03` is answered in favour of `queryEvents`.
 
 **Goal.** Determine whether `UsageStatsManager` is accurate enough to drive daily limits and statistics, and decide the source of the time-in-app metric.
 
@@ -504,29 +504,29 @@ Scenarios pass, tests green, decision recorded.
 
 ### Tasks
 
-- [ ] Request and verify `PACKAGE_USAGE_STATS` access
-- [ ] Read per-application totals for today
-- [ ] Compare measured totals against a stopwatch for a controlled session
-- [ ] Test the day boundary and the local-midnight reset
-- [ ] Test with the screen off and with rapid switching
-- [ ] Handle an empty or partial result without crashing
-- [ ] Record measured error margin per emulator image and API level
-- [ ] Decide and record the source of the time-in-app metric
-- [ ] Write the result document with the decision
+- [x] Request and verify `PACKAGE_USAGE_STATS` access
+- [x] Read per-application totals for today
+- [x] Compare measured totals against a stopwatch for a controlled session
+- [x] Test the day boundary and the local-midnight reset
+- [x] Test with the screen off and with rapid switching
+- [x] Handle an empty or partial result without crashing
+- [x] Record measured error margin per emulator image and API level
+- [x] Decide and record the source of the time-in-app metric
+- [x] Write the result document with the decision
 
 **Expected result.** A recorded accuracy margin, a decision on whether daily limits are viable, and a decision on the statistics source.
 
 ### Automated checks
 
-- [ ] `./gradlew :a05:test` passes, covering empty results, partial results, and day-boundary arithmetic — agent runs
-- [ ] `./gradlew :a05:assembleDebug` succeeds — agent runs
+- [x] `./gradlew :a05:test` passes, covering empty results, partial results, and day-boundary arithmetic — agent runs
+- [x] `./gradlew :a05:assembleDebug` succeeds — agent runs
 
 ### Agent checklist
 
-- [ ] Blocking never depends on usage data
-- [ ] Measured and estimated values are distinguished in the output
-- [ ] Permission-denied path is handled with a clear state
-- [ ] Error margin is recorded as a number, not as an impression
+- [x] Blocking never depends on usage data
+- [x] Measured and estimated values are distinguished in the output
+- [x] Permission-denied path is handled with a clear state
+- [x] Error margin is recorded as a number, not as an impression
 
 ### Manual scenarios for the user
 

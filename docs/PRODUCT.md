@@ -138,8 +138,10 @@ The block screen is a pause, not an alarm.
 |---|---|---|
 | Q-01 | Streak rule: allow a configured number of bypasses per day, or does any bypass end the streak? | dashboard design, block-screen copy |
 | Q-02 | Which Android block-screen direction is the baseline: the minimal one or the structural one? | Android UI |
-| Q-03 | Source of the approximate time-in-app metric: usage statistics or bypass grant length? | statistics screen |
+| Q-03 | ~~Source of the approximate time-in-app metric~~ | **answered** |
 | Q-04 | Default bypass duration on iOS, which depends on what the platform can actually deliver | iOS copy |
 | Q-05 | Business model. Freemium is an untested assumption. | not MVP-blocking |
 
 Questions are answered in this file when decided.
+
+**Q-03, answered.** Time in an application comes from Android usage statistics, read as events rather than as daily buckets, not from the length of bypass grants. Spike `A-05` measured the error at under 0.1 percent over a five-minute session on two emulator images, and showed that the bucketed source does not reset at local midnight and so cannot carry a daily limit. Evidence is in `docs/spikes/SPIKE_A-05_RESULT.md`. A session still running is shown as in progress rather than as a final number.
