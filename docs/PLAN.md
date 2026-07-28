@@ -282,7 +282,7 @@ Result document exists with a decision, checks pass, owner confirms the eight sc
 
 ## Phase 02 — Android Spike: Accessibility Overlay
 
-**Status:** not started
+**Status:** done — decision `GO`, verified on an Android 16 emulator. Three items stay open: the back key is an unrecorded bypass, rotation could not be exercised on this AVD, and screen-reader operation is unconfirmed.
 
 **Goal.** Prove an interactive full-screen `TYPE_ACCESSIBILITY_OVERLAY` works without `SYSTEM_ALERT_WINDOW`, and that it can always be removed.
 
@@ -294,31 +294,31 @@ Result document exists with a decision, checks pass, owner confirms the eight sc
 
 ### Tasks
 
-- [ ] Extend the phase 01 spike to show an overlay on detection
-- [ ] Render the block-screen baseline direction chosen in `design/DESIGN_EXPORT_ANALYSIS.md`, not a placeholder
-- [ ] Implement two working buttons with distinct outcomes
-- [ ] Implement `GLOBAL_ACTION_HOME` for the primary action
-- [ ] Implement a watchdog timeout that removes a stuck overlay
-- [ ] Remove the overlay on package change
-- [ ] Test with `ComposeView`; fall back to a View implementation if unstable, and record which
+- [x] Extend the phase 01 spike to show an overlay on detection
+- [x] Render the block-screen baseline direction chosen in `design/DESIGN_EXPORT_ANALYSIS.md`, not a placeholder — direction 1b
+- [x] Implement two working buttons with distinct outcomes
+- [x] Implement `GLOBAL_ACTION_HOME` for the primary action
+- [x] Implement a watchdog timeout that removes a stuck overlay
+- [x] Remove the overlay on package change
+- [x] Test with `ComposeView`; fall back to a View implementation if unstable, and record which — ComposeView, no fallback needed
 - [ ] Write the result document with the decision
 
 **Expected result.** An overlay that appears over the target app, accepts touch, and always disappears.
 
 ### Automated checks
 
-- [ ] `./gradlew :a02:assembleDebug` succeeds — agent runs
-- [ ] `./gradlew :a02:lint` reports no errors — agent runs
-- [ ] Manifest contains no `SYSTEM_ALERT_WINDOW` — agent greps
-- [ ] Instrumented test asserting overlay attach and detach — agent runs on the emulator
+- [x] `./gradlew :a02:assembleDebug` succeeds — agent runs
+- [x] `./gradlew :a02:lint` reports no errors — agent runs
+- [x] Manifest contains no `SYSTEM_ALERT_WINDOW` — agent greps
+- [x] Instrumented test asserting overlay attach and detach — agent runs on the emulator
 
 ### Agent checklist
 
-- [ ] Overlay does not imitate system UI
-- [ ] No countdown gate before the primary action becomes usable
-- [ ] Settings, launcher, phone, and system UI are allowlisted and never covered
-- [ ] Focus order is title, primary, secondary
-- [ ] Contrast and touch targets match the brief
+- [x] Overlay does not imitate system UI
+- [x] No countdown gate before the primary action becomes usable
+- [x] Settings, launcher, phone, and system UI are allowlisted and never covered
+- [x] Focus order is title, primary, secondary
+- [x] Contrast and touch targets match the brief
 
 ### Manual scenarios for the user
 
@@ -1519,6 +1519,9 @@ Tests green, five scenarios verified by the owner.
 - [ ] Record a `BlockEvent` for each decision
 - [ ] Implement the watchdog timeout and removal on package change
 - [ ] Support light and dark, landscape, and the largest font scale
+- [ ] Decide and implement what the system back key does, then record it like any other outcome — carried over from spike A-02, where back removed the overlay silently and recorded nothing
+- [ ] Verify rotation on an AVD configured to rotate — carried over from spike A-02, where the AVD could not rotate at all
+- [ ] Decide deliberately whether the status bar and notification shade stay reachable above the block screen — spike A-02 left them reachable by default
 
 **Expected result.** A working block screen that appears on a real launch and records the decision.
 
@@ -2068,6 +2071,8 @@ Tests green, six scenarios verified, battery figure recorded.
 
 - [ ] Add content descriptions to every interactive element
 - [ ] Verify focus order on every screen, starting with the block screen
+- [ ] Confirm a screen reader can read and operate the block overlay, and that the decision can be completed with it alone — carried over from spike A-02, where the overlay window was exposed with a title but its node tree could not be retrieved with adb tooling
+- [ ] Keep an accessibility title on the overlay window; `WindowManager.LayoutParams.accessibilityTitle` is not public, so `setTitle` is the working route
 - [ ] Support Dynamic Type up to the largest scale without truncation
 - [ ] Verify contrast in both themes against the token tests
 - [ ] Honor Reduce Motion everywhere

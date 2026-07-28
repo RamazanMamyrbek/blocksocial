@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 rootProject.name = "blocksocial-spikes"
 
 include(":a01")
+include(":a02")
