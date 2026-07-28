@@ -358,7 +358,7 @@ All scenarios pass, no soft-lock observed, decision recorded.
 
 ## Phase 03 — Android Spike: Supported-App Catalog
 
-**Status:** not started
+**Status:** done — decision `GO`, verified on an Android 16 emulator. One item for production: `<queries>` and the catalog are kept in step by hand and should be generated or test-guarded.
 
 **Goal.** Prove that supported applications can be detected and displayed without `QUERY_ALL_PACKAGES`.
 
@@ -370,29 +370,29 @@ All scenarios pass, no soft-lock observed, decision recorded.
 
 ### Tasks
 
-- [ ] Create the catalog JSON in `shared/supported-app-catalog/catalog.json` with a schema version
-- [ ] Include at least Instagram, TikTok, YouTube, Facebook, X, Reddit, Snapchat, Telegram, Discord, VK
-- [ ] Declare exactly those packages through targeted `<queries>`
-- [ ] Resolve installed entries with `PackageManager`
-- [ ] Read the label and icon for installed entries
-- [ ] Render not-installed entries as a normal explained state
-- [ ] Write the result document with the decision
+- [x] Create the catalog JSON in `shared/supported-app-catalog/catalog.json` with a schema version
+- [x] Include at least Instagram, TikTok, YouTube, Facebook, X, Reddit, Snapchat, Telegram, Discord, VK
+- [x] Declare exactly those packages through targeted `<queries>`
+- [x] Resolve installed entries with `PackageManager`
+- [x] Read the label and icon for installed entries
+- [x] Render not-installed entries as a normal explained state
+- [x] Write the result document with the decision
 
 **Expected result.** A list showing which catalog apps are installed, with correct names and icons, and no broad package-visibility permission.
 
 ### Automated checks
 
-- [ ] `./gradlew :a03:assembleDebug` succeeds — agent runs
-- [ ] Merged manifest contains no `QUERY_ALL_PACKAGES` — agent inspects the merged manifest, not just the source
-- [ ] Catalog JSON parses and validates against its schema — agent runs a unit test
-- [ ] Unit test covering a missing package returns the not-installed state — agent runs
+- [x] `./gradlew :a03:assembleDebug` succeeds — agent runs
+- [x] Merged manifest contains no `QUERY_ALL_PACKAGES` — agent inspects the merged manifest, not just the source
+- [x] Catalog JSON parses and validates against its schema — agent runs a unit test
+- [x] Unit test covering a missing package returns the not-installed state — agent runs
 
 ### Agent checklist
 
-- [ ] No installed-app inventory beyond the catalog is read or stored
-- [ ] Wording is "supported applications", never "all your apps"
-- [ ] A missing app produces no error and no crash
-- [ ] Catalog entries carry a stable internal id, not just a package name
+- [x] No installed-app inventory beyond the catalog is read or stored
+- [x] Wording is "supported applications", never "all your apps"
+- [x] A missing app produces no error and no crash
+- [x] Catalog entries carry a stable internal id, not just a package name
 
 ### Manual scenarios for the user
 
@@ -1661,6 +1661,7 @@ Tests green, six scenarios verified.
 - [ ] Explain that the list is supported applications, not all applications
 - [ ] Handle an app uninstalled after selection
 - [ ] Handle an empty catalog result without a dead end
+- [ ] Stop `<queries>` and the catalog from drifting apart, by generating the manifest entries from `catalog.json` or by a test that fails when they disagree — carried over from spike A-04, where twelve manifest lines mirror twelve package names by hand and a mismatch would silently resolve to not-installed on every device
 
 **Expected result.** A selection screen that reflects reality and never implies hidden inspection of the device.
 
