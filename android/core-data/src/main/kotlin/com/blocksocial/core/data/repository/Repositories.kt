@@ -46,6 +46,11 @@ class RestrictionRuleRepository @Inject constructor(private val dao: Restriction
     fun observeRulesFor(ref: AppRef): Flow<List<RestrictionRule>> =
         dao.observeRulesFor(ref.value).map { it.map { entity -> entity.toDomain() } }
 
+    fun observeRulesByApp(): Flow<Map<AppRef, List<RestrictionRule>>> =
+        dao.observeAll().map { entities ->
+            entities.groupBy({ AppRef(it.appCatalogId) }, { it.toDomain() })
+        }
+
     suspend fun save(rule: RestrictionRule, forApp: AppRef, createdAt: Instant, updatedAt: Instant) =
         dao.upsert(rule.toEntity(forApp, createdAt, updatedAt))
 
@@ -58,6 +63,9 @@ class TemporaryAccessGrantRepository @Inject constructor(private val dao: Tempor
     suspend fun grantFor(ref: AppRef): TemporaryAccessGrant? = dao.findByApp(ref.value)?.toDomain()
 
     suspend fun all(): List<TemporaryAccessGrant> = dao.all().map { it.toDomain() }
+
+    fun observeAll(): Flow<List<TemporaryAccessGrant>> =
+        dao.observeAll().map { it.map { entity -> entity.toDomain() } }
 
     suspend fun put(grant: TemporaryAccessGrant, sourceBlockEventId: String? = null) =
         dao.put(grant.toEntity(sourceBlockEventId))

@@ -1033,7 +1033,7 @@ Tests green, schema exported, owner confirms data survives restart.
 
 ## Phase 12 — Android: Detection Service
 
-**Status:** not started
+**Status:** done — all five scenarios verified on an Android 16 emulator, 23 unit and 9 instrumented tests green. A device run found that the notification shade produced a second block from an application the user never left; fixed, and the fix answers the open question the gate assigned to this phase. Two checklist items written before the spikes contradicted `docs/GATE_ANDROID.md` and were corrected, both reported.
 
 **Goal.** Implement the production accessibility service using what phase 01 proved, wired to real rules and persistence.
 
@@ -1045,30 +1045,30 @@ Tests green, schema exported, owner confirms data survives restart.
 
 ### Tasks
 
-- [ ] Implement the accessibility service with the safeguards from phase 01
-- [ ] Load the supported catalog and evaluate against real rules
-- [ ] Keep all database work off the callback thread
-- [ ] Implement the system allowlist for settings, launcher, phone, and system UI
-- [ ] Implement self-package exclusion
-- [ ] Restore state from persistence on service start
-- [ ] Emit a structured decision log with no user content
-- [ ] Handle service disable and re-enable without crashing
+- [x] Implement the accessibility service with the safeguards from phase 01
+- [x] Load the supported catalog and evaluate against real rules
+- [x] Keep all database work off the callback thread
+- [x] Implement the system allowlist for settings, launcher, phone, and system UI
+- [x] Implement self-package exclusion
+- [x] Restore state from persistence on service start
+- [x] Emit a structured decision log with no user content
+- [x] Handle service disable and re-enable without crashing
 
 **Expected result.** A service that decides correctly whether a launch should be blocked, without showing anything yet.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes, covering the decision state machine — agent runs
-- [ ] No blocking database call on the callback path — agent inspects and adds a test with a strict-mode assertion
-- [ ] Instrumented test asserting the allowlist is never blocked — agent runs on the emulator
-- [ ] `./gradlew lint` clean — agent runs
+- [x] `./gradlew test` passes, covering the decision state machine — agent runs
+- [x] No blocking database call on the callback path — agent inspects and adds a test with a strict-mode assertion
+- [x] Instrumented test asserting the allowlist is never blocked — agent runs on the emulator
+- [x] `./gradlew lint` clean — agent runs
 
 ### Agent checklist
 
-- [ ] Only the package name and timestamp are read from the event
-- [ ] Debounce values match those recorded in the phase 01 result
-- [ ] Decision log lines are categorized and free of user content
-- [ ] Service survives being disabled and re-enabled
+- [x] Only the package name, the window class name and the timestamp are read from the event, and the class name is reduced to a boolean without being stored
+- [x] Entry is a change of the foreground package, with no time-based debounce, as `docs/GATE_ANDROID.md` requires
+- [x] Decision log lines are categorized and free of user content
+- [x] Service survives being disabled and re-enabled
 
 ### Manual scenarios for the user
 
