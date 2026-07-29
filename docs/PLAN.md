@@ -106,13 +106,13 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 04 | Android spike: temporary bypass persistence | Android validation | 02 | done |
 | 05 | Android spike: usage data and daily-limit feasibility | Android validation | 03 | done |
 | 06 | Google Play policy package | Android validation | 01, 02 | done |
-| 07 | Domain contract and fixtures | Contract | 04, 05 | not started |
-| 08 | Android validation gate and specification update | Gate | 01–06, 07 | not started |
-| 09 | Android: project skeleton and design tokens | Android MVP | 08 | not started |
-| 10 | Android: domain and rule evaluator | Android MVP | 09 | not started |
-| 11 | Android: persistence layer | Android MVP | 10 | not started |
-| 12 | Android: detection service | Android MVP | 11 | not started |
-| 13 | Android: block screen | Android MVP | 12 | not started |
+| 07 | Domain contract and fixtures | Contract | 04, 05 | done |
+| 08 | Android validation gate and specification update | Gate | 01–06, 07 | done |
+| 09 | Android: project skeleton and design tokens | Android MVP | 08 | done |
+| 10 | Android: domain and rule evaluator | Android MVP | 09 | done |
+| 11 | Android: persistence layer | Android MVP | 10 | done |
+| 12 | Android: detection service | Android MVP | 11 | done |
+| 13 | Android: block screen | Android MVP | 12 | done |
 | 14 | Android: temporary bypass | Android MVP | 13 | not started |
 | 15 | Android: application selection | Android MVP | 11 | not started |
 | 16 | Android: rule editor | Android MVP | 15 | not started |
