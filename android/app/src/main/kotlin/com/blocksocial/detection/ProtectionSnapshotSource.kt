@@ -1,6 +1,6 @@
 package com.blocksocial.detection
 
-import com.blocksocial.catalog.SupportedAppCatalog
+import com.blocksocial.core.data.catalog.SupportedAppCatalog
 import com.blocksocial.core.data.repository.BlockEventRepository
 import com.blocksocial.core.data.repository.RestrictedAppRepository
 import com.blocksocial.core.data.repository.RestrictionRuleRepository

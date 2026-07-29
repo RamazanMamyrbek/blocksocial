@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.os.StrictMode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.blocksocial.catalog.SupportedAppCatalog
+import com.blocksocial.core.data.catalog.SupportedAppCatalog
 import com.blocksocial.core.model.AppRef
 import com.blocksocial.core.model.DeviceTime
 import com.blocksocial.core.model.RestrictionRule
