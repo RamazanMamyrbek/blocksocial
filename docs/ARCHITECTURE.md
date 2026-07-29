@@ -40,7 +40,7 @@ Frozen in phase 07. It lives in `shared/fixtures/` and is data, not code, so nei
 | `business-rules.json` | the rules from `docs/PRODUCT.md` the corpus must cover |
 | `SCHEMA.md` | what a case means, and the interval decisions the contract makes |
 
-`shared/fixtures-validator` is a small Kotlin build whose tests are the schema: it fails on a malformed case, a duplicate identifier, a business rule with no case, a local-time note that disagrees with its own instant, and any platform or mechanism name inside a case. Run it with the Android wrapper, `gradlew -p ../../shared/fixtures-validator test`, until phase 09 gives it a permanent home in the production build.
+`shared/fixtures-validator` is a small Kotlin build whose tests are the schema: it fails on a malformed case, a duplicate identifier, a business rule with no case, a local-time note that disagrees with its own instant, and any platform or mechanism name inside a case. It is wired into the Android build as `:shared-fixtures`, so `gradlew test` from `android/` runs it with everything else and the contract cannot rot unnoticed. It keeps its own settings file and still builds standalone, which is what the iOS track will use.
 
 Three properties matter more than the case count:
 
@@ -118,7 +118,21 @@ android/
 └── feature-settings
 ```
 
+Dependencies point down five layers and never sideways: `core-model` (0), `core-domain` (1), `core-data` and `core-ui` (2), the feature modules (3), `app` (4). A Gradle task, `checkModuleGraph`, fails the build on any project dependency that points at its own layer or above, and it runs as part of `check`. Gradle already rejects a cycle; this catches the flatter mistake of a core module reaching into a feature.
+
+`core-model` and `core-domain` are plain Kotlin/JVM modules with no Android dependency. That is not tidiness: it makes the rule evaluator testable against the shared fixtures without an emulator, and it makes an accidental platform call a compile error rather than a review comment.
+
 System services stay in `app` until a separate platform module is justified. The module split is filled in after one vertical slice works end to end: detect a launch, show the block, record the decision, persist it, display it in history.
+
+### Design system
+
+`core-ui` holds the tokens and nothing else so far: color for both themes, the type scale, spacing, radius, and motion. Values come from `design/DESIGN_EXPORT_ANALYSIS.md`, converted from the documented `oklch()` sources and re-derived by a test on every build, so a hex cannot drift from the design without failing. Section 12 of that document records the conversion; section 9.7 records which roles the measured contrast does **not** allow as text.
+
+There is no dynamic color. The palette is fixed, because a block screen that recolors itself to the user's wallpaper is not the product's design.
+
+Elevation is a step in the surface ramp, never a shadow.
+
+`targetSdk 36` means edge-to-edge is enforced, so every activity handles window insets explicitly. Verified on an Android 16 emulator, where the unhandled case drew the title under the status bar and the last row under the gesture pill.
 
 ### Storage
 
