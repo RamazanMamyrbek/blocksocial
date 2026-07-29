@@ -190,15 +190,19 @@ None of the following may be presented as a guaranteed capability until a spike 
 
 | Assumption | Status |
 |---|---|
-| The accessibility overlay is stable on API 36 across OEMs | unverified, and cannot be verified before beta: no physical device is used |
+| The accessibility overlay works on API 36 | **verified** on an Android 16 emulator by spike `A-02`: interactive, always removable, no `SYSTEM_ALERT_WINDOW` |
+| The overlay is stable on OEM firmware | unverified, and cannot be verified before beta: no physical device is used |
 | Accessibility events are delivered the same way on OEM firmware as on stock Android | unverified, and cannot be verified before beta |
-| Google Play accepts the Accessibility use case | unverified |
-| The curated catalog covers enough applications | unverified |
-| Apple grants the Family Controls distribution entitlement | unverified |
+| Application selection works without `QUERY_ALL_PACKAGES` | **verified** by spike `A-04`: ten catalog entries resolve through targeted `<queries>`, merged manifest clean |
+| Temporary grants survive process death, reboot and clock manipulation | **verified** by spike `A-03` on an Android 16 emulator |
+| Usage measurement is accurate enough to drive daily limits on Android | **verified** on emulator images for API 33 and 36 by spike `A-05`: error under 0.1 percent over five minutes, local-midnight boundary exact |
+| Google Play accepts the Accessibility use case | unverified, and only a review can settle it |
+| The curated catalog covers enough applications | unverified: the mechanism is proven, the coverage is a beta question |
+| Blocking keeps running after an application update or a force-stop | **disproven** by spike `A-03`. It does not, and the failure is silent. See risk `R-07` |
+| Apple grants the Family Controls distribution entitlement | unverified, and not yet requested |
 | A five-minute bypass is achievable on iOS | unverified, fallback is fifteen minutes |
 | Screen Time extensions behave correctly through TestFlight | unverified |
 | Schedule capacity has a workable UX on iOS | unverified |
-| Usage measurement is accurate enough to drive daily limits on Android | **verified** on emulator images for API 33 and 36 by spike `A-05`: error under 0.1 percent over five minutes, local-midnight boundary exact |
 | Usage measurement is accurate enough to drive daily limits on iOS | unverified |
 
 ---
@@ -210,11 +214,12 @@ None of the following may be presented as a guaranteed capability until a spike 
 | R-01 | Google Play rejects the Accessibility use case | critical | the full package is written and cross-read against the code in `docs/store/play/`: prominent disclosure, affirmative consent, Play Console declaration, listing copy, privacy policy, demo-video script, and a data inventory traced line by line. `isAccessibilityTool=false`, one subscribed event type, `canRetrieveWindowContent=false`, no tree inspection, no `INTERNET`, no `QUERY_ALL_PACKAGES`. Phase 23 re-verifies against the shipping build. The residual risk is a review decision and cannot be removed by documentation. |
 | R-02 | Apple does not grant the Family Controls entitlement | critical for iOS, not for the project | the request is filed in phase 27, which opens the iOS track before any Swift is written, so a refusal costs no iOS work. The consequence is accepted deliberately: the answer is not known during the Android cycle at all. Phase 27 depends on nothing and can be pulled forward at any time. A pending request is never recorded as an approval |
 | R-03 | The iOS bypass cannot be made predictable | high | real-device proof; fallback to a fifteen-minute wall-clock grant; keep the duration a variable in all copy |
-| R-04 | The Android overlay is unstable on API 36 | high | prove the overlay before building UI on it; keep a simpler fallback design; emulator proof only, so OEM instability surfaces first in beta |
+| R-04 | The Android overlay is unstable on OEM firmware | medium, downgraded from high | spike `A-02` proved it on an Android 16 emulator: interactive, always removable, ten triggers with no leak, no soft-lock when the process is killed. What remains is OEM behaviour, which surfaces first in the beta |
+| R-05 | ~~App selection requires `QUERY_ALL_PACKAGES`~~ | **closed** | spike `A-04` resolved ten catalog entries through twelve targeted `<package>` declarations with no broad visibility and no runtime permission |
 | R-06 | OEM firmware breaks detection or kills the service, and nothing catches it before release | high | accepted deliberately: development uses an emulator only; the protection health screen must surface a dead service, and the Android beta must recruit Samsung and Xiaomi testers |
-| R-05 | App selection turns out to require `QUERY_ALL_PACKAGES` | high | curated catalog plus targeted `<queries>`; the product promises supported applications only |
+| R-07 | Blocking stops silently after a force-stop or an application update, while the system still shows the service as enabled | high | found by spike `A-03` on stock Android, so this is not an OEM quirk. Android does not rebind a force-stopped accessibility service, and an update can leave it bound but delivering nothing. Protection health must detect an enabled-but-silent service, phases 19 and 20 |
 
-Secondary risks with known mitigations: OEM background termination, handled by a protection health screen and honest positioning; duplicate accessibility events, handled by debounce and a state machine; overlay covering critical system UI, handled by a system allowlist, a watchdog timeout, and removal on package change.
+Secondary risks with known mitigations: OEM background termination, handled by a protection health screen and honest positioning; repeated window events during one application launch, handled by requiring an activity window and a change of foreground package rather than a time-based debounce, proven in spike `A-01`; overlay covering critical system UI, handled by a system allowlist, a watchdog timeout, and removal on package change.
 
 Risks that no amount of code removes: store review decisions, OEM differences, future platform changes, and user willingness to grant permissions. These need early evidence, not more classes.
 
