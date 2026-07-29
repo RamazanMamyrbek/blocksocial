@@ -40,15 +40,15 @@ Android is built on Windows and verified on an emulator, never on a physical dev
 ### RestrictedApp
 
 ```text
-id
-platformIdentifier
+catalogId
 displayName
-iconReference
-isEnabled
+isSelected
 createdAt
 ```
 
-Android uses a package name. iOS uses an opaque `ApplicationToken`, never a bundle ID.
+`catalogId` is the stable identifier from `shared/supported-app-catalog/catalog.json`, and it is what rules, grants and events reference. It is never a package name: check `A-04` established that a catalog entry carries a **list** of package names, because TikTok and Telegram each ship under more than one, and a rename would otherwise orphan the user's data. The installed package is resolved at read time and is not stored as the key.
+
+iOS uses an opaque `ApplicationToken`, never a bundle ID, and never transmits it.
 
 ### RestrictionRule
 
@@ -83,13 +83,16 @@ maximumUsesPerDay
 ### TemporaryAccessGrant
 
 ```text
-id
-restrictedAppId
-grantedAt
-expiresAt
+restrictedAppRef
+grantedAtWallClock
+grantedAtMonotonicMillis
+durationMinutes
 sourceBlockEventId
-status
 ```
+
+A grant stores when it was granted on **two** clocks and how long it lasts, rather than a single `expiresAt`. Check `A-03` showed why on a device: a grant that trusts only the wall clock is defeated by moving the device clock back, and one that trusts only a monotonic counter is defeated by a reboot. Within one boot the monotonic counter decides; a reboot is recognised by that counter running backwards, and only then does the wall clock take over. A wall clock reading earlier than the grant's own creation makes the grant untrustworthy and it is discarded.
+
+The record is keyed by `restrictedAppRef`, so an application cannot hold two grants at once. Status is derived on evaluation rather than stored, because a stored status goes stale the moment the device reboots. The five evaluation outcomes are frozen in `shared/fixtures/bypass-cases.json`.
 
 ### BlockEvent
 
