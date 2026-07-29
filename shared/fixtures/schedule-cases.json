@@ -1,0 +1,394 @@
+{
+  "contractVersion": 1,
+  "kind": "schedule",
+  "cases": [
+    {
+      "id": "schedule-inside-normal-interval",
+      "title": "Inside a same-day interval on a selected weekday",
+      "covers": ["BR-01", "BR-03", "BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-before-start",
+      "title": "Before the interval starts",
+      "covers": ["BR-03"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T17:59:59+09:00",
+        "localTimeNote": "2026-07-27 17:59, Monday"
+      },
+      "expect": { "restrictionActive": false }
+    },
+    {
+      "id": "schedule-exactly-at-start-is-inside",
+      "title": "The start instant is inside the interval",
+      "covers": ["BR-03"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T18:00:00+09:00",
+        "localTimeNote": "2026-07-27 18:00, Monday"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-exactly-at-end-is-outside",
+      "title": "The end instant is outside the interval",
+      "covers": ["BR-03"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T21:00:00+09:00",
+        "localTimeNote": "2026-07-27 21:00, Monday"
+      },
+      "expect": { "restrictionActive": false }
+    },
+    {
+      "id": "schedule-weekday-not-selected",
+      "title": "Same clock time, a weekday the rule does not select",
+      "covers": ["BR-03"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T19:30:00+09:00",
+        "localTimeNote": "2026-07-28 19:30, Tuesday"
+      },
+      "expect": { "restrictionActive": false }
+    },
+    {
+      "id": "schedule-disabled-rule-never-active",
+      "title": "A disabled rule is inactive even inside its own interval",
+      "covers": ["BR-01"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": false,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday"
+      },
+      "expect": { "restrictionActive": false }
+    },
+    {
+      "id": "schedule-overnight-before-midnight",
+      "title": "Overnight interval, the evening before midnight",
+      "covers": ["BR-05"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "22:00",
+          "endLocalTime": "07:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T23:30:00+09:00",
+        "localTimeNote": "2026-07-27 23:30, Monday"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-overnight-after-midnight-belongs-to-start-day",
+      "title": "Overnight interval after midnight: the weekday that owns it is the day it started",
+      "covers": ["BR-05", "BR-03"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "22:00",
+          "endLocalTime": "07:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T03:00:00+09:00",
+        "localTimeNote": "2026-07-28 03:00, Tuesday, inside the interval that began Monday 22:00"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-overnight-outside-in-daytime",
+      "title": "Overnight interval, the middle of the following day is outside it",
+      "covers": ["BR-05"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "22:00",
+          "endLocalTime": "07:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T12:00:00+09:00",
+        "localTimeNote": "2026-07-28 12:00, Tuesday"
+      },
+      "expect": { "restrictionActive": false }
+    },
+    {
+      "id": "schedule-overnight-tuesday-night-not-selected",
+      "title": "Overnight interval selected for Monday does not cover the Tuesday night that follows",
+      "covers": ["BR-05", "BR-03"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "22:00",
+          "endLocalTime": "07:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T23:30:00+09:00",
+        "localTimeNote": "2026-07-28 23:30, Tuesday"
+      },
+      "expect": { "restrictionActive": false }
+    },
+    {
+      "id": "schedule-spring-forward-before-the-gap",
+      "title": "Spring forward: inside the interval, before the hour that does not exist",
+      "covers": ["BR-03", "BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["SUNDAY"],
+          "startLocalTime": "01:30",
+          "endLocalTime": "03:30"
+        }
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-03-29T01:45:00+01:00",
+        "localTimeNote": "2026-03-29 01:45 CET, Sunday, before the clocks jump to 03:00"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-spring-forward-after-the-gap",
+      "title": "Spring forward: still inside the interval after the clocks jump",
+      "covers": ["BR-03", "BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["SUNDAY"],
+          "startLocalTime": "01:30",
+          "endLocalTime": "03:30"
+        }
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-03-29T03:15:00+02:00",
+        "localTimeNote": "2026-03-29 03:15 CEST, Sunday, immediately after the jump from 02:00 to 03:00"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-spring-forward-start-inside-the-gap",
+      "title": "Spring forward: an interval whose start does not exist begins at the first instant that does",
+      "covers": ["BR-03", "BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["SUNDAY"],
+          "startLocalTime": "02:30",
+          "endLocalTime": "04:00"
+        }
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-03-29T03:00:00+02:00",
+        "localTimeNote": "2026-03-29 03:00 CEST, Sunday, the first instant that exists after the gap"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-autumn-back-first-pass",
+      "title": "Autumn back: the first pass through a repeated local time is inside the interval",
+      "covers": ["BR-03", "BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["SUNDAY"],
+          "startLocalTime": "01:30",
+          "endLocalTime": "03:30"
+        }
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-10-25T02:30:00+02:00",
+        "localTimeNote": "2026-10-25 02:30 CEST, Sunday, first pass"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-autumn-back-second-pass",
+      "title": "Autumn back: the second pass through the same local time is also inside the interval",
+      "covers": ["BR-03", "BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["SUNDAY"],
+          "startLocalTime": "01:30",
+          "endLocalTime": "03:30"
+        }
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-10-25T02:30:00+01:00",
+        "localTimeNote": "2026-10-25 02:30 CET, Sunday, second pass, one hour later in real time"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-zone-change-same-instant-now-outside",
+      "title": "The device changes zone: the same instant is no longer inside the interval",
+      "covers": ["BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 12:30 CEST, Monday, the same instant that reads 19:30 in Tokyo"
+      },
+      "expect": { "restrictionActive": false }
+    },
+    {
+      "id": "schedule-zone-change-same-instant-now-inside",
+      "title": "The device changes zone: an instant outside the interval in one zone is inside it in another",
+      "covers": ["BR-06"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY"],
+          "startLocalTime": "18:00",
+          "endLocalTime": "21:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T12:30:00+02:00",
+        "localTimeNote": "2026-07-27 19:30, Monday, the same instant that reads 12:30 in Berlin"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-multiple-days-selected",
+      "title": "A rule selecting several weekdays is active on each of them",
+      "covers": ["BR-03"],
+      "given": {
+        "rule": {
+          "mode": "SCHEDULE",
+          "enabled": true,
+          "daysOfWeek": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+          "startLocalTime": "09:00",
+          "endLocalTime": "18:00"
+        }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T10:00:00+09:00",
+        "localTimeNote": "2026-07-28 10:00, Tuesday"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-always-on-is-always-active",
+      "title": "Always-on mode ignores weekday and time entirely",
+      "covers": ["BR-02"],
+      "given": {
+        "rule": { "mode": "ALWAYS", "enabled": true }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T04:17:00+09:00",
+        "localTimeNote": "2026-07-28 04:17, Tuesday, an hour no schedule would cover"
+      },
+      "expect": { "restrictionActive": true }
+    },
+    {
+      "id": "schedule-always-on-disabled-is-inactive",
+      "title": "A disabled always-on rule is inactive",
+      "covers": ["BR-01", "BR-02"],
+      "given": {
+        "rule": { "mode": "ALWAYS", "enabled": false }
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T04:17:00+09:00",
+        "localTimeNote": "2026-07-28 04:17, Tuesday"
+      },
+      "expect": { "restrictionActive": false }
+    }
+  ]
+}

@@ -95,16 +95,20 @@ status
 
 ```text
 id
-restrictedAppId
+restrictedAppRef
 occurredAt
-triggerReason
-userAction      STAYED_FOCUSED | BYPASSED | DISMISSED_BY_SYSTEM | UNKNOWN
+zone
+primaryReason           ALWAYS | FOCUS_SESSION | SCHEDULE | DAILY_LIMIT
+allReasons              every reason that applied, in priority order
+userAction              STAYED_FOCUSED | BYPASSED | DISMISSED_BY_SYSTEM | UNKNOWN
 bypassDurationMinutes
 platform
-schemaVersion
+eventSchemaVersion
 ```
 
 Both platforms must produce semantically identical events for the same situation.
+
+Frozen in phase 07 as `shared/fixtures/block-event-contract.json`, which is the authoritative version; this table is the summary. Two fields changed there and the reasons are recorded in that file: `triggerReason` became `primaryReason` plus `allReasons`, because `docs/PRODUCT.md` requires the user to see one reason while the record keeps all of them, and one field cannot carry both. `zone` was added so a later reader can group events into the days the user actually lived through, even after travelling.
 
 ---
 
@@ -249,7 +253,9 @@ Each check produces a short result document with an environment, a commit hash, 
 
 ### Cross-platform
 
-Shared fixtures must exist for the rule evaluator before either platform implements it: normal interval, overnight interval, selected weekday, disabled rule, active bypass, expired bypass, daily limit not yet reached, daily limit reached, daily limit reset at local midnight, time-zone change, DST transition. Android and iOS must produce identical domain results.
+Shared fixtures exist for the rule evaluator, frozen in phase 07 as `shared/fixtures/`, and both platforms must produce identical domain results against them. The corpus covers normal interval, overnight interval, selected weekday, disabled rule, active bypass, expired bypass, a bypass that does not leak to a second application, daily limit not yet reached, daily limit reached, daily limit reset at local midnight, time-zone change, and both daylight-saving transitions, together with the two clock rules proven in check `A-03` and the day-boundary arithmetic proven in check `A-05`.
+
+`shared/fixtures-validator` enforces the shape and reports coverage gaps against the business rules in `docs/PRODUCT.md`. Four cases are marked as at risk from Apple's fifteen-minute minimum monitored interval and from the assumption that a monotonic counter resets at boot; check `I-05` and the iOS gate resolve them, and a case that cannot be satisfied changes the contract for both platforms rather than being worked around on one.
 
 ### Go decision
 

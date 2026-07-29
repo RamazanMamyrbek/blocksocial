@@ -1,0 +1,292 @@
+{
+  "contractVersion": 1,
+  "kind": "rule-priority",
+  "priorityOrder": ["ALWAYS", "FOCUS_SESSION", "SCHEDULE", "DAILY_LIMIT"],
+  "note": "FOCUS_SESSION is reserved and unused in the MVP. It occupies index 1 so that shipping manual focus sessions later does not renumber anything. A case marked mvpApplicable=false exercises that slot and may be skipped until the feature exists. allReasons is always listed in priority order.",
+  "cases": [
+    {
+      "id": "priority-always-outranks-schedule",
+      "title": "Always-on and a schedule both apply: the user is told about the always-on rule",
+      "covers": ["BR-10", "BR-11"],
+      "given": {
+        "rules": [
+          { "id": "r-always", "mode": "ALWAYS", "enabled": true },
+          {
+            "id": "r-schedule",
+            "mode": "SCHEDULE",
+            "enabled": true,
+            "daysOfWeek": ["MONDAY"],
+            "startLocalTime": "18:00",
+            "endLocalTime": "21:00"
+          }
+        ],
+        "grant": null,
+        "usageSessions": []
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "restrictionActive": true,
+        "primaryReason": "ALWAYS",
+        "allReasons": ["ALWAYS", "SCHEDULE"]
+      }
+    },
+    {
+      "id": "priority-schedule-outranks-daily-limit",
+      "title": "A schedule and a reached daily limit both apply: the schedule is the stated reason",
+      "covers": ["BR-10", "BR-11"],
+      "given": {
+        "rules": [
+          {
+            "id": "r-schedule",
+            "mode": "SCHEDULE",
+            "enabled": true,
+            "daysOfWeek": ["MONDAY"],
+            "startLocalTime": "18:00",
+            "endLocalTime": "21:00"
+          },
+          { "id": "r-limit", "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 }
+        ],
+        "grant": null,
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-27T09:00:00+09:00", "to": "2026-07-27T09:40:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday, forty minutes already used today",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "restrictionActive": true,
+        "primaryReason": "SCHEDULE",
+        "allReasons": ["SCHEDULE", "DAILY_LIMIT"]
+      }
+    },
+    {
+      "id": "priority-daily-limit-alone",
+      "title": "Only the daily limit applies, so it is the reason",
+      "covers": ["BR-10", "BR-11"],
+      "given": {
+        "rules": [
+          {
+            "id": "r-schedule",
+            "mode": "SCHEDULE",
+            "enabled": true,
+            "daysOfWeek": ["MONDAY"],
+            "startLocalTime": "18:00",
+            "endLocalTime": "21:00"
+          },
+          { "id": "r-limit", "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 }
+        ],
+        "grant": null,
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-27T09:00:00+09:00", "to": "2026-07-27T09:40:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T14:00:00+09:00",
+        "localTimeNote": "2026-07-27 14:00, Monday, outside the schedule but past the limit",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "restrictionActive": true,
+        "primaryReason": "DAILY_LIMIT",
+        "allReasons": ["DAILY_LIMIT"]
+      }
+    },
+    {
+      "id": "priority-all-three-apply",
+      "title": "All three apply: one reason is shown, all three are recorded",
+      "covers": ["BR-10", "BR-11"],
+      "given": {
+        "rules": [
+          { "id": "r-always", "mode": "ALWAYS", "enabled": true },
+          {
+            "id": "r-schedule",
+            "mode": "SCHEDULE",
+            "enabled": true,
+            "daysOfWeek": ["MONDAY"],
+            "startLocalTime": "18:00",
+            "endLocalTime": "21:00"
+          },
+          { "id": "r-limit", "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 }
+        ],
+        "grant": null,
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-27T09:00:00+09:00", "to": "2026-07-27T09:40:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "restrictionActive": true,
+        "primaryReason": "ALWAYS",
+        "allReasons": ["ALWAYS", "SCHEDULE", "DAILY_LIMIT"]
+      }
+    },
+    {
+      "id": "priority-active-bypass-beats-every-rule",
+      "title": "An active grant suppresses the block even when an always-on rule applies",
+      "covers": ["BR-01", "BR-12"],
+      "given": {
+        "rules": [
+          { "id": "r-always", "mode": "ALWAYS", "enabled": true }
+        ],
+        "grant": {
+          "forApp": "app-a",
+          "grantedAtWallClock": "2026-07-27T19:28:00+09:00",
+          "grantedAtMonotonicMillis": 5000000,
+          "durationMinutes": 5
+        },
+        "usageSessions": []
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday, two minutes into a five-minute grant",
+        "forApp": "app-a",
+        "monotonicMillis": 5120000
+      },
+      "expect": {
+        "restrictionActive": false,
+        "primaryReason": null,
+        "allReasons": []
+      }
+    },
+    {
+      "id": "priority-expired-bypass-restores-the-rules",
+      "title": "Once the grant expires the rules apply again",
+      "covers": ["BR-12"],
+      "given": {
+        "rules": [
+          { "id": "r-always", "mode": "ALWAYS", "enabled": true }
+        ],
+        "grant": {
+          "forApp": "app-a",
+          "grantedAtWallClock": "2026-07-27T19:28:00+09:00",
+          "grantedAtMonotonicMillis": 5000000,
+          "durationMinutes": 5
+        },
+        "usageSessions": []
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:34:00+09:00",
+        "localTimeNote": "2026-07-27 19:34, Monday, six minutes after the grant was taken",
+        "forApp": "app-a",
+        "monotonicMillis": 5360000
+      },
+      "expect": {
+        "restrictionActive": true,
+        "primaryReason": "ALWAYS",
+        "allReasons": ["ALWAYS"]
+      }
+    },
+    {
+      "id": "priority-disabled-rule-contributes-no-reason",
+      "title": "A disabled rule is not a reason, even when its condition holds",
+      "covers": ["BR-01", "BR-11"],
+      "given": {
+        "rules": [
+          { "id": "r-always", "mode": "ALWAYS", "enabled": false },
+          {
+            "id": "r-schedule",
+            "mode": "SCHEDULE",
+            "enabled": true,
+            "daysOfWeek": ["MONDAY"],
+            "startLocalTime": "18:00",
+            "endLocalTime": "21:00"
+          }
+        ],
+        "grant": null,
+        "usageSessions": []
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "restrictionActive": true,
+        "primaryReason": "SCHEDULE",
+        "allReasons": ["SCHEDULE"]
+      }
+    },
+    {
+      "id": "priority-nothing-applies",
+      "title": "No rule applies, so there is no reason and no block",
+      "covers": ["BR-01"],
+      "given": {
+        "rules": [
+          {
+            "id": "r-schedule",
+            "mode": "SCHEDULE",
+            "enabled": true,
+            "daysOfWeek": ["MONDAY"],
+            "startLocalTime": "18:00",
+            "endLocalTime": "21:00"
+          }
+        ],
+        "grant": null,
+        "usageSessions": []
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T12:00:00+09:00",
+        "localTimeNote": "2026-07-27 12:00, Monday, outside the interval",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "restrictionActive": false,
+        "primaryReason": null,
+        "allReasons": []
+      }
+    },
+    {
+      "id": "priority-reserved-focus-session-slot",
+      "title": "A focus session outranks a schedule but not an always-on rule",
+      "covers": ["BR-15"],
+      "mvpApplicable": false,
+      "mvpApplicableReason": "Manual focus sessions are deferred in docs/PRODUCT.md. The case exists so the priority order does not have to change when they ship, and may be skipped until then.",
+      "given": {
+        "rules": [
+          { "id": "r-always", "mode": "ALWAYS", "enabled": true },
+          { "id": "r-focus", "mode": "FOCUS_SESSION", "enabled": true },
+          {
+            "id": "r-schedule",
+            "mode": "SCHEDULE",
+            "enabled": true,
+            "daysOfWeek": ["MONDAY"],
+            "startLocalTime": "18:00",
+            "endLocalTime": "21:00"
+          }
+        ],
+        "grant": null,
+        "usageSessions": []
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-27T19:30:00+09:00",
+        "localTimeNote": "2026-07-27 19:30, Monday",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "restrictionActive": true,
+        "primaryReason": "ALWAYS",
+        "allReasons": ["ALWAYS", "FOCUS_SESSION", "SCHEDULE"]
+      }
+    }
+  ]
+}

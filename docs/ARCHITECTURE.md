@@ -26,6 +26,30 @@ There is no backend, no account system, and no synchronization. Every device is 
 
 The rule evaluator is the one piece of logic that must behave identically on both platforms. It is written twice, once per language, and both implementations are tested against the same shared fixtures.
 
+### The shared contract
+
+Frozen in phase 07. It lives in `shared/fixtures/` and is data, not code, so neither platform owns it.
+
+| File | What it pins down |
+|---|---|
+| `schedule-cases.json` | when a schedule rule is active |
+| `bypass-cases.json` | when a temporary grant suppresses a block |
+| `daily-limit-cases.json` | when a daily limit has been reached |
+| `rule-priority-cases.json` | which rule wins when several apply, and the reserved focus-session slot |
+| `block-event-contract.json` | the frozen `BlockEvent` field list |
+| `business-rules.json` | the rules from `docs/PRODUCT.md` the corpus must cover |
+| `SCHEMA.md` | what a case means, and the interval decisions the contract makes |
+
+`shared/fixtures-validator` is a small Kotlin build whose tests are the schema: it fails on a malformed case, a duplicate identifier, a business rule with no case, a local-time note that disagrees with its own instant, and any platform or mechanism name inside a case. Run it with the Android wrapper, `gradlew -p ../../shared/fixtures-validator test`, until phase 09 gives it a permanent home in the production build.
+
+Three properties matter more than the case count:
+
+- **A case states inputs and one expected result, never a mechanism.** A platform that reaches the right answer by a different internal route conforms.
+- **Every instant carries an explicit offset**, and a human-readable local-time note that the validator recomputes and checks. Ambiguous time is how a cross-platform contract rots.
+- **Cases a known Apple limit could make unsatisfiable are marked** with the limit that threatens them. That marking is the shortlist phase 34 works through; a failure there is a contract error and changes both platforms, not an iOS workaround.
+
+The contract was written from Android evidence alone, because iOS validation now runs after Android ships. That is recorded here so the marking is read as a debt, not as decoration.
+
 ---
 
 ## Android
