@@ -1,0 +1,292 @@
+{
+  "contractVersion": 1,
+  "kind": "daily-limit",
+  "measurementPolicy": {
+    "usageIsMeasuredAsRealTimeSpentInFront": true,
+    "acceptableMeasurementErrorPercent": 2,
+    "blockAppearsOnTheNextEntryNotAtTheInstantTheLimitIsReached": true,
+    "note": "Measured usage is the real time an application spent in front, not the difference between two wall-clock readings, which is why a daylight-saving day changes the totals. The limit becoming reached and the block being shown are two different moments: the restriction turns active the moment measurement crosses the limit, and the user meets it the next time they open the application. Copy must say so rather than imply an exact cutoff."
+  },
+  "cases": [
+    {
+      "id": "limit-below-the-limit",
+      "title": "Below the limit, the rule is not active",
+      "covers": ["BR-04"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-28T09:00:00+09:00", "to": "2026-07-28T09:20:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T10:00:00+09:00",
+        "localTimeNote": "2026-07-28 10:00, Tuesday",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 20, "restrictionActive": false, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-exactly-reached",
+      "title": "Exactly at the limit, the rule becomes active",
+      "covers": ["BR-04"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-28T09:00:00+09:00", "to": "2026-07-28T09:30:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T10:00:00+09:00",
+        "localTimeNote": "2026-07-28 10:00, Tuesday",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 30, "restrictionActive": true, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-exceeded",
+      "title": "Past the limit, the rule stays active",
+      "covers": ["BR-04"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-28T09:00:00+09:00", "to": "2026-07-28T09:45:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T10:00:00+09:00",
+        "localTimeNote": "2026-07-28 10:00, Tuesday",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 45, "restrictionActive": true, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-resets-at-local-midnight",
+      "title": "Yesterday's usage does not count towards today",
+      "covers": ["BR-08"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-27T20:00:00+09:00", "to": "2026-07-27T21:00:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T00:05:00+09:00",
+        "localTimeNote": "2026-07-28 00:05, five minutes into the new day",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 0, "restrictionActive": false, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-session-spanning-midnight-counts-only-the-new-day",
+      "title": "A session that runs through midnight contributes only the part after it",
+      "covers": ["BR-08"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-27T23:59:00+09:00", "to": "2026-07-28T00:01:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T00:05:00+09:00",
+        "localTimeNote": "2026-07-28 00:05, after a two-minute session that straddled midnight",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 1, "restrictionActive": false, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-on-a-twenty-three-hour-day",
+      "title": "Spring forward: usage is the real time elapsed, not the difference the wall clock suggests",
+      "covers": ["BR-04", "BR-08"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 100 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-03-29T01:00:00+01:00", "to": "2026-03-29T04:00:00+02:00" }
+        ]
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-03-29T05:00:00+02:00",
+        "localTimeNote": "2026-03-29 05:00 CEST, on a day that is twenty-three hours long; the session reads 01:00 to 04:00 on the wall clock but only two hours passed",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 120, "restrictionActive": true, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-on-a-twenty-five-hour-day",
+      "title": "Autumn back: the repeated hour is real usage and counts",
+      "covers": ["BR-04", "BR-08"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 150 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-10-25T01:00:00+02:00", "to": "2026-10-25T03:00:00+01:00" }
+        ]
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-10-25T04:00:00+01:00",
+        "localTimeNote": "2026-10-25 04:00 CET, on a day that is twenty-five hours long; the session reads 01:00 to 03:00 on the wall clock but three hours passed",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 180, "restrictionActive": true, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-running-session-is-a-lower-bound",
+      "title": "A session still running is measured up to now and is not final",
+      "covers": ["BR-04", "BR-09"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-28T09:00:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T09:20:00+09:00",
+        "localTimeNote": "2026-07-28 09:20, with the application still in front",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 20, "restrictionActive": false, "measurementState": "IN_PROGRESS" }
+    },
+    {
+      "id": "limit-reached-while-the-application-is-open",
+      "title": "The limit is reached mid-session: the rule turns active, the block waits for the next entry",
+      "covers": ["BR-09"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-28T09:00:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T09:34:00+09:00",
+        "localTimeNote": "2026-07-28 09:34, four minutes past the limit, still inside the same session",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "measuredMinutesToday": 34,
+        "restrictionActive": true,
+        "measurementState": "IN_PROGRESS",
+        "blockPresentedImmediately": false
+      }
+    },
+    {
+      "id": "limit-several-sessions-are-summed",
+      "title": "Separate visits add up",
+      "covers": ["BR-04"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-28T09:00:00+09:00", "to": "2026-07-28T09:12:00+09:00" },
+          { "forApp": "app-a", "from": "2026-07-28T11:00:00+09:00", "to": "2026-07-28T11:11:00+09:00" },
+          { "forApp": "app-a", "from": "2026-07-28T14:00:00+09:00", "to": "2026-07-28T14:07:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T15:00:00+09:00",
+        "localTimeNote": "2026-07-28 15:00, after three separate visits",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 30, "restrictionActive": true, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-counts-only-the-application-it-applies-to",
+      "title": "Another application's usage does not count towards this limit",
+      "covers": ["BR-04"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-b", "from": "2026-07-28T09:00:00+09:00", "to": "2026-07-28T10:00:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T10:30:00+09:00",
+        "localTimeNote": "2026-07-28 10:30",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 0, "restrictionActive": false, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-day-window-follows-the-device-zone-tokyo",
+      "title": "The same usage, asked in one zone, falls inside today",
+      "covers": ["BR-08"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-27T20:00:00+00:00", "to": "2026-07-27T21:00:00+00:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T02:00:00+00:00",
+        "localTimeNote": "2026-07-28 11:00, and the session read 05:00 to 06:00 the same morning",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 60, "restrictionActive": true, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-day-window-follows-the-device-zone-berlin",
+      "title": "The same usage, asked in another zone, belongs to yesterday",
+      "covers": ["BR-08"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-27T20:00:00+00:00", "to": "2026-07-27T21:00:00+00:00" }
+        ]
+      },
+      "when": {
+        "zone": "Europe/Berlin",
+        "instant": "2026-07-28T02:00:00+00:00",
+        "localTimeNote": "2026-07-28 04:00 CEST, and the session read 22:00 to 23:00 the previous evening",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 0, "restrictionActive": false, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-disabled-rule-never-active",
+      "title": "A disabled limit is inactive however much the application was used",
+      "covers": ["BR-01", "BR-04"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": false, "dailyLimitMinutes": 30 },
+        "usageSessions": [
+          { "forApp": "app-a", "from": "2026-07-28T09:00:00+09:00", "to": "2026-07-28T12:00:00+09:00" }
+        ]
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T13:00:00+09:00",
+        "localTimeNote": "2026-07-28 13:00, after three hours of use",
+        "forApp": "app-a"
+      },
+      "expect": { "measuredMinutesToday": 180, "restrictionActive": false, "measurementState": "SETTLED" }
+    },
+    {
+      "id": "limit-cannot-be-evaluated-without-measurement",
+      "title": "Without usage measurement the limit cannot be evaluated, and says so rather than reading zero",
+      "covers": ["BR-04", "BR-09"],
+      "given": {
+        "rule": { "mode": "DAILY_LIMIT", "enabled": true, "dailyLimitMinutes": 30 },
+        "usageMeasurementAvailable": false,
+        "usageSessions": []
+      },
+      "when": {
+        "zone": "Asia/Tokyo",
+        "instant": "2026-07-28T13:00:00+09:00",
+        "localTimeNote": "2026-07-28 13:00, with usage measurement unavailable",
+        "forApp": "app-a"
+      },
+      "expect": {
+        "measuredMinutesToday": null,
+        "restrictionActive": false,
+        "measurementState": "UNAVAILABLE"
+      }
+    }
+  ]
+}

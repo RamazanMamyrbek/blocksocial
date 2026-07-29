@@ -1,0 +1,84 @@
+{
+  "contractVersion": 1,
+  "source": "docs/PRODUCT.md, section Business Rules",
+  "note": "Every rule marked scope=fixtures must be covered by at least one case in the corpus. Rules marked scope=elsewhere are real product rules that a rule-evaluator fixture cannot express; each one names where it is enforced instead. The validator checks both halves of this.",
+  "rules": [
+    {
+      "id": "BR-01",
+      "scope": "fixtures",
+      "text": "A restriction is active when its rule is enabled, no bypass is active for that application, and the rule's own condition holds."
+    },
+    {
+      "id": "BR-02",
+      "scope": "fixtures",
+      "text": "Always-on mode: the condition always holds."
+    },
+    {
+      "id": "BR-03",
+      "scope": "fixtures",
+      "text": "Schedule mode: the current weekday is selected and local time falls inside the interval."
+    },
+    {
+      "id": "BR-04",
+      "scope": "fixtures",
+      "text": "Daily limit mode: measured usage of that application today has reached the limit."
+    },
+    {
+      "id": "BR-05",
+      "scope": "fixtures",
+      "text": "An interval such as 22:00-07:00 crosses midnight."
+    },
+    {
+      "id": "BR-06",
+      "scope": "fixtures",
+      "text": "Schedules are stored in local time."
+    },
+    {
+      "id": "BR-07",
+      "scope": "fixtures",
+      "text": "Bypass grants store an absolute expiry."
+    },
+    {
+      "id": "BR-08",
+      "scope": "fixtures",
+      "text": "A daily limit resets at local midnight."
+    },
+    {
+      "id": "BR-09",
+      "scope": "fixtures",
+      "text": "Usage measurement is approximate, so a daily limit triggers slightly late rather than exactly at the limit."
+    },
+    {
+      "id": "BR-10",
+      "scope": "fixtures",
+      "text": "Rule priority: always-on, then schedule, then daily limit."
+    },
+    {
+      "id": "BR-11",
+      "scope": "fixtures",
+      "text": "When several rules apply, the user sees one clear reason while all reasons are preserved in the event record."
+    },
+    {
+      "id": "BR-12",
+      "scope": "fixtures",
+      "text": "After a bypass is granted, the block must not appear again for that application until the grant expires."
+    },
+    {
+      "id": "BR-13",
+      "scope": "elsewhere",
+      "enforcedBy": "The detection layer, not the rule evaluator. A critical system application never reaches rule evaluation because it is excluded before it. Verified on the emulator in spikes A-01 and A-02, and required again in phase 12.",
+      "text": "BlockSocial never blocks itself, system settings, the launcher, the phone app, or critical system UI."
+    },
+    {
+      "id": "BR-14",
+      "scope": "elsewhere",
+      "enforcedBy": "The statistics and presentation layer, phase 18. The corpus does express the measurement side of it: a running session is a lower bound, and daily-limit cases carry an explicit tolerance rather than implying an exact cutoff.",
+      "text": "Statistics never show false precision. A metric a platform cannot measure is hidden, not shown as zero."
+    },
+    {
+      "id": "BR-15",
+      "scope": "fixtures",
+      "text": "A manual focus session, if it ships later, sits directly below always-on in the priority order. The MVP has nothing in that slot, but the order must already reserve it."
+    }
+  ]
+}
