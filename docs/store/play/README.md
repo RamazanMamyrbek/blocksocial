@@ -2,7 +2,7 @@
 
 Everything needed to declare BlockSocial's use of the Accessibility API, written so that the three places the mechanism is described say the same thing. Produced in plan phase 06 as spike `A-06`.
 
-Nothing here is submitted yet. Phase 40 re-verifies the whole package against the shipping build before submission.
+Nothing here is submitted yet. Phase 24 re-verifies the whole package against the shipping build before submission.
 
 ## Contents
 
@@ -36,9 +36,9 @@ Every claim in the package was checked against the spike sources at `dev` commit
 
 **1. The back-key line.** `OverlayViewHost.kt:54` reads a `KeyEvent`. The disclosure says BlockSocial does not read what you type. Both are true — the key event belongs to BlockSocial's own window and the service subscribes to no key event type — but a reviewer grepping the source would find it and wonder. It is named in `DATA_INVENTORY.md` section 2 so that it is disclosed by us rather than discovered.
 
-**2. Ungated logging in two spike modules.** `a03` and `a05` log package names without a debug check. They are throwaway builds that never ship, but the privacy policy claims nothing leaves the device, and a release log is somewhere a package name could leak. Recorded as a gap in `DATA_INVENTORY.md` section 8, assigned to phase 40.
+**2. Ungated logging in two spike modules.** `a03` and `a05` log package names without a debug check. They are throwaway builds that never ship, but the privacy policy claims nothing leaves the device, and a release log is somewhere a package name could leak. Recorded as a gap in `DATA_INVENTORY.md` section 8, assigned to phase 24.
 
-**3. The privacy policy describes storage that does not exist yet.** Rules, selections and event history are written about in the future tense of the shipping app; only temporary grants exist today, in `a04`. The policy accompanies the shipping build, so it is written for it, and the notes at the end of that file say plainly which parts are not yet true. Phase 40 confirms.
+**3. The privacy policy describes storage that does not exist yet.** Rules, selections and event history are written about in the future tense of the shipping app; only temporary grants exist today, in `a04`. The policy accompanies the shipping build, so it is written for it, and the notes at the end of that file say plainly which parts are not yet true. Phase 24 confirms.
 
 No contradiction was found between the three descriptions of the mechanism.
 

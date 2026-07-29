@@ -203,8 +203,8 @@ None of the following may be presented as a guaranteed capability until a spike 
 
 | ID | Risk | Impact | Mitigation |
 |---|---|---|---|
-| R-01 | Google Play rejects the Accessibility use case | critical | the full package is written and cross-read against the code in `docs/store/play/`: prominent disclosure, affirmative consent, Play Console declaration, listing copy, privacy policy, demo-video script, and a data inventory traced line by line. `isAccessibilityTool=false`, one subscribed event type, `canRetrieveWindowContent=false`, no tree inspection, no `INTERNET`, no `QUERY_ALL_PACKAGES`. Phase 40 re-verifies against the shipping build. The residual risk is a review decision and cannot be removed by documentation. |
-| R-02 | Apple does not grant the Family Controls entitlement | critical | request it before any broad iOS work; a rejection forces an Android-first decision |
+| R-01 | Google Play rejects the Accessibility use case | critical | the full package is written and cross-read against the code in `docs/store/play/`: prominent disclosure, affirmative consent, Play Console declaration, listing copy, privacy policy, demo-video script, and a data inventory traced line by line. `isAccessibilityTool=false`, one subscribed event type, `canRetrieveWindowContent=false`, no tree inspection, no `INTERNET`, no `QUERY_ALL_PACKAGES`. Phase 24 re-verifies against the shipping build. The residual risk is a review decision and cannot be removed by documentation. |
+| R-02 | Apple does not grant the Family Controls entitlement | critical for iOS, not for the project | the request is filed in phase 07, early and in parallel with Android work, so the answer arrives while Android is being built. The plan is already Android-first, so a refusal costs no Android work; it decides whether iOS ships at all. A pending request is never recorded as an approval |
 | R-03 | The iOS bypass cannot be made predictable | high | real-device proof; fallback to a fifteen-minute wall-clock grant; keep the duration a variable in all copy |
 | R-04 | The Android overlay is unstable on API 36 | high | prove the overlay before building UI on it; keep a simpler fallback design; emulator proof only, so OEM instability surfaces first in beta |
 | R-06 | OEM firmware breaks detection or kills the service, and nothing catches it before release | high | accepted deliberately: development uses an emulator only; the protection health screen must surface a dead service, and the Android beta must recruit Samsung and Xiaomi testers |
@@ -218,7 +218,9 @@ Risks that no amount of code removes: store review decisions, OEM differences, f
 
 ## 8. Validation Before Development
 
-Feature implementation does not begin until the central mechanisms are proven: on an Android emulator, and on a real iPhone for iOS. The checks themselves are the first phases of `PLAN.md` and do involve minimal, throwaway code.
+Feature implementation does not begin until that platform's central mechanisms are proven: on an Android emulator for Android, on a real iPhone for iOS. The checks themselves are early phases of `PLAN.md` and do involve minimal, throwaway code.
+
+The two platforms are validated at different times. Android validation, checks `A-01` through `A-06`, is complete. iOS validation, checks `I-01` through `I-07`, runs after Android has shipped. The consequence is that the shared domain contract is written from Android evidence alone and iOS conforms to it afterwards; where that conflicts with an Apple limit, the contract changes and Android changes with it.
 
 Each check produces a short result document with an environment, a commit hash, evidence, and a `GO`, `CHANGE`, or `STOP` decision. Code that compiles is not a passed check.
 

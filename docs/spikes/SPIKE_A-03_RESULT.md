@@ -149,13 +149,13 @@ Bound services:{}
 
 The accessibility service was gone and the system never rebound it. Reopening a restricted application produced no block at all — not because the grant applied, but because nothing was watching. The grant file was still on disk and correct.
 
-This is not a bypass defect. It is a protection-availability defect, and it is the strongest argument yet for the protection health screen in phase 25: the application must be able to tell the user that blocking is not running, because the device gives no other signal. Phase 26 must decide how the service is brought back.
+This is not a bypass defect. It is a protection-availability defect, and it is the strongest argument yet for the protection health screen in phase 20: the application must be able to tell the user that blocking is not running, because the device gives no other signal. Phase 21 must decide how the service is brought back.
 
 ### An updated app can be enabled but dead
 
 Reinstalling the APK left the service listed under `Bound services` with a live process, yet no events were delivered. Writing `enabled_accessibility_services` with the value it already held did not rebind it; only clearing the setting and writing it again did. An update can therefore leave a user enabled-but-unprotected, with the system settings screen showing the service as on.
 
-Both findings belong to the same question and are carried to phase 25.
+Both findings belong to the same question and are carried to phase 20.
 
 ### The spike's own observability
 

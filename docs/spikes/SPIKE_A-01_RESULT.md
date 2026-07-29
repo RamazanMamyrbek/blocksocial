@@ -173,7 +173,7 @@ The keyguard produced no window-state event, so the visit never ended and the un
 
 Under the naive rule this case did fire, but only by accident, as a side effect of the bug in defect 2.
 
-This is a product decision, not only a technical one. Picking up the phone and finding Instagram already open is exactly the automatic behaviour this product exists to interrupt. The likely fix is to end the current visit on `ACTION_SCREEN_OFF` or `ACTION_USER_PRESENT` rather than relying on accessibility events. It must be designed and verified in the production detection phase, phase 18.
+This is a product decision, not only a technical one. Picking up the phone and finding Instagram already open is exactly the automatic behaviour this product exists to interrupt. The likely fix is to end the current visit on `ACTION_SCREEN_OFF` or `ACTION_USER_PRESENT` rather than relying on accessibility events. It must be designed and verified in the production detection phase, phase 13.
 
 ## Findings for production
 
@@ -187,10 +187,10 @@ This is a product decision, not only a technical one. Picking up the phone and f
 
 - Emulator only. Stock Android 16 with Google APIs. **No OEM was tested**, and OEM divergence in accessibility event delivery is exactly risk `R-04`. Nothing here reduces that risk.
 - Latency figures come from a virtualised device and say nothing about physical hardware.
-- No reboot, no permission revocation, no long-running or low-memory behaviour was tested. Those belong to phases 03 and 26.
+- No reboot, no permission revocation, no long-running or low-memory behaviour was tested. Those belong to phases 04 and 21.
 - Two of eight scenarios were shaped by the emulator: the long-press power gesture opened the assistant rather than a power menu, so scenario 8 was retested with a genuine system permission dialog instead, and split-screen was entered through `am start --windowingMode 6` rather than by gesture.
 
-Physical-device confirmation of these eight scenarios remains required and is carried by phase 28.
+Physical-device confirmation of these eight scenarios remains required and is carried by the Android beta, phase 25.
 
 ## Defects
 
@@ -198,4 +198,4 @@ Physical-device confirmation of these eight scenarios remains required and is ca
 |---|---|---|
 | 1 | One launch produced several detections | fixed, regression test added |
 | 2 | Return to a target produced no detection | fixed, regression test added |
-| 3 | Unlocking into an open target produces no detection | **open**, assigned to phase 18 |
+| 3 | Unlocking into an open target produces no detection | **open**, assigned to phase 13 |

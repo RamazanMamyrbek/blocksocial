@@ -29,7 +29,7 @@ Screen recording of the prominent disclosure text from `DISCLOSURE_AND_CONSENT.m
 
 > Caption: BlockSocial explains the Accessibility use before asking for anything.
 
-The spike has no disclosure screen. Film this against a static render of the approved copy and say so in the description, or defer this shot until phase 25 builds the real screen. Do not film a mockup and present it as the running app.
+The spike has no disclosure screen. Film this against a static render of the approved copy and say so in the description, or defer this shot until phase 20 builds the real screen. Do not film a mockup and present it as the running app.
 
 **2. Turning the service on, 0:12–0:25**
 

@@ -28,7 +28,13 @@ blocksocial/
     └── files/                        the design export itself
 ```
 
-`docs/PLAN.md` holds 46 phases from git setup to store submission. Its first phases are technical validation: they prove the mechanisms listed in `docs/TECHNICAL_SPECIFICATION.md` section 8, on an Android emulator and on a real iPhone. Implementation phases follow and are re-scoped at the phase 14 gate.
+`docs/PLAN.md` holds 50 phases from git setup to two store submissions.
+
+**Android runs first, all the way to the Play Store, then iOS begins.** Phases 00 to 06 are complete: the Android mechanisms are validated on an emulator and the Play policy package is written. Phases 08 to 27 build and ship Android. Phases 28 to 49 do the same for iOS afterwards.
+
+The one exception is phase 07, which files the Apple Family Controls entitlement request early. It is paperwork, not development, but Apple's answer is slow and can be no, and that answer decides whether iOS happens at all.
+
+What this ordering costs is written down rather than discovered later: the domain contract in phase 08 is frozen from Android evidence alone, and phase 34 is where iOS gets its say and where any resulting Android rework is paid for.
 
 Android uses no physical device at any point. What that costs, and who carries the risk instead, is stated in `docs/TECHNICAL_SPECIFICATION.md` section 9.
 
