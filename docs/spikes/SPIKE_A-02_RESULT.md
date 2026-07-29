@@ -125,7 +125,7 @@ package=com.google.android.youtube decision=IGNORED_ALREADY_FOREGROUND
 
 Pressing back removes the overlay and leaves the user inside the application, with no event recorded and no bypass grant created. For a product whose entire value is *recording the decision*, a silent third exit is wrong.
 
-Three options for phase 14, and this is a product decision, not a technical one:
+Three options for phase 13, and this is a product decision, not a technical one:
 
 1. Back behaves as `Stay focused`: go home, record a refusal.
 2. Back is ignored, leaving only the two stated choices.
@@ -135,17 +135,17 @@ Option 1 matches the tone rule that the block screen is a pause rather than a tr
 
 ### 2. Rotation was not verified — open
 
-The scenario could not be executed. The AVD does not rotate at all: with `accelerometer_rotation 0` and `user_rotation 1` the display stayed `cur=1080x2400` **with no overlay present**, and `cmd window set-user-rotation` does not exist on this image. This is an emulator limitation, not overlay behaviour. Rotation must be checked in phase 14 on an AVD configured for it, or accepted as a beta item.
+The scenario could not be executed. The AVD does not rotate at all: with `accelerometer_rotation 0` and `user_rotation 1` the display stayed `cur=1080x2400` **with no overlay present**, and `cmd window set-user-rotation` does not exist on this image. This is an emulator limitation, not overlay behaviour. Rotation must be checked in phase 13 on an AVD configured for it, or accepted as a beta item.
 
 ### 3. Screen-reader operation is unconfirmed — open
 
 Confirmed: the overlay window is exposed to accessibility services with `focused=true`, `active=true`, and a real title after this spike added one. Before the fix the title was `null`, which would have made a screen reader announce an untitled window; `WindowManager.LayoutParams.accessibilityTitle` is not in the public SDK, so `setTitle` is used instead and does reach the accessibility window list.
 
-Not confirmed: that TalkBack reads the content and that the decision can be completed with TalkBack alone. TalkBack was installed and enabled alongside the spike service, but `uiautomator dump` kept returning the application's node tree rather than the overlay's, so the overlay's nodes could not be retrieved with adb tooling. Scenario 9 therefore has no evidence either way and belongs to phase 22.
+Not confirmed: that TalkBack reads the content and that the decision can be completed with TalkBack alone. TalkBack was installed and enabled alongside the spike service, but `uiautomator dump` kept returning the application's node tree rather than the overlay's, so the overlay's nodes could not be retrieved with adb tooling. Scenario 9 therefore has no evidence either way and belongs to phase 21.
 
 ### 4. The status bar is not covered — recorded, not a defect
 
-Overlay bounds start at `y=128`, below the status bar, so the clock and the notification shade stay reachable. This is consistent with the rule against imitating system UI and with leaving the user in control, but it does mean the shade can be pulled down over the block screen. Phase 14 should decide deliberately rather than inherit this by accident.
+Overlay bounds start at `y=128`, below the status bar, so the clock and the notification shade stay reachable. This is consistent with the rule against imitating system UI and with leaving the user in control, but it does mean the shade can be pulled down over the block screen. Phase 13 should decide deliberately rather than inherit this by accident.
 
 ## Findings for production
 

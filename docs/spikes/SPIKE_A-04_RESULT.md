@@ -110,7 +110,7 @@ The resolver tests cover the installed case, the missing case, alias matching, a
 
 1. **The catalog cannot be validated by reading it.** Duplicate ids and a package claimed by two entries both parse as valid JSON and both corrupt rule storage. Those checks belong in the build, not in a code review, which is why they are tests rather than documentation.
 2. **`<queries>` and the catalog must not drift.** Twelve `<package>` lines currently mirror twelve package names by hand. A catalog entry added without a matching manifest line resolves to not-installed on every device, silently and with no error. Production should generate the manifest entries from `catalog.json` or add a test that fails when the two disagree.
-3. **Catalog coverage is a product question, not a technical one.** Ten entries is what the phase asked for. Which applications testers actually want is a beta question, recorded in the phase 25 feedback set.
+3. **Catalog coverage is a product question, not a technical one.** Ten entries is what the phase asked for. Which applications testers actually want is a beta question, recorded in the phase 24 feedback set.
 
 ## Limits of this evidence
 

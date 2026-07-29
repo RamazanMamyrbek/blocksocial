@@ -87,7 +87,7 @@ Nothing. There is no `INTERNET` permission in any manifest, and no networking AP
 
 Accessibility service logging is compiled behind a debug check: `a01/.../LaunchDetectionService.kt:64`, `a02/.../BlockOverlayService.kt:125`, `a04/.../BlockOverlayService.kt:173`.
 
-**Known gap, to be closed before submission.** The spike activities in `a03` and `a05` call `Log.i` without a debug gate (`a03/.../CatalogActivity.kt:23`, `a05/.../UsageActivity.kt:38,48,57,67,80`), and those lines include package names. These are throwaway spike builds and never ship. Phase 24 must verify that no release build logs a package name; the specification already requires release logs to contain no application names. This gap is recorded here rather than glossed over, because the privacy policy must describe actual behaviour, not intended behaviour.
+**Known gap, to be closed before submission.** The spike activities in `a03` and `a05` call `Log.i` without a debug gate (`a03/.../CatalogActivity.kt:23`, `a05/.../UsageActivity.kt:38,48,57,67,80`), and those lines include package names. These are throwaway spike builds and never ship. Phase 23 must verify that no release build logs a package name; the specification already requires release logs to contain no application names. This gap is recorded here rather than glossed over, because the privacy policy must describe actual behaviour, not intended behaviour.
 
 ## 9. Declared data types for the Play Data safety form
 

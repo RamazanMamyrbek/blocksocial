@@ -2,7 +2,7 @@
 
 Phase-by-phase plan from technical validation to release. Read `AGENTS.md` before executing any phase.
 
-**Android ships first, all the way to the Play Store. iOS starts afterwards.** The one exception is phase 07, which files the Apple entitlement request early because the answer is slow and can be no.
+**Android ships first, all the way to the Play Store. iOS starts afterwards, beginning with the Apple entitlement request.**
 
 ---
 
@@ -40,7 +40,7 @@ Rules:
 - One phase per branch. Never mix two phases in one branch.
 - Commit in small, meaningful steps within the phase.
 - Merge into `dev` only when that phase's merge conditions are all true.
-- `main` receives a merge only in the release phases, 27 and 49.
+- `main` receives a merge only in the release phases, 26 and 49.
 - Release tags name their platform: `android-v1.0.0`, `ios-v1.0.0`. One repository releases twice.
 - Never rewrite published history.
 
@@ -73,7 +73,7 @@ The agent drives everything from the host over `adb` — install, enable the acc
 
 This applies to Android only. iOS is verified by the teammate on a real iPhone, and every mention of a real device in an iOS phase means exactly that.
 
-The cost is real and is not written off: an emulator runs stock Android and cannot expose how Samsung or Xiaomi firmware kills background services, restricts autostart, or delivers accessibility events. That is risk `R-06` in `docs/TECHNICAL_SPECIFICATION.md`. It is carried by the protection health screen in phase 20, which must make a dead service visible, and by the Android beta in phase 25, which must recruit testers on that hardware. Phase 23 is scoped as an API-level matrix, not a device matrix.
+The cost is real and is not written off: an emulator runs stock Android and cannot expose how Samsung or Xiaomi firmware kills background services, restricts autostart, or delivers accessibility events. That is risk `R-06` in `docs/TECHNICAL_SPECIFICATION.md`. It is carried by the protection health screen in phase 19, which must make a dead service visible, and by the Android beta in phase 24, which must recruit testers on that hardware. Phase 22 is scoped as an API-level matrix, not a device matrix.
 
 Evidence wording is not negotiable: "verified on an Android 16 emulator", never "verified on a device".
 
@@ -85,9 +85,9 @@ What this buys: a shipped product sooner, one platform's problems at a time, and
 
 What it costs, stated so nobody rediscovers it later:
 
-- **The domain contract is written from Android evidence alone.** Phase 08 freezes the fixtures with only Android spikes behind them. iOS gets its say in phase 34, and a fixture iOS cannot satisfy is a contract error that changes both platforms. Budget for Android rework there.
+- **The domain contract is written from Android evidence alone.** Phase 07 freezes the fixtures with only Android spikes behind them. iOS gets its say in phase 34, and a fixture iOS cannot satisfy is a contract error that changes both platforms. Budget for Android rework there.
 - **iOS platform limits are known only from documentation** until phase 28. The fifteen-minute minimum, the twenty-activity cap and the fifty-token shield are written in `docs/TECHNICAL_SPECIFICATION.md` section 4 from Apple's documentation, not from a device.
-- **The Apple entitlement is the one thing that cannot wait**, which is why phase 07 sits inside the Android track. A refusal there costs no Android work but decides whether iOS happens at all.
+- **Apple's answer on the entitlement is not known until the iOS track begins.** Phase 27 files the request, and it is the first iOS phase precisely so that a refusal costs no Swift. But the request can take weeks, and the project runs the whole Android cycle without knowing whether iOS is possible. This was decided deliberately. Phase 27 depends on nothing and can be run early, in parallel with any Android phase, by anyone who wants the answer sooner.
 
 ### Phase status legend
 
@@ -106,34 +106,34 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 04 | Android spike: temporary bypass persistence | Android validation | 02 | done |
 | 05 | Android spike: usage data and daily-limit feasibility | Android validation | 03 | done |
 | 06 | Google Play policy package | Android validation | 01, 02 | done |
-| 07 | Apple Family Controls entitlement request | Apple entitlement | — | not started |
-| 08 | Domain contract and fixtures | Contract | 04, 05 | not started |
-| 09 | Android validation gate and specification update | Gate | 01–06, 08 | not started |
-| 10 | Android: project skeleton and design tokens | Android MVP | 09 | not started |
-| 11 | Android: domain and rule evaluator | Android MVP | 10 | not started |
-| 12 | Android: persistence layer | Android MVP | 11 | not started |
-| 13 | Android: detection service | Android MVP | 12 | not started |
-| 14 | Android: block screen | Android MVP | 13 | not started |
-| 15 | Android: temporary bypass | Android MVP | 14 | not started |
-| 16 | Android: application selection | Android MVP | 12 | not started |
-| 17 | Android: rule editor | Android MVP | 16 | not started |
-| 18 | Android: daily limits | Android MVP | 17 | not started |
-| 19 | Android: history, statistics, dashboard | Android MVP | 18 | not started |
-| 20 | Android: onboarding, permissions, protection health | Android MVP | 19 | not started |
-| 21 | Android: recovery and reliability hardening | Android MVP | 20 | not started |
-| 22 | Android: accessibility and localization | Android MVP | 21 | not started |
-| 23 | Android: API-level matrix and defect fixing | Android MVP | 22 | not started |
-| 24 | Google Play submission preparation | Android release | 23 | not started |
-| 25 | Android closed beta | Android release | 24 | not started |
-| 26 | Android beta feedback and defect resolution | Android release | 25 | not started |
-| 27 | Android release candidate and Play submission | Android release | 26 | not started |
-| 28 | iOS spike: skeleton, targets, and signing | iOS validation | 00, 07 | not started |
+| 07 | Domain contract and fixtures | Contract | 04, 05 | not started |
+| 08 | Android validation gate and specification update | Gate | 01–06, 07 | not started |
+| 09 | Android: project skeleton and design tokens | Android MVP | 08 | not started |
+| 10 | Android: domain and rule evaluator | Android MVP | 09 | not started |
+| 11 | Android: persistence layer | Android MVP | 10 | not started |
+| 12 | Android: detection service | Android MVP | 11 | not started |
+| 13 | Android: block screen | Android MVP | 12 | not started |
+| 14 | Android: temporary bypass | Android MVP | 13 | not started |
+| 15 | Android: application selection | Android MVP | 11 | not started |
+| 16 | Android: rule editor | Android MVP | 15 | not started |
+| 17 | Android: daily limits | Android MVP | 16 | not started |
+| 18 | Android: history, statistics, dashboard | Android MVP | 17 | not started |
+| 19 | Android: onboarding, permissions, protection health | Android MVP | 18 | not started |
+| 20 | Android: recovery and reliability hardening | Android MVP | 19 | not started |
+| 21 | Android: accessibility and localization | Android MVP | 20 | not started |
+| 22 | Android: API-level matrix and defect fixing | Android MVP | 21 | not started |
+| 23 | Google Play submission preparation | Android release | 22 | not started |
+| 24 | Android closed beta | Android release | 23 | not started |
+| 25 | Android beta feedback and defect resolution | Android release | 24 | not started |
+| 26 | Android release candidate and Play submission | Android release | 25 | not started |
+| 27 | Apple Family Controls entitlement request | iOS entitlement | — | not started |
+| 28 | iOS spike: skeleton, targets, and signing | iOS validation | 00, 27 | not started |
 | 29 | iOS spike: authorization and picker | iOS validation | 28 | not started |
 | 30 | iOS spike: schedule and shield | iOS validation | 29 | not started |
 | 31 | iOS spike: shield actions | iOS validation | 30 | not started |
 | 32 | iOS spike: usage-threshold bypass and limits | iOS validation | 31 | not started |
 | 33 | iOS spike: capacity limits | iOS validation | 30 | not started |
-| 34 | iOS contract conformance and validation gate | Gate | 08, 28–33 | not started |
+| 34 | iOS contract conformance and validation gate | Gate | 07, 28–33 | not started |
 | 35 | iOS: production skeleton | iOS MVP | 34 | not started |
 | 36 | iOS: domain and persistence | iOS MVP | 35 | not started |
 | 37 | iOS: authorization and picker | iOS MVP | 36 | not started |
@@ -150,20 +150,22 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 48 | iOS beta feedback and defect resolution | iOS release | 47 | not started |
 | 49 | iOS release candidate and App Store submission | iOS release | 48 | not started |
 
-Phases 00 to 06 are complete. Phase 07 can be run at any time and blocks nothing. The Android track runs 08 to 27 without interruption; the iOS track runs 28 to 49 afterwards.
+Phases 00 to 06 are complete. The Android track runs 07 to 26 without interruption. The iOS track runs 27 to 49 afterwards, and phase 27 can be pulled forward at any time because it depends on nothing.
 
 ### Renumbering map
 
-The plan was reordered after phase 06 so that Android runs to release before iOS begins. Phases 00 to 06 kept their numbers and their content. Everything after was renumbered; nothing was deleted. Older commits, and the spike result documents written before the change, may cite the old numbers.
+The plan was reordered after phase 06 so that Android runs to release before iOS begins. Phases 00 to 06 kept their numbers and their content. Everything after was renumbered; nothing was deleted. Older commits, and the spike result documents written before the change, may cite the numbers in the left-hand column.
 
-| Old | New | Old | New | Old | New |
-|---|---|---|---|---|---|
-| 07–12 | 28–33 | 13 | 08 | 14 | 09 |
-| 15–28 | 10–23 | 29–39 | 35–45 | 40 | 24 |
-| 41 | 46 | 42 | 25 | 43 | 47 |
-| 44 | 26 and 48 | 45 | 27 and 49 | — | 07, 34 are new |
+| Original | Now | Original | Now |
+|---|---|---|---|
+| 07–12 iOS validation | 28–33 | 13 shared contract | 07 |
+| 14 validation gate | 08 | 15–28 Android MVP | 09–22 |
+| 29–39 iOS MVP | 35–45 | 40 Play submission | 23 |
+| 41 App Store submission | 46 | 42 Android beta | 24 |
+| 43 iOS beta | 47 | 44 beta defects | 25 and 48 |
+| 45 release | 26 and 49 | — | 27 and 34 are new |
 
-Phases 44 and 45 were single cross-platform phases and became one per platform. Phases 07 and 34 did not exist before: 07 extracts the Apple entitlement request out of the old phase 07, and 34 is the iOS gate that the old combined gate no longer provides.
+Phases 44 and 45 were single cross-platform phases and became one per platform. Phase 27 extracts the Apple entitlement request out of the original phase 07, and phase 34 is the iOS gate that the original combined gate no longer provides.
 
 ---
 
@@ -235,15 +237,18 @@ Initial commit exists, `dev` branches from it, checks above pass.
 ---
 
 
+
 # Android Validation
+
 
 
 Each validation phase produces `docs/spikes/SPIKE_<ID>_RESULT.md` containing environment, commit hash, steps, evidence, defects, and a decision of `GO`, `CHANGE`, or `STOP`. Code written in these phases is throwaway and lives under `spikes/android/<id>/`. It is never promoted directly; it informs the production phase that replaces it.
 
 
+
 ## Phase 01 — Android Spike: Launch Detection
 
-**Status:** done — decision `GO`, verified on an Android 16 emulator. Physical-hardware confirmation is not planned during development; the OEM gap is carried by phases 20 and 25.
+**Status:** done — decision `GO`, verified on an Android 16 emulator. Physical-hardware confirmation is not planned during development; the OEM gap is carried by phases 19 and 24.
 
 **Goal.** Prove that an `AccessibilityService` on `targetSdk 36` reliably detects a transition into a target application, with no false or runaway detections.
 
@@ -302,7 +307,7 @@ All eight scenarios behave correctly on the emulator, no repeated detection stor
 
 | Risk | Response |
 |---|---|
-| OEM delivers events differently | unmeasurable here; record the emulator image and hand the question to phase 25 |
+| OEM delivers events differently | unmeasurable here; record the emulator image and hand the question to phase 24 |
 | Event floods on rapid switching | debounce window is tunable and its value is recorded |
 | Detection latency feels slow | record measured delay; if unacceptable, decision is `CHANGE` |
 
@@ -460,7 +465,7 @@ Merged manifest verified clean, detection works on a device, decision recorded.
 
 ## Phase 04 — Android Spike: Temporary Bypass Persistence
 
-**Status:** done — decision `GO`, verified on an Android 16 emulator. Grants are sound; the spike instead exposed that force-stop and app update can leave blocking dead, which moves to phase 20.
+**Status:** done — decision `GO`, verified on an Android 16 emulator. Grants are sound; the spike instead exposed that force-stop and app update can leave blocking dead, which moves to phase 19.
 
 **Goal.** Prove that a per-application grant suppresses repeated blocks correctly and survives process death and reboot.
 
@@ -596,7 +601,7 @@ Two devices measured, decisions recorded, tests green.
 
 ## Phase 06 — Google Play Policy Package
 
-**Status:** done — package written and cross-read against the code at commit `5bf53a3`. Two gaps recorded rather than smoothed over: ungated logging in two spike modules, and policy text describing storage that production has not built yet. Both assigned to phase 24.
+**Status:** done — package written and cross-read against the code at commit `5bf53a3`. Two gaps recorded rather than smoothed over: ungated logging in two spike modules, and policy text describing storage that production has not built yet. Both assigned to phase 23.
 
 **Goal.** Produce the complete policy package for the Accessibility use case and prove it describes what the code actually does.
 
@@ -650,7 +655,7 @@ Package complete, internally consistent, no placeholders, owner has read it end 
 | Risk | Response |
 |---|---|
 | Play policy interpretation is wrong | this is the earliest possible check; a rejection later is far costlier |
-| Documents drift from the code | phase 24 re-verifies the package against the shipping build |
+| Documents drift from the code | phase 23 re-verifies the package against the shipping build |
 
 ### Documents to update
 
@@ -663,83 +668,10 @@ Package complete and cross-read, no contradictions found.
 ---
 
 
-# Apple Entitlement, Requested Early
-
-One iOS item lives inside the Android track, because Apple's answer is slow and can be no. Nothing in the Android track waits for it.
-
-## Phase 07 — Apple Family Controls Entitlement Request
-
-**Status:** not started
-
-**Goal.** Get the Family Controls distribution entitlement request in front of Apple, so the answer arrives while Android is being built rather than a year later.
-
-**Depends on.** Nothing technical. It needs an Apple Developer account and a description of the product, both of which exist now.
-
-**Branch.** `phase/07-apple-entitlement-request`
-
-**Out of scope.** Any Swift. Any Xcode project. Any iOS design. This phase writes a request and files it.
-
-This is the only iOS item that sits inside the Android track, and it is deliberate. The request is paperwork, but the answer is slow and it can be no. If Apple refuses, the iOS half of the product changes shape entirely, and that is worth knowing during Android development rather than after it. Everything else about iOS waits for phase 28.
-
-The phase can be moved later if the owner prefers. Nothing in the Android track depends on it.
-
-### Tasks
-
-- [ ] Confirm an Apple Developer account exists, or record that obtaining one is the first blocker
-- [ ] Reserve the bundle identifier and create the App ID
-- [ ] Write the entitlement request describing what BlockSocial does with Family Controls and why
-- [ ] State in the request that the app is for the device owner's own use, never for controlling another person's device
-- [ ] Submit the request
-- [ ] Record the submission date, the exact text submitted, and the reference number
-- [ ] Set a reminder to chase it if no answer arrives
-
-**Expected result.** A submitted request with its date and text recorded, or a written statement of what blocks submission.
-
-### Automated checks
-
-- [ ] The submitted text contains no claim absent from `docs/PRODUCT.md` — agent cross-reads
-- [ ] The request does not describe BlockSocial as parental control — agent greps the submitted text
-- [ ] The recorded date and reference are present, not left blank — agent verifies
-
-### Agent checklist
-
-- [ ] The request describes the real mechanism, in the same terms as the Play package
-- [ ] It never claims the app assists users with disabilities
-- [ ] The record states plainly that the entitlement is not granted until Apple says so
-- [ ] No later document treats a pending request as an approval
-
-### Manual scenarios for the user
-
-1. Read the request text before it is sent and confirm it describes the product you want to build.
-2. Submit it, or have the teammate submit it from the developer account.
-3. Record the answer here when it arrives, whatever it is.
-
-### Definition of Done
-
-Request submitted with date and text recorded, or the blocker to submitting it written down.
-
-### Risks
-
-| Risk | Response |
-|---|---|
-| Apple refuses the entitlement | risk `R-02`. The plan is already Android-first, so a refusal costs no Android work; it forces a decision about whether iOS ships at all |
-| The answer never arrives | chase it; an unanswered request is not an approval and phase 28 must say so |
-| No Apple Developer account yet | record it as the blocker; it costs money and time and is better discovered now |
-
-### Documents to update
-
-`docs/ios/ENTITLEMENT_REQUEST.md`, `docs/TECHNICAL_SPECIFICATION.md` risk `R-02`
-
-### Merge into `dev` when
-
-The request is submitted and recorded, or the blocker is documented.
-
----
-
 
 # Contract and Android Gate
 
-## Phase 08 — Domain Contract and Fixtures
+## Phase 07 — Domain Contract and Fixtures
 
 **Status:** not started
 
@@ -747,7 +679,7 @@ The request is submitted and recorded, or the blocker is documented.
 
 **Depends on.** Phases 04 and 05.
 
-**Branch.** `phase/08-domain-contract`
+**Branch.** `phase/07-domain-contract`
 
 **Out of scope.** Any platform implementation. UI. Statistics aggregation.
 
@@ -817,15 +749,15 @@ Fixtures validate, rule coverage mapped with no gaps, at-risk cases marked.
 
 ---
 
-## Phase 09 — Android Validation Gate and Specification Update
+## Phase 08 — Android Validation Gate and Specification Update
 
 **Status:** not started
 
 **Goal.** Convert the Android validation evidence into decisions, update the specification, and decide whether Android implementation proceeds.
 
-**Depends on.** Phases 01 through 06, and 08.
+**Depends on.** Phases 01 through 06, and 07.
 
-**Branch.** `phase/09-android-validation-gate`
+**Branch.** `phase/08-android-validation-gate`
 
 **Out of scope.** Any implementation. Any new spike. Any iOS verdict, which phase 34 makes on its own evidence.
 
@@ -840,13 +772,13 @@ This gate covers Android only. The original single gate judged both platforms at
 - [ ] Answer: is usage measurement accurate enough for daily limits?
 - [ ] Answer: do temporary grants survive process death, reboot and clock manipulation?
 - [ ] Record what emulator-only evidence does not cover, and who carries it
-- [ ] Record the current state of the Apple entitlement request from phase 07, as information, not as a verdict
+- [ ] Record the current state of the Apple entitlement request from phase 27, as information, not as a verdict
 - [ ] Fold every `CHANGE` decision into the specification and architecture
 - [ ] Remove resolved items from the unverified-assumptions table
 - [ ] Downgrade or close resolved risks
 - [ ] Answer the open questions in `docs/PRODUCT.md` that the Android spikes settled
 - [ ] Record a `GO`, `CHANGE`, or `STOP` verdict for Android
-- [ ] Re-scope phases 10 to 27 against what was learned
+- [ ] Re-scope phases 09 to 27 against what was learned
 
 **Expected result.** A gate document with evidence-backed answers and an Android verdict, plus an updated specification containing no assumption an Android spike has already settled.
 
@@ -874,7 +806,7 @@ This gate covers Android only. The original single gate judged both platforms at
 
 ### Definition of Done
 
-Every Android answer recorded with citations, specification and architecture updated, Android verdict recorded, phases 10 to 27 re-scoped.
+Every Android answer recorded with citations, specification and architecture updated, Android verdict recorded, phases 09 to 27 re-scoped.
 
 ### Risks
 
@@ -895,17 +827,18 @@ All answers recorded, Android verdict made, documents consistent.
 ---
 
 
+
 # Android MVP
 
-## Phase 10 — Android: Project Skeleton and Design Tokens
+## Phase 09 — Android: Project Skeleton and Design Tokens
 
 **Status:** not started
 
 **Goal.** Create the production Android project with its module structure, dependency setup, and the design token system, so every later phase has somewhere to put code.
 
-**Depends on.** Phase 09.
+**Depends on.** Phase 08.
 
-**Branch.** `phase/10-android-skeleton`
+**Branch.** `phase/09-android-skeleton`
 
 **Out of scope.** Any feature. Any screen beyond a token preview. Any system service.
 
@@ -968,15 +901,15 @@ Build green, token tests pass, preview verified by the owner.
 
 ---
 
-## Phase 11 — Android: Domain and Rule Evaluator
+## Phase 10 — Android: Domain and Rule Evaluator
 
 **Status:** not started
 
 **Goal.** Implement the domain model and the rule evaluator, proven against the shared fixtures.
 
-**Depends on.** Phase 10.
+**Depends on.** Phase 09.
 
-**Branch.** `phase/11-android-domain`
+**Branch.** `phase/10-android-domain`
 
 **Out of scope.** Persistence. Android framework dependencies. UI.
 
@@ -1032,15 +965,15 @@ All fixture tests green, no Android dependency in the domain modules.
 
 ---
 
-## Phase 12 — Android: Persistence Layer
+## Phase 11 — Android: Persistence Layer
 
 **Status:** not started
 
 **Goal.** Implement Room and DataStore with a migration policy, so state survives process death and reboot.
 
-**Depends on.** Phase 11.
+**Depends on.** Phase 10.
 
-**Branch.** `phase/12-android-persistence`
+**Branch.** `phase/11-android-persistence`
 
 **Out of scope.** UI. The accessibility service. Statistics aggregation jobs.
 
@@ -1086,7 +1019,7 @@ Tests green, schema exported, migration test present, destructive migration bloc
 | Risk | Response |
 |---|---|
 | Schema churn later | schema is exported and migration-tested from the first version |
-| Heavy queries on the detection path | indices added now; measured in phase 13 |
+| Heavy queries on the detection path | indices added now; measured in phase 12 |
 
 ### Documents to update
 
@@ -1098,15 +1031,15 @@ Tests green, schema exported, owner confirms data survives restart.
 
 ---
 
-## Phase 13 — Android: Detection Service
+## Phase 12 — Android: Detection Service
 
 **Status:** not started
 
 **Goal.** Implement the production accessibility service using what phase 01 proved, wired to real rules and persistence.
 
-**Depends on.** Phase 12.
+**Depends on.** Phase 11.
 
-**Branch.** `phase/13-android-detection`
+**Branch.** `phase/12-android-detection`
 
 **Out of scope.** The block screen UI. Bypass creation. Statistics.
 
@@ -1154,7 +1087,7 @@ Correct decisions in all five scenarios, no database work on the callback thread
 | Risk | Response |
 |---|---|
 | Callback latency from database access | measured; work moved off the callback thread |
-| OEM kills the service | surfaced by protection health in phase 20 |
+| OEM kills the service | surfaced by protection health in phase 19 |
 
 ### Documents to update
 
@@ -1166,22 +1099,22 @@ Tests green, five scenarios verified by the owner.
 
 ---
 
-## Phase 14 — Android: Block Screen
+## Phase 13 — Android: Block Screen
 
 **Status:** not started
 
 **Goal.** Implement the production block screen using the chosen design direction, driven by real detection.
 
-**Depends on.** Phase 13.
+**Depends on.** Phase 12.
 
-**Branch.** `phase/14-android-block-screen`
+**Branch.** `phase/13-android-block-screen`
 
-**Out of scope.** Bypass grant logic, which is phase 15. Statistics on the screen beyond a simple count.
+**Out of scope.** Bypass grant logic, which is phase 14. Statistics on the screen beyond a simple count.
 
 ### Tasks
 
 - [ ] Implement the overlay host in the accessibility service
-- [ ] Build the block screen from the chosen design direction and the phase 10 tokens
+- [ ] Build the block screen from the chosen design direction and the phase 09 tokens
 - [ ] Show the application, the active rule, and the time remaining
 - [ ] Implement the primary action returning the user home
 - [ ] Implement the secondary action as a stub that only records intent
@@ -1228,7 +1161,7 @@ Eight scenarios pass, events recorded correctly, no truncation at the largest sc
 
 | Risk | Response |
 |---|---|
-| Overlay instability appears only at scale | watchdog plus the phase 23 API-level matrix |
+| Overlay instability appears only at scale | watchdog plus the phase 22 API-level matrix |
 | Design direction does not fit the smallest device | fall back to the simpler direction recorded in phase 02 |
 
 ### Documents to update
@@ -1241,15 +1174,15 @@ Tests green, eight scenarios verified.
 
 ---
 
-## Phase 15 — Android: Temporary Bypass
+## Phase 14 — Android: Temporary Bypass
 
 **Status:** not started
 
 **Goal.** Implement real bypass grants with repeat-block suppression, using what phase 04 proved.
 
-**Depends on.** Phase 14.
+**Depends on.** Phase 13.
 
-**Branch.** `phase/15-android-bypass`
+**Branch.** `phase/14-android-bypass`
 
 **Out of scope.** Bypass usage limits per day beyond the policy field. iOS parity.
 
@@ -1309,15 +1242,15 @@ Tests green, six scenarios verified.
 
 ---
 
-## Phase 16 — Android: Application Selection
+## Phase 15 — Android: Application Selection
 
 **Status:** not started
 
 **Goal.** Ship the supported-app selection screen using the catalog proven in phase 03.
 
-**Depends on.** Phase 12.
+**Depends on.** Phase 11.
 
-**Branch.** `phase/16-android-app-selection`
+**Branch.** `phase/15-android-app-selection`
 
 **Out of scope.** Rules. The block screen. Catalog expansion beyond the initial list.
 
@@ -1376,17 +1309,17 @@ Tests green, five scenarios verified.
 
 ---
 
-## Phase 17 — Android: Rule Editor
+## Phase 16 — Android: Rule Editor
 
 **Status:** not started
 
 **Goal.** Ship rule creation and editing for schedule and always-on modes, with the daily-limit mode present but not yet enforced.
 
-**Depends on.** Phase 16.
+**Depends on.** Phase 15.
 
-**Branch.** `phase/17-android-rule-editor`
+**Branch.** `phase/16-android-rule-editor`
 
-**Out of scope.** Daily-limit enforcement, which is phase 18. Statistics.
+**Out of scope.** Daily-limit enforcement, which is phase 17. Statistics.
 
 ### Tasks
 
@@ -1445,15 +1378,15 @@ Tests green, six scenarios verified.
 
 ---
 
-## Phase 18 — Android: Daily Limits
+## Phase 17 — Android: Daily Limits
 
 **Status:** not started
 
 **Goal.** Ship the `DAILY_LIMIT` mode using the usage measurement validated in phase 05.
 
-**Depends on.** Phase 17.
+**Depends on.** Phase 16.
 
-**Branch.** `phase/18-android-daily-limits`
+**Branch.** `phase/17-android-daily-limits`
 
 **Out of scope.** Charts. Weekly trends. iOS parity.
 
@@ -1514,15 +1447,15 @@ Tests green, six scenarios verified on two devices.
 
 ---
 
-## Phase 19 — Android: History, Statistics, Dashboard
+## Phase 18 — Android: History, Statistics, Dashboard
 
 **Status:** not started
 
 **Goal.** Ship the surfaces that show the user what they decided, with honest numbers.
 
-**Depends on.** Phase 18.
+**Depends on.** Phase 17.
 
-**Branch.** `phase/19-android-dashboard`
+**Branch.** `phase/18-android-dashboard`
 
 **Out of scope.** Weekly and monthly trends. Export. Charts beyond the design components.
 
@@ -1583,15 +1516,15 @@ Tests green, six scenarios verified.
 
 ---
 
-## Phase 20 — Android: Onboarding, Permissions, Protection Health
+## Phase 19 — Android: Onboarding, Permissions, Protection Health
 
 **Status:** not started
 
 **Goal.** Ship the first-run experience and the permission lifecycle, including recovery when a permission is revoked.
 
-**Depends on.** Phase 19.
+**Depends on.** Phase 18.
 
-**Branch.** `phase/20-android-onboarding-permissions`
+**Branch.** `phase/19-android-onboarding-permissions`
 
 **Out of scope.** Store assets. Analytics. Any remote content.
 
@@ -1646,7 +1579,7 @@ Six scenarios pass, no crash on any revocation, disclosure matches the policy pa
 | Risk | Response |
 |---|---|
 | Users refuse permissions | value explained before the request; measured in beta |
-| OEM guidance inaccurate | cannot be checked without that hardware; it ships labelled unverified and is corrected from phase 25 reports |
+| OEM guidance inaccurate | cannot be checked without that hardware; it ships labelled unverified and is corrected from phase 24 reports |
 
 ### Documents to update
 
@@ -1658,15 +1591,15 @@ Tests green, six scenarios verified on the emulator, OEM guidance labelled unver
 
 ---
 
-## Phase 21 — Android: Recovery and Reliability Hardening
+## Phase 20 — Android: Recovery and Reliability Hardening
 
 **Status:** not started
 
 **Goal.** Make the application behave correctly after reboot, process death, permission changes, and time changes.
 
-**Depends on.** Phase 20.
+**Depends on.** Phase 19.
 
-**Branch.** `phase/21-android-recovery`
+**Branch.** `phase/20-android-recovery`
 
 **Out of scope.** New features. Visual changes.
 
@@ -1728,15 +1661,15 @@ Tests green, six scenarios verified, battery figure recorded.
 
 ---
 
-## Phase 22 — Android: Accessibility and Localization
+## Phase 21 — Android: Accessibility and Localization
 
 **Status:** not started
 
 **Goal.** Make every screen usable with a screen reader, at the largest font scale, and in both languages.
 
-**Depends on.** Phase 21.
+**Depends on.** Phase 20.
 
-**Branch.** `phase/22-android-a11y-localization`
+**Branch.** `phase/21-android-a11y-localization`
 
 **Out of scope.** New features. Additional languages beyond Russian and English.
 
@@ -1800,19 +1733,19 @@ Tests green, five scenarios verified.
 
 ---
 
-## Phase 23 — Android: API-Level Matrix and Defect Fixing
+## Phase 22 — Android: API-Level Matrix and Defect Fixing
 
 **Status:** not started
 
 **Goal.** Verify the full application across every API level an emulator can provide, fix what it exposes, and state in writing what remains unverified because no physical device is used.
 
-**Depends on.** Phase 22.
+**Depends on.** Phase 21.
 
-**Branch.** `phase/23-android-api-matrix`
+**Branch.** `phase/22-android-api-matrix`
 
 **Out of scope.** New features. Store submission. Any claim about OEM firmware behaviour.
 
-This phase was originally a three-brand physical device matrix. It is not, because Android verification uses an emulator only. What it cannot cover does not disappear; it moves to the protection health screen and to the beta in phase 25, and this phase's job includes saying so precisely.
+This phase was originally a three-brand physical device matrix. It is not, because Android verification uses an emulator only. What it cannot cover does not disappear; it moves to the protection health screen and to the beta in phase 24, and this phase's job includes saying so precisely.
 
 ### Tasks
 
@@ -1822,7 +1755,7 @@ This phase was originally a three-brand physical device matrix. It is not, becau
 - [ ] Add a regression test for every defect fixed
 - [ ] Write the OEM background-restriction guidance from vendor documentation, marked as unverified
 - [ ] Produce a compatibility summary that separates what was tested from what was not
-- [ ] List the OEM behaviours the beta must confirm, and hand that list to phase 25
+- [ ] List the OEM behaviours the beta must confirm, and hand that list to phase 24
 
 **Expected result.** A written compatibility summary covering three API levels, a defect list with no critical or major items remaining, and an explicit statement of the OEM gap.
 
@@ -1838,7 +1771,7 @@ This phase was originally a three-brand physical device matrix. It is not, becau
 - [ ] No defect is closed without a test
 - [ ] The compatibility summary names API levels, and never implies device coverage
 - [ ] OEM guidance is labelled as written from documentation, not observation
-- [ ] The list handed to phase 25 is concrete enough for a tester to execute
+- [ ] The list handed to phase 24 is concrete enough for a tester to execute
 
 ### Manual scenarios for the user
 
@@ -1847,7 +1780,7 @@ This phase was originally a three-brand physical device matrix. It is not, becau
 
 ### Definition of Done
 
-Three API levels covered on emulator images, defects recorded and fixed, no critical or major defects open, compatibility summary written, OEM gap documented and handed to phase 25.
+Three API levels covered on emulator images, defects recorded and fixed, no critical or major defects open, compatibility summary written, OEM gap documented and handed to phase 24.
 
 ### Risks
 
@@ -1859,7 +1792,7 @@ Three API levels covered on emulator images, defects recorded and fixed, no crit
 
 ### Documents to update
 
-`docs/COMPATIBILITY.md`, protection health guidance strings, phase 25 tester recruitment criteria
+`docs/COMPATIBILITY.md`, protection health guidance strings, phase 24 tester recruitment criteria
 
 ### Merge into `dev` when
 
@@ -1868,27 +1801,28 @@ API-level matrix complete, no critical or major defects open, OEM gap written do
 ---
 
 
+
 # Android Release
 
-Android reaches the Play Store here, before any iOS implementation begins.
+Android reaches the Play Store here, before any iOS work begins.
 
-## Phase 24 — Google Play Submission Preparation
+## Phase 23 — Google Play Submission Preparation
 
 **Status:** not started
 
 **Goal.** Prepare everything Google Play requires and prove it matches the shipping build.
 
-**Depends on.** Phase 23.
+**Depends on.** Phase 22.
 
-**Branch.** `phase/24-play-submission-prep`
+**Branch.** `phase/23-play-submission-prep`
 
-**Out of scope.** Actual submission, which happens in phase 27. iOS.
+**Out of scope.** Actual submission, which happens in phase 26. iOS.
 
 ### Tasks
 
 - [ ] Re-verify the phase 06 policy package against the shipping build
 - [ ] Close the ungated-logging gap: confirm no release build logs a package name — carried over from phase 06, where `a03` and `a05` logged package names outside a `BuildConfig.DEBUG` check while the privacy policy claims nothing leaves the device
-- [ ] Confirm the privacy policy's storage section matches what production actually stores — carried over from phase 06, where it was written for rules, selections and history that only phases 12 and 19 build
+- [ ] Confirm the privacy policy's storage section matches what production actually stores — carried over from phase 06, where it was written for rules, selections and history that only phases 11 and 18 build
 - [ ] Re-run the `DATA_INVENTORY.md` traceability against production sources, since every line number in it points at spike code
 - [ ] Finalize the store listing text
 - [ ] Produce screenshots for the required device sizes
@@ -1944,15 +1878,15 @@ Signed artifact verified, declarations complete and mapped.
 
 ---
 
-## Phase 25 — Android Closed Beta
+## Phase 24 — Android Closed Beta
 
 **Status:** not started
 
 **Goal.** Put the Android build in front of real users and collect structured feedback. This is also the **first contact with physical hardware and OEM firmware**, because development uses an emulator only.
 
-**Depends on.** Phase 24.
+**Depends on.** Phase 23.
 
-**Branch.** `phase/25-android-beta`
+**Branch.** `phase/24-android-beta`
 
 **Out of scope.** iOS. New features. Public release.
 
@@ -1960,7 +1894,7 @@ Signed artifact verified, declarations complete and mapped.
 
 - [ ] Configure the closed testing track
 - [ ] Recruit testers on at least Samsung and Xiaomi or Redmi hardware, plus one Pixel or AOSP-like device
-- [ ] Execute the OEM behaviour list handed over by phase 23
+- [ ] Execute the OEM behaviour list handed over by phase 22
 - [ ] Confirm on each brand: the service survives a reboot, survives background restriction, and protection health reports the truth when it does not
 - [ ] Write the tester instructions and the feedback form
 - [ ] Instrument the early metrics locally, with no third-party SDK
@@ -1983,7 +1917,7 @@ Signed artifact verified, declarations complete and mapped.
 - [ ] No user content leaves the device
 - [ ] Tester instructions state clearly what is being tested
 - [ ] Every report is triaged, none silently dropped
-- [ ] The phase 23 OEM list is fully executed, and every item is marked confirmed or failed
+- [ ] The phase 22 OEM list is fully executed, and every item is marked confirmed or failed
 - [ ] Any OEM defect found is recorded as a defect, never as an acceptable quirk
 
 ### Manual scenarios for the user
@@ -2013,15 +1947,15 @@ Feedback collected and triaged, metrics recorded.
 
 ---
 
-## Phase 26 — Android Beta Feedback and Defect Resolution
+## Phase 25 — Android Beta Feedback and Defect Resolution
 
 **Status:** not started
 
 **Goal.** Fix what the Android beta exposed and decide honestly what ships as a stated limitation.
 
-**Depends on.** Phase 25.
+**Depends on.** Phase 24.
 
-**Branch.** `phase/26-android-beta-defects`
+**Branch.** `phase/25-android-beta-defects`
 
 **Out of scope.** New features. Scope growth from feature requests. iOS.
 
@@ -2084,15 +2018,15 @@ Android suite green, no critical or major defects open.
 
 ---
 
-## Phase 27 — Android Release Candidate and Play Submission
+## Phase 26 — Android Release Candidate and Play Submission
 
 **Status:** not started
 
 **Goal.** Cut the Android release, merge to `main`, and submit to Google Play.
 
-**Depends on.** Phase 26.
+**Depends on.** Phase 25.
 
-**Branch.** `phase/27-android-release-candidate`
+**Branch.** `phase/26-android-release-candidate`
 
 **Out of scope.** Post-release features. Monetization. iOS, which reaches its own release in phase 49.
 
@@ -2144,7 +2078,7 @@ Artifact verified against the release build, declarations re-checked, `android-v
 
 | Risk | Response |
 |---|---|
-| Play review rejects the submission | the policy package was prepared in phases 06 and 24 precisely for this; a rejection produces a new phase, not a patch |
+| Play review rejects the submission | the policy package was prepared in phases 06 and 23 precisely for this; a rejection produces a new phase, not a patch |
 | A last-minute change breaks something | the full suite runs against the exact release build |
 | `main` diverges once iOS also releases | platform-scoped tags and one shared `main`; iOS merges through `dev` like everything else |
 
@@ -2159,10 +2093,89 @@ Artifact verified, declarations accurate, owner has signed off.
 ---
 
 
+
+# Apple Entitlement
+
+The iOS track opens with paperwork, not code, so a refusal costs no Swift.
+
+## Phase 27 — Apple Family Controls Entitlement Request
+
+**Status:** not started
+
+**Goal.** File the Family Controls distribution entitlement request with Apple, before any Swift is written, so no iOS work proceeds on the assumption of an approval that may not come.
+
+**Depends on.** Nothing technical. It needs an Apple Developer account and a description of the product.
+
+**Branch.** `phase/27-apple-entitlement-request`
+
+**Out of scope.** Any Swift. Any Xcode project. Any iOS design. This phase writes a request and files it.
+
+This is the first iOS phase, and it is deliberately first: everything after it becomes wasted work if Apple refuses. It runs after Android has shipped, which was the owner's decision.
+
+The cost of that decision, recorded here so it is never a surprise: **Apple's answer will not be known until the iOS track begins.** The request can take weeks and it can be refused. A refusal discovered here costs nothing already built, because no iOS work will have started — but it also means the project spends the entire Android cycle without knowing whether iOS is possible at all. That is an accepted trade, not an oversight. Anyone who wants the answer sooner can run this phase at any time: nothing in the Android track depends on it, and it can be started in parallel with any Android phase.
+
+### Tasks
+
+- [ ] Confirm an Apple Developer account exists, or record that obtaining one is the first blocker
+- [ ] Reserve the bundle identifier and create the App ID
+- [ ] Write the entitlement request describing what BlockSocial does with Family Controls and why
+- [ ] State in the request that the app is for the device owner's own use, never for controlling another person's device
+- [ ] Reuse the mechanism description already cross-read in `docs/store/play/`, so both stores are told the same thing
+- [ ] Submit the request
+- [ ] Record the submission date, the exact text submitted, and the reference number
+- [ ] Set a reminder to chase it if no answer arrives
+
+**Expected result.** A submitted request with its date and text recorded, or a written statement of what blocks submission.
+
+### Automated checks
+
+- [ ] The submitted text contains no claim absent from `docs/PRODUCT.md` — agent cross-reads
+- [ ] The request does not describe BlockSocial as parental control — agent greps the submitted text
+- [ ] The mechanism description matches the one in `docs/store/play/ACCESSIBILITY_DECLARATION.md` in substance — agent compares
+- [ ] The recorded date and reference are present, not left blank — agent verifies
+
+### Agent checklist
+
+- [ ] The request describes the real mechanism, in the same terms as the Play package
+- [ ] It never claims the app assists users with disabilities
+- [ ] The record states plainly that the entitlement is not granted until Apple says so
+- [ ] No later phase treats a pending request as an approval
+
+### Manual scenarios for the user
+
+1. Read the request text before it is sent and confirm it describes the product you want to build.
+2. Submit it, or have the teammate submit it from the developer account.
+3. Record the answer here when it arrives, whatever it is.
+
+### Definition of Done
+
+Request submitted with date and text recorded, or the blocker to submitting it written down.
+
+### Risks
+
+| Risk | Response |
+|---|---|
+| Apple refuses the entitlement | risk `R-02`. No iOS work has been done yet, so nothing built is lost; the decision becomes whether iOS ships at all |
+| The answer arrives slowly and phases 28 onward stall | this phase can be run early, in parallel with any Android phase, precisely to avoid that; it sits here only because iOS was deferred as a whole |
+| No Apple Developer account yet | record it as the blocker; it costs money and time |
+
+### Documents to update
+
+`docs/ios/ENTITLEMENT_REQUEST.md`, `docs/TECHNICAL_SPECIFICATION.md` risk `R-02`
+
+### Merge into `dev` when
+
+The request is submitted and recorded, or the blocker is documented.
+
+---
+
+
 # iOS Validation
 
 
+
 Every iOS phase ends with a handoff document in `docs/handoffs/HANDOFF_<phase>.md` written by the agent, containing commit hash, Xcode and iOS versions, affected targets, exact build steps, expected behavior, numbered test cases, required evidence, and known limitations. The teammate executes it and returns a report. The agent never claims an iOS phase works before that report arrives.
+
 
 
 ## Phase 28 — iOS Spike: Skeleton, Targets, and Signing
@@ -2171,15 +2184,15 @@ Every iOS phase ends with a handoff document in `docs/handoffs/HANDOFF_<phase>.m
 
 **Goal.** Get all five targets building and signing on the teammate's machine.
 
-**Depends on.** Phases 00 and 07. Phase 07 submitted the Family Controls entitlement request long before this phase; its outcome is read here, not requested here.
+**Depends on.** Phases 00 and 27. Phase 27 filed the Family Controls entitlement request; its outcome is read here, not requested here.
 
 **Branch.** `phase/28-ios-skeleton`
 
-**Out of scope.** Any product feature. UI beyond a placeholder. Persistence. Requesting the entitlement, which phase 07 already did.
+**Out of scope.** Any product feature. UI beyond a placeholder. Persistence. Requesting the entitlement, which phase 27 already did.
 
 ### Tasks
 
-- [ ] Read the current entitlement status recorded in phase 07 and state it plainly before anything else
+- [ ] Read the current entitlement status recorded in phase 27 and state it plainly before anything else
 - [ ] Create the Xcode project with the main app and three extension targets
 - [ ] Create the test target
 - [ ] Configure the App Group across all targets
@@ -2206,7 +2219,7 @@ Teammate-side, listed in the handoff:
 
 ### Agent checklist
 
-- [ ] The entitlement status from phase 07 is stated at the top of the result, granted or not
+- [ ] The entitlement status from phase 27 is stated at the top of the result, granted or not
 - [ ] Bundle identifiers follow one consistent scheme
 - [ ] App Group identifier is identical across targets
 - [ ] Extensions contain no networking and no heavy dependencies
@@ -2225,13 +2238,13 @@ The agent writes these into the handoff; the teammate executes them.
 
 ### Definition of Done
 
-Teammate reports all targets building and signing, or a precise blocker list; entitlement status from phase 07 recorded; `ios/BUILD_ENVIRONMENT.md` filled from the report.
+Teammate reports all targets building and signing, or a precise blocker list; entitlement status from phase 27 recorded; `ios/BUILD_ENVIRONMENT.md` filled from the report.
 
 ### Risks
 
 | Risk | Response |
 |---|---|
-| The entitlement was never granted | phase 07 should have surfaced this long ago; if it is still open here, stop and decide whether iOS proceeds at all before writing more Swift |
+| The entitlement was never granted | phase 27 should have surfaced this long ago; if it is still open here, stop and decide whether iOS proceeds at all before writing more Swift |
 | Provisioning complexity across four App IDs | one target at a time; the handoff isolates the failing one |
 
 ### Documents to update
@@ -2621,6 +2634,7 @@ Teammate report received, boundaries recorded, no stale shield.
 ---
 
 
+
 # iOS Contract and Gate
 
 ## Phase 34 — iOS Contract Conformance and Validation Gate
@@ -2629,18 +2643,18 @@ Teammate report received, boundaries recorded, no stale shield.
 
 **Goal.** Prove the shared fixtures are satisfiable on iOS, convert the iOS spike evidence into decisions, and decide whether iOS implementation proceeds.
 
-**Depends on.** Phases 08 and 28 through 33.
+**Depends on.** Phases 07 and 28 through 33.
 
 **Branch.** `phase/34-ios-validation-gate`
 
 **Out of scope.** Any iOS product implementation. Any change to Android behaviour that is not forced by a fixture failure.
 
-This phase carries the debt created by building Android first. The fixtures in phase 08 were written from Android evidence, and this is where iOS gets its say. A fixture iOS cannot satisfy is not an iOS problem to work around: it is a contract error, and fixing it changes both platforms.
+This phase carries the debt created by building Android first. The fixtures in phase 07 were written from Android evidence, and this is where iOS gets its say. A fixture iOS cannot satisfy is not an iOS problem to work around: it is a contract error, and fixing it changes both platforms.
 
 ### Tasks
 
 - [ ] Run the shared fixtures against the iOS domain implementation from the spikes
-- [ ] Start with the cases phase 08 marked as at risk from Apple limits
+- [ ] Start with the cases phase 07 marked as at risk from Apple limits
 - [ ] Record every fixture that fails, with the Apple limit or behaviour that causes it
 - [ ] For each failure decide: change the fixture and Android with it, or accept a documented per-platform difference
 - [ ] Collect every iOS spike result and its decision into one summary table
@@ -2698,10 +2712,13 @@ Conformance report complete, Android green against the final fixtures, iOS verdi
 ---
 
 
+
 # iOS MVP
 
 
+
 Every phase below produces a handoff document and a teammate test checklist written by the agent. No iOS phase is done before the teammate's report arrives.
+
 
 
 ## Phase 35 — iOS: Production Skeleton
@@ -3501,6 +3518,7 @@ TestFlight verification complete, no critical or major defects open.
 ---
 
 
+
 # iOS Release
 
 ## Phase 46 — App Store Submission Preparation
@@ -3723,7 +3741,7 @@ Both suites green, no critical or major defects open.
 
 **Branch.** `phase/49-ios-release-candidate`
 
-**Out of scope.** Post-release features. Monetization. Android, which released in phase 27.
+**Out of scope.** Post-release features. Monetization. Android, which released in phase 26.
 
 Android is already live by this point. Anything shipped here must not change Android behaviour without a deliberate Android release of its own.
 
@@ -3811,13 +3829,13 @@ Feature requests collected during beta are recorded here without commitment.
 
 | Risk | Where it is addressed |
 |---|---|
-| Google Play rejects the Accessibility use case | phases 06, 24, 27 |
-| Apple withholds the Family Controls entitlement | phases 07, 28, 34 |
+| Google Play rejects the Accessibility use case | phases 06, 23, 26 |
+| Apple withholds the Family Controls entitlement | phases 27, 28, 34 |
 | The iOS bypass cannot be made predictable | phases 32, 40, 47 |
-| The Android overlay is unstable on API 36 | phases 02, 14, 23 |
-| App selection requires broad package visibility | phases 03, 16, 24 |
-| Usage measurement too poor for daily limits | phases 05, 18, 41 |
-| OEM background termination | unmeasurable on an emulator; surfaced by protection health in phase 20, confirmed by beta testers in phase 25 |
-| The domain contract is written from Android evidence alone | phase 08 marks the cases at risk; phase 34 proves them on iOS and pays for any that fail |
+| The Android overlay is unstable on API 36 | phases 02, 13, 22 |
+| App selection requires broad package visibility | phases 03, 15, 23 |
+| Usage measurement too poor for daily limits | phases 05, 17, 41 |
+| OEM background termination | unmeasurable on an emulator; surfaced by protection health in phase 19, confirmed by beta testers in phase 24 |
+| The domain contract is written from Android evidence alone | phase 07 marks the cases at risk; phase 34 proves them on iOS and pays for any that fail |
 | iOS verification cadence too slow | one mechanism per handoff, every iOS phase |
-| Scope growth from beta feedback | phases 26 and 48 route requests to the backlog |
+| Scope growth from beta feedback | phases 25 and 48 route requests to the backlog |

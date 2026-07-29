@@ -76,6 +76,6 @@ To be set at publication.
 ## Notes for the reviewer of this draft, not part of the published text
 
 - Two placeholders remain deliberately: the last-updated date and the contact address. Both are set at publication and cannot be filled honestly now. They are the only ones.
-- The claim "no internet permission" must be re-verified against the shipping manifest in phase 24. It is true of every spike today.
-- The section on storage lists what production will store. Only temporary openings exist so far, in spike `A-04`. The wording is written for the shipping product because that is what the policy will accompany; phase 24 must confirm it still matches.
+- The claim "no internet permission" must be re-verified against the shipping manifest in phase 23. It is true of every spike today.
+- The section on storage lists what production will store. Only temporary openings exist so far, in spike `A-04`. The wording is written for the shipping product because that is what the policy will accompany; phase 23 must confirm it still matches.
 - The debug-logging gap recorded in `DATA_INVENTORY.md` section 8 must be closed before this policy is published, because the policy says nothing leaves the device and a release log is a place a package name could leak.

@@ -30,11 +30,11 @@ blocksocial/
 
 `docs/PLAN.md` holds 50 phases from git setup to two store submissions.
 
-**Android runs first, all the way to the Play Store, then iOS begins.** Phases 00 to 06 are complete: the Android mechanisms are validated on an emulator and the Play policy package is written. Phases 08 to 27 build and ship Android. Phases 28 to 49 do the same for iOS afterwards.
+**Android runs first, all the way to the Play Store, then iOS begins.** Phases 00 to 06 are complete: the Android mechanisms are validated on an emulator and the Play policy package is written. Phases 07 to 26 build and ship Android. Phases 27 to 49 do the same for iOS afterwards.
 
-The one exception is phase 07, which files the Apple Family Controls entitlement request early. It is paperwork, not development, but Apple's answer is slow and can be no, and that answer decides whether iOS happens at all.
+The iOS track opens with phase 27, the Apple Family Controls entitlement request. It is paperwork rather than development, and it comes first so that a refusal costs no Swift. It depends on nothing and can be pulled forward at any time.
 
-What this ordering costs is written down rather than discovered later: the domain contract in phase 08 is frozen from Android evidence alone, and phase 34 is where iOS gets its say and where any resulting Android rework is paid for.
+What this ordering costs is written down rather than discovered later. The domain contract in phase 07 is frozen from Android evidence alone, and phase 34 is where iOS gets its say and where any resulting Android rework is paid for. Apple's answer on the entitlement is not known during the Android cycle at all.
 
 Android uses no physical device at any point. What that costs, and who carries the risk instead, is stated in `docs/TECHNICAL_SPECIFICATION.md` section 9.
 
