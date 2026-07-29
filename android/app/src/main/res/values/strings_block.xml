@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="block_window_title">BlockSocial pause</string>
+    <string name="block_app_line">You opened %1$s</string>
+    <string name="block_headline_always">You set this app to stay closed</string>
+    <string name="block_headline_schedule_until">A schedule is holding this until %1$s</string>
+    <string name="block_headline_schedule">A schedule is holding this</string>
+    <string name="block_headline_daily_limit">You have reached your time for today</string>
+    <string name="block_supporting">Nothing here is locked. You can change or remove this rule whenever you want.</string>
+    <string name="block_stay_focused">Stay Focused</string>
+    <string name="block_open_temporarily">Open Temporarily</string>
+    <string name="block_footnote">%1$d of %2$d opens today ended here</string>
+</resources>

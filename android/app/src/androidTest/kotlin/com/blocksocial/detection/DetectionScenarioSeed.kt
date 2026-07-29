@@ -1,5 +1,6 @@
 package com.blocksocial.detection
 
+import android.util.Log
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -8,6 +9,7 @@ import com.blocksocial.core.data.mapper.toEntity
 import com.blocksocial.core.model.AppRef
 import com.blocksocial.core.model.RestrictedApp
 import com.blocksocial.core.model.RestrictionRule
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -45,7 +47,26 @@ class DetectionScenarioSeed {
         }
     }
 
+    @Test
+    fun reportRecordedBlockEvents() = runTest {
+        val database = database()
+        try {
+            val events = database.blockEventDao().observeRecent(20).first()
+            events.forEach {
+                Log.i(
+                    SCENARIO_TAG,
+                    "event app=${it.appCatalogId} action=${it.userAction} " +
+                        "reason=${it.primaryReason} bypassMinutes=${it.bypassDurationMinutes}",
+                )
+            }
+            Log.i(SCENARIO_TAG, "total=${events.size}")
+        } finally {
+            database.close()
+        }
+    }
+
     private companion object {
+        const val SCENARIO_TAG = "BlockSocialScenario"
         val YOUTUBE = AppRef("youtube")
     }
 }

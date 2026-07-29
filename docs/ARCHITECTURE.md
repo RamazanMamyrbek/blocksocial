@@ -99,6 +99,12 @@ Actions:
 
 Recovery guarantees: the overlay can always be removed, a watchdog timeout prevents a stuck overlay, and the overlay is removed on a package change. Settings, the launcher, the phone app, and system UI are on a permanent allowlist.
 
+**Every way out is a recorded outcome.** Spike `A-02` found that the system back key removed the overlay silently and recorded nothing, which is a bypass the history would never show. Back is now treated as `Stay Focused`: the user chose to leave, so the event says so. The watchdog and the foreground moving elsewhere record `DISMISSED_BY_SYSTEM`, which the statistics never count as either a refusal or a bypass. A test walks every dismissal path and asserts the window count returns to zero and the outcome is reported.
+
+The status bar and the notification shade stay reachable above the block screen. This is deliberate: the product is a pause, not a cage, and trapping the user under a full-screen window would be both hostile and hard to defend under Play policy. Because system UI does not end a visit, reaching the shade does not produce a second block.
+
+The screen carries the whole decision without scrolling at the largest font scale and in a landscape-shaped viewport, both verified on an Android 16 emulator. Rotation itself is still unverified: neither the `A-02` AVD nor this one rotates, so the display never leaves `rotation 0`. It stays open and moves to phase 22, where the API-level matrix needs an AVD that rotates anyway.
+
 ### Application selection
 
 A curated JSON catalog at `shared/supported-app-catalog/catalog.json`, with every package declared through targeted `<queries>`. `PackageManager` decides which catalog entries are installed. Missing entries render as a normal, explained state rather than an error.

@@ -1101,7 +1101,7 @@ Tests green, five scenarios verified by the owner.
 
 ## Phase 13 — Android: Block Screen
 
-**Status:** not started
+**Status:** done, with one item carried forward. The block screen appears on a real launch on an Android 16 emulator and every outcome is recorded, including the back key, which spike `A-02` found removed the overlay silently. 250 tests green. **Rotation is still unverified**: this AVD does not rotate either, so the item moves to phase 22 rather than being ticked. TalkBack remains for the owner. The service was seen in `Crashed services` once and could not be reproduced; the error handling that failure class needs was added regardless.
 
 **Goal.** Implement the production block screen using the chosen design direction, driven by real detection.
 
@@ -1113,34 +1113,34 @@ Tests green, five scenarios verified by the owner.
 
 ### Tasks
 
-- [ ] Implement the overlay host in the accessibility service
-- [ ] Build the block screen from the chosen design direction and the phase 09 tokens
-- [ ] Show the application, the active rule, and the time remaining
-- [ ] Implement the primary action returning the user home
-- [ ] Implement the secondary action as a stub that only records intent
-- [ ] Record a `BlockEvent` for each decision
-- [ ] Implement the watchdog timeout and removal on package change
-- [ ] Support light and dark, landscape, and the largest font scale
-- [ ] Decide and implement what the system back key does, then record it like any other outcome — carried over from spike A-02, where back removed the overlay silently and recorded nothing
+- [x] Implement the overlay host in the accessibility service
+- [x] Build the block screen from the chosen design direction and the phase 09 tokens
+- [x] Show the application, the active rule, and the time remaining
+- [x] Implement the primary action returning the user home
+- [x] Implement the secondary action as a stub that only records intent
+- [x] Record a `BlockEvent` for each decision
+- [x] Implement the watchdog timeout and removal on package change
+- [x] Support light and dark, landscape, and the largest font scale
+- [x] Decide and implement what the system back key does, then record it like any other outcome — carried over from spike A-02, where back removed the overlay silently and recorded nothing
 - [ ] Verify rotation on an AVD configured to rotate — carried over from spike A-02, where the AVD could not rotate at all
-- [ ] Decide deliberately whether the status bar and notification shade stay reachable above the block screen — spike A-02 left them reachable by default
+- [x] Decide deliberately whether the status bar and notification shade stay reachable above the block screen — spike A-02 left them reachable by default
 
 **Expected result.** A working block screen that appears on a real launch and records the decision.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes, covering event recording for both actions — agent runs
-- [ ] Compose UI tests for both themes and the largest font scale — agent runs
-- [ ] Accessibility test asserting every interactive element has a label — agent runs
-- [ ] Instrumented test asserting the overlay always detaches — agent runs on the emulator
+- [x] `./gradlew test` passes, covering event recording for both actions — agent runs
+- [x] Compose UI tests for both themes and the largest font scale — agent runs
+- [x] Accessibility test asserting every interactive element has a label — agent runs
+- [x] Instrumented test asserting the overlay always detaches — agent runs on the emulator
 
 ### Agent checklist
 
-- [ ] The screen never imitates system UI
-- [ ] There is no forced wait before the primary action works
-- [ ] Focus order reaches the primary action first
-- [ ] Copy contains no shaming language and no hardcoded duration promise
-- [ ] Every string is a resource, none hardcoded
+- [x] The screen never imitates system UI
+- [x] There is no forced wait before the primary action works
+- [x] Focus order reaches the primary action first
+- [x] Copy contains no shaming language and no hardcoded duration promise
+- [x] Every string is a resource, none hardcoded
 
 ### Manual scenarios for the user
 
