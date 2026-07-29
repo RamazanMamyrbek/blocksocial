@@ -673,7 +673,7 @@ Package complete and cross-read, no contradictions found.
 
 ## Phase 07 — Domain Contract and Fixtures
 
-**Status:** not started
+**Status:** done — 58 cases across four files, validated by `shared/fixtures-validator` with 26 checks, all green. Four cases marked at risk from Apple limits, all in the bypass corpus.
 
 **Goal.** Freeze the rule evaluator contract and the event contract as shared JSON fixtures, so Android has one definition to implement and iOS has one definition to conform to later.
 
@@ -689,36 +689,36 @@ That is a real cost, not a neutral reordering. The mitigation is to keep the fix
 
 ### Tasks
 
-- [ ] Create `shared/fixtures/schedule-cases.json`
-- [ ] Create `shared/fixtures/bypass-cases.json`
-- [ ] Create `shared/fixtures/daily-limit-cases.json`
-- [ ] Create `shared/fixtures/rule-priority-cases.json`
-- [ ] Cover normal interval, overnight interval, selected weekday, disabled rule
-- [ ] Cover active bypass, expired bypass, bypass on a second app
-- [ ] Cover limit not reached, limit reached, limit reset at local midnight
-- [ ] Cover time-zone change and DST transition in both directions
-- [ ] Carry over the two clock rules proven in spike `A-03`: a clock moved backwards must not extend a grant, and a reboot must not resurrect an expired one
-- [ ] Carry over the day-boundary arithmetic proven in spike `A-05`, including a 23-hour and a 25-hour day
-- [ ] Freeze the `BlockEvent` field list and schema version
-- [ ] Write a fixture schema so malformed cases fail loudly
-- [ ] Mark every case that a known Apple limit could make unsatisfiable, so phase 34 has a shortlist rather than a search
+- [x] Create `shared/fixtures/schedule-cases.json`
+- [x] Create `shared/fixtures/bypass-cases.json`
+- [x] Create `shared/fixtures/daily-limit-cases.json`
+- [x] Create `shared/fixtures/rule-priority-cases.json`
+- [x] Cover normal interval, overnight interval, selected weekday, disabled rule
+- [x] Cover active bypass, expired bypass, bypass on a second app
+- [x] Cover limit not reached, limit reached, limit reset at local midnight
+- [x] Cover time-zone change and DST transition in both directions
+- [x] Carry over the two clock rules proven in spike `A-03`: a clock moved backwards must not extend a grant, and a reboot must not resurrect an expired one
+- [x] Carry over the day-boundary arithmetic proven in spike `A-05`, including a 23-hour and a 25-hour day
+- [x] Freeze the `BlockEvent` field list and schema version
+- [x] Write a fixture schema so malformed cases fail loudly
+- [x] Mark every case that a known Apple limit could make unsatisfiable, so phase 34 has a shortlist rather than a search
 
 **Expected result.** A fixture corpus that Android loads now and iOS loads later, with every case carrying inputs and one expected domain result.
 
 ### Automated checks
 
-- [ ] Every fixture file validates against its schema — agent runs a validation script
-- [ ] No two cases have the same identifier — agent runs
-- [ ] Every enumerated business rule in `docs/PRODUCT.md` has at least one case — agent maps them and reports gaps
-- [ ] No case name, field or comment mentions an Android class, API or package — agent greps
+- [x] Every fixture file validates against its schema — agent runs a validation script
+- [x] No two cases have the same identifier — agent runs
+- [x] Every enumerated business rule in `docs/PRODUCT.md` has at least one case — agent maps them and reports gaps
+- [x] No case name, field or comment mentions an Android class, API or package — agent greps
 
 ### Agent checklist
 
-- [ ] Cases state expected results, not implementation details
-- [ ] Overnight and DST cases specify the exact local times
-- [ ] Daily-limit cases include the approximate-measurement tolerance
-- [ ] Nothing in the corpus assumes a mechanism only Android has
-- [ ] The cases at risk from Apple limits are marked, and the reason is written next to each
+- [x] Cases state expected results, not implementation details
+- [x] Overnight and DST cases specify the exact local times
+- [x] Daily-limit cases include the approximate-measurement tolerance
+- [x] Nothing in the corpus assumes a mechanism only Android has
+- [x] The cases at risk from Apple limits are marked, and the reason is written next to each
 
 ### Manual scenarios for the user
 
