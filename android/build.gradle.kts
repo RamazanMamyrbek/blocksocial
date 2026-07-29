@@ -86,6 +86,22 @@ val checkDomainIsFrameworkFree by tasks.registering {
     }
 }
 
+val checkNoDestructiveMigration by tasks.registering {
+    group = "verification"
+    description = "Fails when shipped code allows Room to drop the user's data on a schema change."
+    doLast {
+        val offenders = fileTree(rootDir) {
+            include("*/src/main/**/*.kt")
+        }.filter { it.readText().contains("fallbackToDestructiveMigration") }.files
+        if (offenders.isNotEmpty()) {
+            throw GradleException(
+                "Destructive migration is never acceptable in shipped code:\n" +
+                    offenders.joinToString("\n") { it.relativeTo(rootDir).path },
+            )
+        }
+    }
+}
+
 tasks.named("check") {
-    dependsOn(checkModuleGraph, checkDomainIsFrameworkFree)
+    dependsOn(checkModuleGraph, checkDomainIsFrameworkFree, checkNoDestructiveMigration)
 }

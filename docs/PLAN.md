@@ -967,7 +967,7 @@ All fixture tests green, no Android dependency in the domain modules.
 
 ## Phase 11 — Android: Persistence Layer
 
-**Status:** not started
+**Status:** done — six tables at schema version 1, exported and committed. 15 unit tests and 14 instrumented tests green on an Android 16 emulator. Survival was verified rather than assumed: data seeded, then read back after a force-stop and again after a reboot, without reseeding. Two stale blocks in `docs/TECHNICAL_SPECIFICATION.md` section 2 were corrected, both reported.
 
 **Goal.** Implement Room and DataStore with a migration policy, so state survives process death and reboot.
 
@@ -979,30 +979,30 @@ All fixture tests green, no Android dependency in the domain modules.
 
 ### Tasks
 
-- [ ] Define Room entities for restricted apps, rules, grants, block events, usage sessions, aggregates
-- [ ] Define DAOs with the queries the features need
-- [ ] Implement repositories over the DAOs
-- [ ] Configure DataStore for onboarding, theme, language, consent, permission snapshot
-- [ ] Write the schema version and export the schema
-- [ ] Add a migration test from version one
-- [ ] Forbid destructive migration in release builds
+- [x] Define Room entities for restricted apps, rules, grants, block events, usage sessions, aggregates
+- [x] Define DAOs with the queries the features need
+- [x] Implement repositories over the DAOs
+- [x] Configure DataStore for onboarding, theme, language, consent, permission snapshot
+- [x] Write the schema version and export the schema
+- [x] Add a migration test from version one
+- [x] Forbid destructive migration in release builds
 
 **Expected result.** A persistence layer with an exported schema, migration test, and repositories the domain can use.
 
 ### Automated checks
 
-- [ ] `./gradlew :core-data:test` passes — agent runs
-- [ ] Room schema is exported to the repository — agent verifies the file exists
-- [ ] Migration test passes — agent runs
-- [ ] No `fallbackToDestructiveMigration` in the release configuration — agent greps
-- [ ] Instrumented DAO tests pass — agent runs on the emulator
+- [x] `./gradlew :core-data:test` passes — agent runs
+- [x] Room schema is exported to the repository — agent verifies the file exists
+- [x] Migration test passes — agent runs
+- [x] No `fallbackToDestructiveMigration` in the release configuration — agent greps
+- [x] Instrumented DAO tests pass — agent runs on the emulator
 
 ### Agent checklist
 
-- [ ] Entities carry a schema version
-- [ ] No user content is stored beyond package identifiers and timestamps
-- [ ] Repositories expose domain types, not entities
-- [ ] Indices exist for every query used on a hot path
+- [x] Entities carry a schema version
+- [x] No user content is stored beyond package identifiers and timestamps
+- [x] Repositories expose domain types, not entities
+- [x] Indices exist for every query used on a hot path
 
 ### Manual scenarios for the user
 

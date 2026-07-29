@@ -167,6 +167,27 @@ Every case in `shared/fixtures/` runs as its own test, so the report names the c
 
 Room holds restricted apps, rules, temporary grants, block events, usage sessions, and statistics aggregates. DataStore holds onboarding state, language, theme, consent versions, debug flags, and the last permission snapshot. Destructive production migrations are prohibited.
 
+Six tables, schema version 1, exported to `android/core-data/schemas/` and committed. The export is not decoration: a migration test opens the database at the exported schema and validates it against the entities, so an entity that drifts from the committed schema fails the build rather than a user's install.
+
+**Destructive migration is forbidden by a check, not by discipline.** `checkNoDestructiveMigration` fails the build if `fallbackToDestructiveMigration` appears anywhere in shipped source. Without a migration, Room refuses to open a changed schema and says so; it never silently drops what the user recorded.
+
+Everything is stored as primitives — strings, integers, epoch milliseconds — so the schema is readable without a converter registry, and a test asserts that no column outside an approved list exists. That list is the enforcement point for the privacy rule: nothing is stored beyond catalog identifiers, enumerated decisions, and timestamps.
+
+Keys and indices follow the questions the application actually asks:
+
+| Table | Key | Index | Asked by |
+|---|---|---|---|
+| `restriction_rule` | rule id | `appCatalogId` + `enabled` | every detection, for one application |
+| `temporary_access_grant` | **`appCatalogId`** | — | every detection, for one application |
+| `usage_session` | generated | `appCatalogId` + `fromEpochMillis` | the daily-limit day window |
+| `block_event` | event id | `occurredAtEpochMillis` | history, newest first |
+
+A grant is keyed by its application rather than by a grant id, so an application cannot hold two grants at once and re-granting is idempotent by construction. That is the storage half of the rule that a block must not reappear until the grant expires.
+
+Rules reference the catalog identifier, never a package name, and deleting an application cascades to its rules. Repositories return domain types; entities do not leave `core-data`.
+
+Both survival guarantees were verified on an Android 16 emulator by seeding the database and preferences, then reading them back after a force-stop and again after a reboot, without reseeding.
+
 ### Background work
 
 The accessibility service is the runtime mechanism. WorkManager handles only deferrable work: daily aggregation, old-event cleanup, consistency checks, and statistics preparation. There is no permanent foreground service and no polling.
