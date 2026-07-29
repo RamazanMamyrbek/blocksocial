@@ -17,6 +17,9 @@ import com.blocksocial.block.BlockOverlayController
 import com.blocksocial.block.BlockPresentation
 import com.blocksocial.block.BlockScreen
 import com.blocksocial.core.data.repository.BlockEventRepository
+import com.blocksocial.core.data.repository.TemporaryAccessGrantRepository
+import com.blocksocial.core.domain.BypassEvaluator
+import com.blocksocial.core.domain.GrantEvaluation
 import com.blocksocial.core.domain.RestrictionDecision
 import com.blocksocial.core.domain.ScheduleEvaluator
 import com.blocksocial.core.model.AppRef
@@ -49,6 +52,9 @@ class BlockSocialAccessibilityService : AccessibilityService() {
     @Inject
     lateinit var blockEvents: BlockEventRepository
 
+    @Inject
+    lateinit var grants: TemporaryAccessGrantRepository
+
     @Volatile
     private var snapshot: ProtectionSnapshot = ProtectionSnapshot.Empty
 
@@ -56,6 +62,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
     private var overlay: BlockOverlayController? = null
     private var scope: CoroutineScope? = null
     private var reasonsWhenShown: List<RuleMode> = listOf(RuleMode.ALWAYS)
+    private var grantedDurationMinutes: Int = BypassPolicy.Android.grantDurationMinutes
 
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -84,6 +91,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
 
         val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         scope = serviceScope
+        serviceScope.launch { sweepSpentGrants() }
         serviceScope.launch {
             snapshotSource.snapshots()
                 .catch { failure -> DetectionLog.lifecycle("snapshot-failed", failure.javaClass.simpleName) }
@@ -117,6 +125,11 @@ class BlockSocialAccessibilityService : AccessibilityService() {
             overlay?.dismissIfForegroundLeft(result.app)
         }
 
+        val evaluation = result.decision?.bypass?.evaluation
+        if (result.app != null && evaluation != null && evaluation.isSpent()) {
+            forgetGrant(result.app, evaluation)
+        }
+
         if (result.shouldBlock && result.app != null && result.decision != null) {
             showBlock(result.app, result.decision, current)
         }
@@ -133,10 +146,41 @@ class BlockSocialAccessibilityService : AccessibilityService() {
                         overlay?.dismiss(BlockOutcome.STAYED_FOCUSED)
                         performGlobalAction(GLOBAL_ACTION_HOME)
                     },
-                    onOpenTemporarily = { overlay?.dismiss(BlockOutcome.OPENED_TEMPORARILY) },
+                    onOpenTemporarily = {
+                        grantTemporaryAccess(app)
+                        overlay?.dismiss(BlockOutcome.OPENED_TEMPORARILY)
+                    },
                 )
             }
         }
+    }
+
+    private suspend fun sweepSpentGrants() {
+        val at = readDeviceTime()
+        runCatching { grants.all() }
+            .getOrDefault(emptyList())
+            .filter { BypassEvaluator.evaluate(it, it.forApp, at).evaluation?.isSpent() == true }
+            .forEach { spent ->
+                DetectionLog.lifecycle("grant-swept", "app=${spent.forApp.value}")
+                runCatching { grants.clear(spent.forApp) }
+            }
+    }
+
+    private fun grantTemporaryAccess(app: AppRef) {
+        val grant = BypassPolicy.Android.grant(app, readDeviceTime())
+        grantedDurationMinutes = grant.durationMinutes
+        snapshot = snapshot.copy(grantsByApp = snapshot.grantsByApp + (app to grant))
+        DetectionLog.lifecycle("granted", "app=${app.value} minutes=${grant.durationMinutes}")
+        scope?.launch {
+            runCatching { grants.put(grant) }
+                .onFailure { DetectionLog.lifecycle("grant-failed", it.javaClass.simpleName) }
+        }
+    }
+
+    private fun forgetGrant(app: AppRef, evaluation: GrantEvaluation) {
+        snapshot = snapshot.copy(grantsByApp = snapshot.grantsByApp - app)
+        DetectionLog.lifecycle("grant-cleared", "app=${app.value} evaluation=$evaluation")
+        scope?.launch { runCatching { grants.clear(app) } }
     }
 
     private fun presentationFor(
@@ -181,7 +225,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
             primaryReason = reasons.first(),
             allReasons = reasons,
             userAction = outcome.userAction,
-            bypassDurationMinutes = BypassPolicy.Android.grantDurationMinutes
+            bypassDurationMinutes = grantedDurationMinutes
                 .takeIf { outcome.userAction == UserAction.BYPASSED },
             platform = Platform.ANDROID,
         )
@@ -221,6 +265,17 @@ class BlockSocialAccessibilityService : AccessibilityService() {
         monotonicMillis = SystemClock.elapsedRealtime(),
         zone = ZoneId.systemDefault(),
     )
+}
+
+private fun GrantEvaluation.isSpent(): Boolean = when (this) {
+    GrantEvaluation.EXPIRED,
+    GrantEvaluation.EXPIRED_AFTER_REBOOT,
+    GrantEvaluation.DISCARDED_CLOCK_MOVED_BEFORE_GRANT,
+    -> true
+
+    GrantEvaluation.ACTIVE,
+    GrantEvaluation.ACTIVE_AFTER_REBOOT,
+    -> false
 }
 
 private fun TransitionOutcome.movesTheForeground(): Boolean = when (this) {
