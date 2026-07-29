@@ -99,6 +99,8 @@ All color roles are authored in `oklch()`. Dark theme is authored first, light t
 
 Hex values below are recomputed from the `oklch()` sources for implementation convenience. They are approximate; browsers may gamut-map slightly differently. Treat `oklch()` as the source of truth and regenerate hex during implementation.
 
+Section 12 records the regeneration performed in phase 09 and the conversion that produced it. Every hex in the two tables below was reproduced exactly, so no value here needed correcting.
+
 #### Dark theme
 
 | Role | Source | Approx. hex |
@@ -278,9 +280,9 @@ Option 2e states: "A streak counts days where you stayed with every rule. Openin
 
 The design's rule is stricter than the concept's and turns a legitimate bypass into a streak-ending event, which sits uneasily beside the principle that a bypass is not a failure. This must be resolved in favor of one document before the dashboard is designed.
 
-### 9.2 Estimated time is derived from grant length, not from usage
+### 9.2 Estimated time is derived from grant length, not from usage — resolved
 
-Option 2e derives "Time in app" from the length of granted bypasses. `docs/TECHNICAL_SPECIFICATION.md` section 4 assigns usage measurement to `UsageStatsManager`. Which source feeds this tile is an open question, and it depends on spike `A-05`. Until then the tile's provenance label is provisional.
+Option 2e derives "Time in app" from the length of granted bypasses. Spike `A-05` has since returned and `Q-03` is answered in `docs/PRODUCT.md`: the metric comes from Android usage statistics read as events, not from grant length. The design's provenance label is therefore wrong and the tile must be relabelled when the dashboard is designed. The `EST` badge, the dashed border and the tilde stay, because the measurement is still approximate.
 
 ### 9.3 Contrast figures in the export are approximate
 
@@ -304,11 +306,31 @@ Manrope and IBM Plex Mono are both open-licensed, but neither ships with Android
 
 Everything is rendered at 412 × 892. The brief requires the block screen to be decidable without scrolling on the smallest supported device. That case has not been tested.
 
-### 9.6 The block screen direction is unchosen
+### 9.6 The block screen direction is unchosen — resolved
 
-Three directions exist and none is selected. 1c is the strongest expression of the product idea but is explicitly provisional on `A-02`; 1b is the safest and is named as the fallback; 1d is flagged by its own author as the likeliest to break the three-second rule.
+Three directions existed and none was selected. `A-02` has since returned and `docs/GATE_ANDROID.md` answers `Q-02`: the baseline is **1b, "Quiet"**. 1c stays a candidate for a later design pass. 1d is not implemented until a real user test exists.
 
-Recommended resolution: treat 1b as the baseline that must work, and treat 1c as the target to confirm after `A-02` returns. Do not implement 1d until a real user test exists.
+### 9.7 Three roles cannot carry text at the contrast the brief requires
+
+Section 9.3 recomputed five pairs, all of them `on-` roles, and all of them pass. Phase 09 measured **every** role against every surface step, which the export never did. Three results need a decision.
+
+| Role | Theme | On `surface` | On `surfaceContainer` | On `surfaceContainerHigh` |
+|---|---|---|---|---|
+| `warning` | light | 3.76:1 | 3.41:1 | 3.02:1 |
+| `outline` | dark | 2.43:1 | 2.18:1 | 1.83:1 |
+| `outline` | light | 1.78:1 | 1.61:1 | 1.43:1 |
+| `primary` | light | 5.44:1 | 4.93:1 | 4.37:1 |
+| `danger` | dark | 5.56:1 | 4.99:1 | 4.18:1 |
+
+**`warning` cannot be text in light theme.** It clears 3:1 everywhere, so it is sound as a fill, a glyph or a border, but amber warning *text* on a light surface fails 4.5:1 on every step. The protection health item, option 2d, is the surface where this matters.
+
+**`outline` clears no contrast threshold at all**, not even the 3:1 that WCAG asks of a control boundary. As a divider that is correct and intended; the problem is that option 2a makes the destructive button *outlined rather than filled*, so on that one control the outline is what identifies it. Either that button needs a second cue beyond the triangle glyph it already carries, or it needs a stronger border color.
+
+**`primary` and `danger` fall just under 4.5:1 on `surfaceContainerHigh`** — 4.37 and 4.18. Both are fine on the two lower steps. A colored label on the highest surface step is the case to avoid.
+
+None of this is a token defect. The palette is deliberately low-chroma and every role clears the non-text minimum. What it means is that the *usage* rules have to be written down, because the numbers do not permit "any role may be text on any surface". The design system sign-off named in 9.3 is where that belongs.
+
+The token tests in `android/core-ui` encode what is settled: 4.5:1 for every `on-` role on every surface step, 4.5:1 for `onPrimary` on `primary` and on `danger`, and 3:1 for every accent role. `outline` is deliberately excluded from the ratio gate and asserted only to differ from each surface step.
 
 ---
 
@@ -331,3 +353,44 @@ Treat the folder as read-only. Design decisions that must survive belong in this
 5. Request the iOS pass: authorization explanation, selection summary, and shield copy in English and Russian.
 6. Request light-theme renderings for the chosen block screen if it is not 1c.
 7. Produce the screen catalog and the copy deck, then re-check every provisional marker against spike results.
+
+---
+
+## 12. Token Conversion Record
+
+Written in plan phase 09, when the tokens were implemented in `android/core-ui`.
+
+### 12.1 How the hex values were derived
+
+`oklch()` → OKLab rectangular coordinates → LMS → linear sRGB → sRGB transfer function → 8-bit channels, rounded half-up. D65 throughout, no chromatic adaptation, no gamut mapping.
+
+No channel of any of the twenty tokens fell outside `[0, 1]` before clamping, so nothing was gamut-mapped and no token lost chroma in conversion. This matters: the palette is low-chroma by design, and that is what keeps it inside sRGB.
+
+The conversion was run twice, in two languages, by two independent implementations written from the same formula — once to produce the values and once inside the test suite to check them. Both agree, and both reproduce the export's own approximate table **exactly**, all twenty values. The recomputed contrast figures also reproduce the five in section 9.3, including the one that overstates its pair.
+
+### 12.2 Where the tokens live and what stops them drifting
+
+`android/core-ui/src/main/kotlin/com/blocksocial/core/ui/theme/Palette.kt` holds the twenty values as `Color` constants.
+
+`ColorTokenConversionTest` holds the `oklch()` triples copied from section 4.1 and re-derives every one at test time. Editing a hex without editing the documented source, or the reverse, fails the build. The design document is the source of truth in a way the build can check, which is what risk "colors drift from the design" asked for.
+
+### 12.3 Roles the design did not define
+
+The export defines ten roles per theme. Two additions were needed to render anything.
+
+| Addition | Value | Reason |
+|---|---|---|
+| `onPrimary`, dark | `surface`, `#11171B` | dark `primary` is light, so its label must be dark. 8.42:1 |
+| `onPrimary`, light | `#FFFFFF` | section 4.3 states white text on the light primary button. 5.81:1 |
+
+Material 3 requires forty-nine color slots; the design defines ten. Every slot is mapped from a documented token, with `scrim` as the single exception — pure black, which is the platform convention and carries no hue. `ColorSchemeTest` asserts that no slot holds a color outside the documented palette, so a stray Material default cannot reach the screen.
+
+Mappings worth knowing: `error` is `danger`, `surfaceVariant` is `surfaceContainer`, `secondary` and `tertiary` are both `primary` because the design has one accent, and `surfaceBright`/`surfaceDim` swap between themes because the surface ramp runs in opposite directions.
+
+### 12.4 What was implemented and what was deferred
+
+The type scale carries the documented sizes and weights. **The families are the platform defaults, not Manrope and IBM Plex Mono**, because finding 9.4 is unresolved and bundling two families is a decision with size and licensing consequences. Measured values use `FontFamily.Monospace` and prose uses `FontFamily.Default`, so the *distinction* the design makes is live and only the specific faces are pending. Line height is left unset because the design does not specify one; the platform derives it from font metrics rather than inheriting a Material default sized for a different scale.
+
+Spacing, radius and motion are implemented as documented. Reduce Motion reads the system animator duration scale and collapses all three durations to zero, live, without an application restart.
+
+`danger` is defined, converted, tested and mapped to the Material `error` slot. No product surface references it, per the export's rule that it is reserved for deleting all local data. It appears in the debug token preview because that screen's purpose is to show every token.

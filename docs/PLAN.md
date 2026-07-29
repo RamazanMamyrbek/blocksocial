@@ -832,7 +832,7 @@ All answers recorded, Android verdict made, documents consistent.
 
 ## Phase 09 — Android: Project Skeleton and Design Tokens
 
-**Status:** not started
+**Status:** done — project builds, 16 token tests and 3 Compose instrumented tests green, lint clean, verified on Android 16 and Android 13 emulator images. Two findings: `targetSdk 36` forces edge-to-edge and every screen must handle insets, and three color roles cannot carry text at 4.5:1, recorded as `design/DESIGN_EXPORT_ANALYSIS.md` section 9.7.
 
 **Goal.** Create the production Android project with its module structure, dependency setup, and the design token system, so every later phase has somewhere to put code.
 
@@ -844,34 +844,34 @@ All answers recorded, Android verdict made, documents consistent.
 
 ### Tasks
 
-- [ ] Create the Gradle project under `android/` with a Version Catalog
-- [ ] Create modules `app`, `core-model`, `core-domain`, `core-data`, `core-ui`
-- [ ] Create empty feature modules for onboarding, dashboard, app-selection, rules, history, settings
-- [ ] Configure Hilt
-- [ ] Configure Compose and Material 3
-- [ ] Implement color tokens for light and dark from `design/DESIGN_EXPORT_ANALYSIS.md`
-- [ ] Implement the type scale, spacing scale, radius scale, and motion durations
-- [ ] Wire Reduce Motion to collapse durations to zero
-- [ ] Add a debug token-preview screen
-- [ ] Configure unit test and instrumented test infrastructure
+- [x] Create the Gradle project under `android/` with a Version Catalog
+- [x] Create modules `app`, `core-model`, `core-domain`, `core-data`, `core-ui`
+- [x] Create empty feature modules for onboarding, dashboard, app-selection, rules, history, settings
+- [x] Configure Hilt
+- [x] Configure Compose and Material 3
+- [x] Implement color tokens for light and dark from `design/DESIGN_EXPORT_ANALYSIS.md`
+- [x] Implement the type scale, spacing scale, radius scale, and motion durations
+- [x] Wire Reduce Motion to collapse durations to zero
+- [x] Add a debug token-preview screen
+- [x] Configure unit test and instrumented test infrastructure
 
 **Expected result.** A project that builds, with a theme that renders correctly in both themes and a preview screen proving it.
 
 ### Automated checks
 
-- [ ] `./gradlew build` succeeds — agent runs
-- [ ] `./gradlew test` passes — agent runs
-- [ ] `./gradlew lint` reports no errors — agent runs
-- [ ] Every color role resolves in both themes — agent runs a unit test over the token map
-- [ ] Contrast of every on-color against its surface is at least 4.5:1 — agent runs a computed test
+- [x] `./gradlew build` succeeds — agent runs
+- [x] `./gradlew test` passes — agent runs
+- [x] `./gradlew lint` reports no errors — agent runs
+- [x] Every color role resolves in both themes — agent runs a unit test over the token map
+- [x] Contrast of every on-color against its surface is at least 4.5:1 — agent runs a computed test
 
 ### Agent checklist
 
-- [ ] Tokens are converted from the documented `oklch` sources, and the conversion is recorded
-- [ ] Danger role is defined but referenced nowhere yet
-- [ ] Elevation is a surface step, not a shadow
-- [ ] No feature code exists in any module yet
-- [ ] Module dependencies point one direction only
+- [x] Tokens are converted from the documented `oklch` sources, and the conversion is recorded
+- [x] Danger role is defined but referenced nowhere yet
+- [x] Elevation is a surface step, not a shadow
+- [x] No feature code exists in any module yet
+- [x] Module dependencies point one direction only
 
 ### Manual scenarios for the user
 
