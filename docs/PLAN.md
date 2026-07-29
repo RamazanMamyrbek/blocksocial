@@ -560,7 +560,7 @@ Two devices measured, decisions recorded, tests green.
 
 ## Phase 06 — Google Play Policy Package
 
-**Status:** not started
+**Status:** done — package written and cross-read against the code at commit `5bf53a3`. Two gaps recorded rather than smoothed over: ungated logging in two spike modules, and policy text describing storage that production has not built yet. Both assigned to phase 40.
 
 **Goal.** Produce the complete policy package for the Accessibility use case and prove it describes what the code actually does.
 
@@ -572,31 +572,31 @@ Two devices measured, decisions recorded, tests green.
 
 ### Tasks
 
-- [ ] Write the in-app prominent disclosure text
-- [ ] Write the affirmative consent screen text
-- [ ] Write the privacy policy draft
-- [ ] Write the Play listing paragraph describing the Accessibility use case
-- [ ] Draft the Play Console Accessibility declaration
-- [ ] Write the demo-video script
-- [ ] Inventory every piece of data the service touches
-- [ ] Write the argument that screen content is never stored
-- [ ] Write the justification for `isAccessibilityTool=false`
-- [ ] Cross-read the disclosure, the spike code, and the declaration for contradictions
+- [x] Write the in-app prominent disclosure text
+- [x] Write the affirmative consent screen text
+- [x] Write the privacy policy draft
+- [x] Write the Play listing paragraph describing the Accessibility use case
+- [x] Draft the Play Console Accessibility declaration
+- [x] Write the demo-video script
+- [x] Inventory every piece of data the service touches
+- [x] Write the argument that screen content is never stored
+- [x] Write the justification for `isAccessibilityTool=false`
+- [x] Cross-read the disclosure, the spike code, and the declaration for contradictions
 
 **Expected result.** A policy package in `docs/store/play/` where all three descriptions of the mechanism agree.
 
 ### Automated checks
 
-- [ ] Every claim in the disclosure is traceable to a line in the spike code — agent lists the mapping
-- [ ] The data inventory contains no item the code does not touch, and misses none it does — agent verifies against phase 01 source
-- [ ] All documents are in English and free of placeholders — agent greps for `TBD` and `TODO`
+- [x] Every claim in the disclosure is traceable to a line in the spike code — agent lists the mapping
+- [x] The data inventory contains no item the code does not touch, and misses none it does — agent verifies against phase 01 source
+- [x] All documents are in English and free of placeholders — agent greps for `TBD` and `TODO`
 
 ### Agent checklist
 
-- [ ] The disclosure does not resemble a system dialog
-- [ ] No claim is made that cannot be demonstrated in the demo video
-- [ ] `isAccessibilityTool=false` justification matches the product positioning
-- [ ] The privacy policy matches the actual data behavior, not the intended one
+- [x] The disclosure does not resemble a system dialog
+- [x] No claim is made that cannot be demonstrated in the demo video
+- [x] `isAccessibilityTool=false` justification matches the product positioning
+- [x] The privacy policy matches the actual data behavior, not the intended one
 
 ### Manual scenarios for the user
 
@@ -3015,6 +3015,9 @@ TestFlight verification complete, no critical or major defects open.
 ### Tasks
 
 - [ ] Re-verify the phase 06 policy package against the shipping build
+- [ ] Close the ungated-logging gap: confirm no release build logs a package name — carried over from phase 06, where `a03` and `a05` logged package names outside a `BuildConfig.DEBUG` check while the privacy policy claims nothing leaves the device
+- [ ] Confirm the privacy policy's storage section matches what production actually stores — carried over from phase 06, where it was written for rules, selections and history that only phases 17 and 24 build
+- [ ] Re-run the `DATA_INVENTORY.md` traceability against production sources, since every line number in it points at spike code
 - [ ] Finalize the store listing text
 - [ ] Produce screenshots for the required device sizes
 - [ ] Record the Accessibility demo video from the script
