@@ -903,7 +903,7 @@ Build green, token tests pass, preview verified by the owner.
 
 ## Phase 10 — Android: Domain and Rule Evaluator
 
-**Status:** not started
+**Status:** done — all 58 shared fixture cases pass, each as its own named test, plus 13 supporting tests. The harness was checked by corrupting one expectation per file and confirming exactly four failures. The domain has no Android dependency, and a Gradle check now fails the build if it gains one.
 
 **Goal.** Implement the domain model and the rule evaluator, proven against the shared fixtures.
 
@@ -915,29 +915,29 @@ Build green, token tests pass, preview verified by the owner.
 
 ### Tasks
 
-- [ ] Implement `RestrictedApp`, `RestrictionRule`, `BypassPolicy`, `TemporaryAccessGrant`, `BlockEvent` in `core-model`
-- [ ] Implement the schedule evaluator including overnight intervals
-- [ ] Implement bypass evaluation against absolute expiry
-- [ ] Implement daily-limit evaluation with local-midnight reset
-- [ ] Implement rule priority: always-on, then schedule, then daily limit
-- [ ] Implement the fixture loader and run every shared case as a test
-- [ ] Handle time-zone change and DST explicitly
+- [x] Implement `RestrictedApp`, `RestrictionRule`, `BypassPolicy`, `TemporaryAccessGrant`, `BlockEvent` in `core-model`
+- [x] Implement the schedule evaluator including overnight intervals
+- [x] Implement bypass evaluation against absolute expiry
+- [x] Implement daily-limit evaluation with local-midnight reset
+- [x] Implement rule priority: always-on, then schedule, then daily limit
+- [x] Implement the fixture loader and run every shared case as a test
+- [x] Handle time-zone change and DST explicitly
 
 **Expected result.** A pure Kotlin domain layer with no Android dependency, passing every shared fixture case.
 
 ### Automated checks
 
-- [ ] `./gradlew :core-domain:test` passes with every fixture case — agent runs
-- [ ] Fixture count in the test report equals the count in `shared/fixtures/` — agent verifies
-- [ ] `core-model` and `core-domain` have no Android dependency — agent inspects the dependency graph
-- [ ] `./gradlew lint` clean — agent runs
+- [x] `./gradlew :core-domain:test` passes with every fixture case — agent runs
+- [x] Fixture count in the test report equals the count in `shared/fixtures/` — agent verifies
+- [x] `core-model` and `core-domain` have no Android dependency — agent inspects the dependency graph
+- [x] `./gradlew lint` clean — agent runs
 
 ### Agent checklist
 
-- [ ] No fixture case is skipped or marked as expected-to-fail
-- [ ] Evaluation is pure: same inputs give the same result
-- [ ] Clock is injected, never read statically
-- [ ] Daily-limit tolerance matches the fixture definition
+- [x] No fixture case is skipped or marked as expected-to-fail
+- [x] Evaluation is pure: same inputs give the same result
+- [x] Clock is injected, never read statically
+- [x] Daily-limit tolerance matches the fixture definition
 
 ### Manual scenarios for the user
 

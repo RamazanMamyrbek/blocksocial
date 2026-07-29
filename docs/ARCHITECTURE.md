@@ -134,6 +134,35 @@ Elevation is a step in the surface ramp, never a shadow.
 
 `targetSdk 36` means edge-to-edge is enforced, so every activity handles window insets explicitly. Verified on an Android 16 emulator, where the unhandled case drew the title under the status bar and the last row under the gesture pill.
 
+### Domain
+
+`core-model` holds the state, `core-domain` holds the decisions, and neither touches the framework. One entry point answers the only question the rest of the application asks:
+
+```text
+RuleEvaluator.evaluate(rules, grant, usageSessions, forApp, at) → RestrictionDecision
+```
+
+It returns `restrictionActive`, the `primaryReason` shown to the user, and `allReasons` in priority order for the event record. Three evaluators sit beneath it — schedule, bypass, daily limit — each usable alone, each a pure function.
+
+**The clock is a parameter, never a reading.** `DeviceTime` carries the wall clock, the monotonic counter and the zone together, so no evaluator can consult the system on its own and no test has to manipulate one. That is what makes the daylight-saving and clock-tampering cases expressible at all.
+
+An active grant is checked before any rule, and it short-circuits: a suppressed block reports no reasons rather than reasons that were overridden.
+
+**A rule is a sealed type, not a mode flag.** A schedule rule cannot exist without its days and times, and a daily-limit rule cannot exist without its limit, because the compiler will not build one.
+
+Two interval decisions are not what a naive implementation produces, and both come from `shared/fixtures/SCHEMA.md`:
+
+- A start time that falls in a spring-forward gap begins at **the first instant that exists**. `java.time` would instead shift the local time forward by the length of the gap, which starts the interval an hour late. The evaluator asks the zone rules for the transition and uses its instant.
+- An overnight interval belongs to the day it **starts**, so the evaluator tests today and yesterday as candidate start days rather than only the current date.
+
+Reaching a daily limit does not present a block. The restriction turns active the moment measurement crosses the limit, and the user meets it the next time they open the application — the corpus states this and the detection layer in phase 12 depends on it.
+
+`BlockEvent` enforces its own contract at construction: `primaryReason` must appear in `allReasons`, `allReasons` must be in priority order, and a bypass duration exists exactly when the action was a bypass. A malformed event cannot be built, so it cannot be stored.
+
+Two Gradle checks keep this honest, both wired into `check`: `checkDomainIsFrameworkFree` fails if either domain module gains an Android dependency or plugin, and `checkModuleGraph` fails on a sideways or upward module dependency. The whole test-runtime classpath of `core-domain` is `core-model`, the Kotlin standard library, JUnit and a JSON parser.
+
+Every case in `shared/fixtures/` runs as its own test, so the report names the cases rather than counting them. The iOS evaluator in phase 36 implements the same contract against the same files.
+
 ### Storage
 
 Room holds restricted apps, rules, temporary grants, block events, usage sessions, and statistics aggregates. DataStore holds onboarding state, language, theme, consent versions, debug flags, and the last permission snapshot. Destructive production migrations are prohibited.

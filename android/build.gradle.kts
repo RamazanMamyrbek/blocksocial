@@ -52,6 +52,40 @@ val checkModuleGraph by tasks.registering {
     }
 }
 
+val frameworkFreeModules = listOf(":core-model", ":core-domain")
+
+val androidArtifactGroups = listOf("androidx.", "com.android", "com.google.android")
+
+val checkDomainIsFrameworkFree by tasks.registering {
+    group = "verification"
+    description = "Fails when the domain modules gain an Android dependency."
+    doLast {
+        val violations = mutableListOf<String>()
+        frameworkFreeModules.forEach { path ->
+            val module = project(path)
+            if (module.plugins.hasPlugin("com.android.library") ||
+                module.plugins.hasPlugin("com.android.application")
+            ) {
+                violations += "$path applies an Android Gradle plugin"
+            }
+            listOf("compileClasspath", "runtimeClasspath", "testRuntimeClasspath").forEach { name ->
+                module.configurations.findByName(name)
+                    ?.resolvedConfiguration
+                    ?.resolvedArtifacts
+                    ?.map { it.moduleVersion.id }
+                    ?.filter { id -> androidArtifactGroups.any { id.group.startsWith(it) } }
+                    ?.forEach { violations += "$path:$name pulls in $it" }
+            }
+        }
+        if (violations.isNotEmpty()) {
+            throw GradleException(
+                "The domain must stay free of the Android framework:\n" +
+                    violations.distinct().joinToString("\n"),
+            )
+        }
+    }
+}
+
 tasks.named("check") {
-    dependsOn(checkModuleGraph)
+    dependsOn(checkModuleGraph, checkDomainIsFrameworkFree)
 }

@@ -10,4 +10,11 @@ dependencies {
     api(project(":core-model"))
 
     testImplementation(libs.junit)
+    testImplementation(libs.org.json)
+}
+
+tasks.test {
+    testLogging {
+        events("passed", "failed")
+    }
 }
