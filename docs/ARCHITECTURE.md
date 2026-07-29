@@ -58,21 +58,33 @@ The contract was written from Android evidence alone, because iOS validation now
 
 ```text
 Accessibility event (TYPE_WINDOW_STATE_CHANGED)
-   → packageName
+   → packageName, className, eventTime
    → exclude BlockSocial and system packages
+   → require className to resolve to a real activity
+   → require the foreground package to have changed
    → check the supported catalog
    → evaluate the rule
    → evaluate active bypass grants
    → show the overlay
 ```
 
-The service consumes only the package name and the transition timestamp. It never inspects the accessibility tree beyond that, never reads text, and never performs actions inside other applications.
+The service consumes the package name, the window class name and the transition timestamp. The class name is passed to `PackageManager` and reduced to a boolean; it is never stored or displayed. The service never inspects the accessibility tree, never reads text, and never performs actions inside other applications.
 
-Required safeguards against duplicate and runaway events: `lastHandledPackage`, `lastHandledAt`, a debounce window, an `overlayVisible` guard, self-package exclusion, and revalidation of the foreground target before showing the overlay.
+**Two rules are mandatory, and both were established by spike `A-01` after the obvious implementation failed on a device.**
+
+*An event counts only when `packageName` plus `className` resolve to a real activity.* `TYPE_WINDOW_STATE_CHANGED` with `packageName` alone is not a foreground signal: an application that is going into the background keeps emitting window events, and those events carry a plain view class rather than an activity class. Without this check, pressing home and returning to a restricted application produces no block at all, because the state machine still believes the application is in front. The check needs only the targeted package visibility the catalog already declares.
+
+*An entry is a change of the foreground package, not a time-based debounce.* An application emits several window events while starting, spread wider than any workable debounce window: one cold launch produced two blocks, a deep link produced three. Any number of further activity windows inside the same application is one visit. Leaving to a system or non-target application ends the visit, so a genuine return is detected again. BlockSocial's own package does not end a visit, because the block screen belongs to us.
+
+The service logs every decision, not only the ones that block. Spike `A-01` lost several inconclusive device runs to logging only the blocking branch: a decision that is not logged makes a wrong decision invisible.
 
 ### Block surface
 
-A full-screen `TYPE_ACCESSIBILITY_OVERLAY` hosted by the accessibility service. No separate overlay permission is requested. The main application UI is Compose; the overlay uses `ComposeView` if it proves stable, otherwise a small View-based implementation.
+A full-screen `TYPE_ACCESSIBILITY_OVERLAY` hosted by the accessibility service. No separate overlay permission is requested. The main application UI is Compose, and the overlay uses `ComposeView`: spike `A-02` proved it stable on an emulator, so the View-based fallback is not needed.
+
+Compose in a window that is not an activity needs its own `LifecycleOwner`, `ViewModelStoreOwner` and `SavedStateRegistryOwner`, supplied by the overlay host. Without those three the content does not compose at all. The window also carries an accessibility title, set through `setTitle`, because `WindowManager.LayoutParams.accessibilityTitle` is not in the public SDK and an untitled window is announced as untitled.
+
+The design baseline is direction **1b, "Quiet"** from `design/DESIGN_EXPORT_ANALYSIS.md`, confirmed in the Android gate.
 
 Actions:
 
@@ -83,7 +95,11 @@ Recovery guarantees: the overlay can always be removed, a watchdog timeout preve
 
 ### Application selection
 
-A curated JSON catalog of supported package names, with those packages declared through targeted `<queries>`. `PackageManager` decides which catalog entries are installed. Missing entries render as a normal, explained state rather than an error.
+A curated JSON catalog at `shared/supported-app-catalog/catalog.json`, with every package declared through targeted `<queries>`. `PackageManager` decides which catalog entries are installed. Missing entries render as a normal, explained state rather than an error.
+
+An entry carries a stable `id` and a **list** of package names, not one. Rules and stored selections reference the id, so a package rename does not orphan user data, and the list covers applications that ship under more than one package: TikTok and Telegram already do. The displayed name for an installed application is the label the device reports; the catalog's own name is a fallback for entries that are not installed and therefore have no device label.
+
+The manifest `<queries>` and the catalog must not drift apart. A catalog entry with no matching manifest declaration resolves to not-installed on every device, silently and with no error, so the two are kept in step by generation or by a failing test rather than by care.
 
 ### Modules
 
@@ -114,9 +130,15 @@ The accessibility service is the runtime mechanism. WorkManager handles only def
 
 Daily limits read accumulated usage from `UsageStatsManager` and mark the application as restricted once the limit is reached; the block itself still comes from the accessibility service on the next launch. The limit is never enforced by polling.
 
+Usage is derived from `queryEvents`, not from `queryUsageStats`. The bucketed source agrees on totals but does not reset at local midnight and cannot report sessions or an arbitrary window, so it cannot carry a daily limit. A session ends only when a **different** package is resumed, when the screen goes non-interactive, or when the day window ends. `ACTIVITY_PAUSED` and `ACTIVITY_STOPPED` are never read: they fire when a single activity becomes invisible, which happens whenever an application navigates inside itself, and reading them under-reported one browser by 93 percent in spike `A-05`. Events are queried from before the window start, so a session already running at midnight is counted from midnight rather than lost.
+
 ### Recovery
 
 After reboot, rules remain in Room, grants are recomputed, expired grants are removed, and the dashboard reports the resulting health state. After process death, service state is restored from persistence; overlay logic never depends on an Activity being alive.
+
+A grant stores its expiry on **two** clocks: the device wall clock and a monotonic counter that restarts at boot. Within one boot the monotonic clock decides, so moving the device clock changes nothing — spike `A-03` moved it back an hour and the grant still expired on time. A reboot is recognised by the monotonic counter running backwards, and only then does the wall clock take over; a wall clock earlier than the grant's own creation makes the grant untrustworthy and it is discarded. Expiry is evaluated on every detection, never on a timer, and no grant state is read from disk inside an accessibility callback.
+
+Two failure modes are not recoverable from inside the application and must therefore be **reported** rather than repaired. Force-stopping BlockSocial kills the accessibility service and Android does not rebind it. Reinstalling can leave the service listed as bound, with a live process, delivering no events. In both cases blocking stops while the system settings screen still shows the service as enabled, so protection health must detect a service that is enabled but silent, not merely a permission that was revoked.
 
 ### Stack
 

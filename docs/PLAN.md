@@ -751,7 +751,7 @@ Fixtures validate, rule coverage mapped with no gaps, at-risk cases marked.
 
 ## Phase 08 — Android Validation Gate and Specification Update
 
-**Status:** not started
+**Status:** done — verdict `GO` for Android. Five spike decisions, all `GO`; three constraints promoted to mandatory; risk `R-05` closed, `R-04` downgraded, `R-07` added; `Q-02` answered. Gate in `docs/GATE_ANDROID.md`.
 
 **Goal.** Convert the Android validation evidence into decisions, update the specification, and decide whether Android implementation proceeds.
 
@@ -765,37 +765,37 @@ This gate covers Android only. The original single gate judged both platforms at
 
 ### Tasks
 
-- [ ] Collect every Android spike result and its decision into one summary table
-- [ ] Answer: is the Android overlay stable on API 36?
-- [ ] Answer: is the Accessibility use case defensible under Play policy?
-- [ ] Answer: does Android work without `QUERY_ALL_PACKAGES`?
-- [ ] Answer: is usage measurement accurate enough for daily limits?
-- [ ] Answer: do temporary grants survive process death, reboot and clock manipulation?
-- [ ] Record what emulator-only evidence does not cover, and who carries it
-- [ ] Record the current state of the Apple entitlement request from phase 27, as information, not as a verdict
-- [ ] Fold every `CHANGE` decision into the specification and architecture
-- [ ] Remove resolved items from the unverified-assumptions table
-- [ ] Downgrade or close resolved risks
-- [ ] Answer the open questions in `docs/PRODUCT.md` that the Android spikes settled
-- [ ] Record a `GO`, `CHANGE`, or `STOP` verdict for Android
-- [ ] Re-scope phases 09 to 27 against what was learned
+- [x] Collect every Android spike result and its decision into one summary table
+- [x] Answer: is the Android overlay stable on API 36?
+- [x] Answer: is the Accessibility use case defensible under Play policy?
+- [x] Answer: does Android work without `QUERY_ALL_PACKAGES`?
+- [x] Answer: is usage measurement accurate enough for daily limits?
+- [x] Answer: do temporary grants survive process death, reboot and clock manipulation?
+- [x] Record what emulator-only evidence does not cover, and who carries it
+- [x] Record the current state of the Apple entitlement request from phase 27, as information, not as a verdict
+- [x] Fold every `CHANGE` decision into the specification and architecture — no decision was `CHANGE`, but three mandatory constraints from `GO` results were folded in
+- [x] Remove resolved items from the unverified-assumptions table
+- [x] Downgrade or close resolved risks
+- [x] Answer the open questions in `docs/PRODUCT.md` that the Android spikes settled
+- [x] Record a `GO`, `CHANGE`, or `STOP` verdict for Android
+- [x] Re-scope phases 09 to 26 against what was learned
 
 **Expected result.** A gate document with evidence-backed answers and an Android verdict, plus an updated specification containing no assumption an Android spike has already settled.
 
 ### Automated checks
 
-- [ ] Every answer cites a spike result file that exists — agent verifies each path resolves
-- [ ] The unverified-assumptions table contains nothing an Android spike has decided — agent cross-checks
-- [ ] No document still describes a mechanism a spike replaced — agent greps for the old terms
-- [ ] No answer claims anything about iOS behaviour — agent greps the gate document
+- [x] Every answer cites a spike result file that exists — agent verifies each path resolves
+- [x] The unverified-assumptions table contains nothing an Android spike has decided — agent cross-checks
+- [x] No document still describes a mechanism a spike replaced — agent greps for the old terms
+- [x] No answer claims anything about iOS behaviour — agent greps the gate document
 
 ### Agent checklist
 
-- [ ] Every answer cites evidence, never an opinion
-- [ ] Emulator-only evidence is labelled as such in every answer that rests on it
-- [ ] Product copy promises nothing the gate did not confirm
-- [ ] Phase re-scoping is written down, not implied
-- [ ] The entitlement status is reported exactly as it stands, and a pending request is never written up as an approval
+- [x] Every answer cites evidence, never an opinion
+- [x] Emulator-only evidence is labelled as such in every answer that rests on it
+- [x] Product copy promises nothing the gate did not confirm
+- [x] Phase re-scoping is written down, not implied
+- [x] The entitlement status is reported exactly as it stands, and a pending request is never written up as an approval
 
 ### Manual scenarios for the user
 
@@ -806,7 +806,7 @@ This gate covers Android only. The original single gate judged both platforms at
 
 ### Definition of Done
 
-Every Android answer recorded with citations, specification and architecture updated, Android verdict recorded, phases 09 to 27 re-scoped.
+Every Android answer recorded with citations, specification and architecture updated, Android verdict recorded, phases 09 to 26 re-scoped.
 
 ### Risks
 
@@ -2673,7 +2673,7 @@ This phase carries the debt created by building Android first. The fixtures in p
 
 - [ ] Every shared fixture case has a recorded iOS result — agent verifies the mapping is complete
 - [ ] Every fixture change made here is applied to Android in the same phase — agent runs the Android suite
-- [ ] Every answer cites a spike result file that exists — agent verifies each path resolves
+- [x] Every answer cites a spike result file that exists — agent verifies each path resolves
 - [ ] No documented platform difference contradicts `docs/PRODUCT.md` — agent cross-reads
 
 ### Agent checklist
