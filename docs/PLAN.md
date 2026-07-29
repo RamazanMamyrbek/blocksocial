@@ -113,7 +113,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 11 | Android: persistence layer | Android MVP | 10 | done |
 | 12 | Android: detection service | Android MVP | 11 | done |
 | 13 | Android: block screen | Android MVP | 12 | done |
-| 14 | Android: temporary bypass | Android MVP | 13 | not started |
+| 14 | Android: temporary bypass | Android MVP | 13 | done |
 | 15 | Android: application selection | Android MVP | 11 | not started |
 | 16 | Android: rule editor | Android MVP | 15 | not started |
 | 17 | Android: daily limits | Android MVP | 16 | not started |
@@ -1176,7 +1176,7 @@ Tests green, eight scenarios verified.
 
 ## Phase 14 — Android: Temporary Bypass
 
-**Status:** not started
+**Status:** done — the whole grant lifecycle verified on an Android 16 emulator, including a reboot mid-grant that came back as `ACTIVE_AFTER_REBOOT` and expiry that restored the block and cleared the stored grant. 262 tests green. Scenario 4 could not be run on device because only one catalog application is installed on the AVD; it rests on a unit test and the fourteen bypass fixtures. Two checkboxes in this phase were found already ticked from commit `d47a285` and were corrected before the work started.
 
 **Goal.** Implement real bypass grants with repeat-block suppression, using what phase 04 proved.
 
@@ -1188,29 +1188,29 @@ Tests green, eight scenarios verified.
 
 ### Tasks
 
-- [ ] Create a `TemporaryAccessGrant` from the secondary action
-- [ ] Persist the grant with an absolute expiry
-- [ ] Suppress the block for that application until expiry
+- [x] Create a `TemporaryAccessGrant` from the secondary action
+- [x] Persist the grant with an absolute expiry
+- [x] Suppress the block for that application until expiry
 - [x] Keep other restricted applications blocked
-- [ ] Recompute grants on service start and after reboot
+- [x] Recompute grants on service start and after reboot
 - [x] Remove expired grants
-- [ ] Detect a backwards clock change and refuse to extend a grant
-- [ ] Record `BYPASSED` with the granted duration
+- [x] Detect a backwards clock change and refuse to extend a grant
+- [x] Record `BYPASSED` with the granted duration
 
 **Expected result.** A bypass that behaves exactly as phase 04 proved, now integrated with real rules and storage.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes, covering expiry boundary, second-app isolation, and clock rollback — agent runs
-- [ ] Fixture cases for bypass all pass — agent runs
-- [ ] Instrumented test for grant survival across process death — agent runs on the emulator
+- [x] `./gradlew test` passes, covering expiry boundary, second-app isolation, and clock rollback — agent runs
+- [x] Fixture cases for bypass all pass — agent runs
+- [x] Instrumented test for grant survival across process death — agent runs on the emulator
 
 ### Agent checklist
 
-- [ ] Expiry is absolute and stored, never a memory countdown
-- [ ] A grant never leaks to another application
-- [ ] Recorded duration matches the granted duration
-- [ ] Suppression is evaluated on every detection
+- [x] Expiry is absolute and stored, never a memory countdown
+- [x] A grant never leaks to another application
+- [x] Recorded duration matches the granted duration
+- [x] Suppression is evaluated on every detection
 
 ### Manual scenarios for the user
 
@@ -2673,7 +2673,7 @@ This phase carries the debt created by building Android first. The fixtures in p
 
 - [ ] Every shared fixture case has a recorded iOS result — agent verifies the mapping is complete
 - [ ] Every fixture change made here is applied to Android in the same phase — agent runs the Android suite
-- [x] Every answer cites a spike result file that exists — agent verifies each path resolves
+- [ ] Every answer cites a spike result file that exists — agent verifies each path resolves
 - [ ] No documented platform difference contradicts `docs/PRODUCT.md` — agent cross-reads
 
 ### Agent checklist
