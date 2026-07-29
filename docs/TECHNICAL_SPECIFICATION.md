@@ -203,7 +203,7 @@ None of the following may be presented as a guaranteed capability until a spike 
 
 | ID | Risk | Impact | Mitigation |
 |---|---|---|---|
-| R-01 | Google Play rejects the Accessibility use case | critical | prominent disclosure, affirmative consent, Play Console declaration, demo video, `isAccessibilityTool=false`, no unnecessary tree inspection |
+| R-01 | Google Play rejects the Accessibility use case | critical | the full package is written and cross-read against the code in `docs/store/play/`: prominent disclosure, affirmative consent, Play Console declaration, listing copy, privacy policy, demo-video script, and a data inventory traced line by line. `isAccessibilityTool=false`, one subscribed event type, `canRetrieveWindowContent=false`, no tree inspection, no `INTERNET`, no `QUERY_ALL_PACKAGES`. Phase 40 re-verifies against the shipping build. The residual risk is a review decision and cannot be removed by documentation. |
 | R-02 | Apple does not grant the Family Controls entitlement | critical | request it before any broad iOS work; a rejection forces an Android-first decision |
 | R-03 | The iOS bypass cannot be made predictable | high | real-device proof; fallback to a fifteen-minute wall-clock grant; keep the duration a variable in all copy |
 | R-04 | The Android overlay is unstable on API 36 | high | prove the overlay before building UI on it; keep a simpler fallback design; emulator proof only, so OEM instability surfaces first in beta |
