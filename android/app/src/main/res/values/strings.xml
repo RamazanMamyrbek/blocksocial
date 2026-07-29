@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BlockSocial</string>
+    <string name="accessibility_service_label">BlockSocial protection</string>
+    <string name="accessibility_service_description">BlockSocial needs to know which application comes to the front, so it can pause you before a social app opens and let you choose to stay focused or open it anyway. It reads only which application appeared and when. It never reads the text on your screen, your messages, or what you type, and it never acts inside other applications on your behalf.</string>
 </resources>

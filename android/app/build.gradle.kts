@@ -8,6 +8,36 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+abstract class CopySupportedAppCatalog : DefaultTask() {
+
+    @get:InputFile
+    abstract val catalog: RegularFileProperty
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @TaskAction
+    fun copyCatalog() {
+        val target = outputDirectory.get().asFile
+        target.mkdirs()
+        catalog.get().asFile.copyTo(target.resolve("catalog.json"), overwrite = true)
+    }
+}
+
+val copySupportedAppCatalog by tasks.registering(CopySupportedAppCatalog::class) {
+    catalog.set(layout.projectDirectory.file("../../shared/supported-app-catalog/catalog.json"))
+    outputDirectory.set(layout.buildDirectory.dir("generated/catalog/assets"))
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.sources.assets?.addGeneratedSourceDirectory(
+            copySupportedAppCatalog,
+            CopySupportedAppCatalog::outputDirectory,
+        )
+    }
+}
+
 android {
     namespace = "com.blocksocial"
     compileSdk = 36
@@ -22,6 +52,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 
@@ -47,6 +78,7 @@ kotlin {
     }
 }
 
+
 dependencies {
     implementation(project(":core-ui"))
     implementation(project(":core-data"))
@@ -69,8 +101,12 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    testImplementation(libs.junit)
+    implementation(libs.kotlinx.coroutines.core)
 
+    testImplementation(libs.junit)
+    testImplementation(libs.org.json)
+
+    androidTestImplementation(libs.androidx.room.runtime)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.test.runner)

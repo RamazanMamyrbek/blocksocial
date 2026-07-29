@@ -64,6 +64,9 @@ interface TemporaryAccessGrantDao {
     @Query("SELECT * FROM temporary_access_grant")
     suspend fun all(): List<TemporaryAccessGrantEntity>
 
+    @Query("SELECT * FROM temporary_access_grant")
+    fun observeAll(): Flow<List<TemporaryAccessGrantEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun put(grant: TemporaryAccessGrantEntity)
 
