@@ -31,6 +31,7 @@ import com.blocksocial.core.model.RestrictionRule
 import com.blocksocial.core.model.RuleMode
 import com.blocksocial.core.model.UserAction
 import com.blocksocial.core.ui.theme.BlockSocialTheme
+import com.blocksocial.health.ServiceHeartbeat
 import com.blocksocial.usage.UsageReading
 import com.blocksocial.usage.UsageStatsReader
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,6 +60,9 @@ class BlockSocialAccessibilityService : AccessibilityService() {
 
     @Inject
     lateinit var usageStats: UsageStatsReader
+
+    @Inject
+    lateinit var heartbeat: ServiceHeartbeat
 
     @Volatile
     private var usage: UsageReading = UsageReading.Unavailable
@@ -114,11 +118,13 @@ class BlockSocialAccessibilityService : AccessibilityService() {
                 }
         }
 
+        heartbeat.onConnected(Instant.now())
         DetectionLog.lifecycle("connected")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
+        heartbeat.onEvent(Instant.now())
         val activePipeline = pipeline ?: return
         val current = snapshot
 
@@ -272,6 +278,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
         pipeline = null
         overlay = null
         snapshot = ProtectionSnapshot.Empty
+        heartbeat.onDisconnected()
         DetectionLog.lifecycle("unbound")
         return super.onUnbind(intent)
     }

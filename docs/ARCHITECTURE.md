@@ -218,6 +218,10 @@ Taking a bypass writes the grant to storage and applies it to the in-memory snap
 
 Verified end to end on an Android 16 emulator: after taking a five-minute grant, leaving and returning reported `grant=ACTIVE` with no block; a reboot mid-grant restored it as `ACTIVE_AFTER_REBOOT`, the wall clock correctly taking over from the reset monotonic counter; and after expiry the same launch reported `EXPIRED_AFTER_REBOOT`, blocked, and cleared the stored grant.
 
+Protection health reports both, as distinct states rather than one vague failure, and each says what stops working and what survives. Phase 19 added a probe for the silent case: opening the health screen is itself a window change, so a live service must report it within a grace period; a service that does not answer its own probe is called broken rather than healthy.
+
+One correction to the record. Phase 19 tried to reproduce the force-stop case on an Android 16 emulator and could not: `am force-stop` **cleared** `enabled_accessibility_services` instead of leaving the service listed as enabled. The platform therefore reported the service as turned off, which is the honest outcome and better than what `A-03` saw. The enabled-but-dead state is still implemented and unit tested, because `A-03` observed it and older platforms may still behave that way, but it has not been seen on a device since. Treat it as defensive rather than confirmed.
+
 Two failure modes are not recoverable from inside the application and must therefore be **reported** rather than repaired. Force-stopping BlockSocial kills the accessibility service and Android does not rebind it. Reinstalling can leave the service listed as bound, with a live process, delivering no events. In both cases blocking stops while the system settings screen still shows the service as enabled, so protection health must detect a service that is enabled but silent, not merely a permission that was revoked.
 
 ### Stack

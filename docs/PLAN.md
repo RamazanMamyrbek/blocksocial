@@ -118,7 +118,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 16 | Android: rule editor | Android MVP | 15 | done |
 | 17 | Android: daily limits | Android MVP | 16 | partial |
 | 18 | Android: history, statistics, dashboard | Android MVP | 17 | partial |
-| 19 | Android: onboarding, permissions, protection health | Android MVP | 18 | not started |
+| 19 | Android: onboarding, permissions, protection health | Android MVP | 18 | partial |
 | 20 | Android: recovery and reliability hardening | Android MVP | 19 | not started |
 | 21 | Android: accessibility and localization | Android MVP | 20 | not started |
 | 22 | Android: API-level matrix and defect fixing | Android MVP | 21 | not started |
@@ -1518,7 +1518,7 @@ Tests green, six scenarios verified.
 
 ## Phase 19 — Android: Onboarding, Permissions, Protection Health
 
-**Status:** not started
+**Status:** partial. Protection health is built and closes the reporting half of risk `R-07`: both silent-failure modes are implemented as distinct states and covered by 9 reducer tests and 9 Compose tests, and every degraded item states what stops working, what keeps working, and offers one repair action. Verified on an Android 16 emulator, including revocation with no crash. **One state could not be reproduced on device:** force-stopping the app on Android 16 *cleared* `enabled_accessibility_services` rather than leaving it enabled, so the platform reported it as turned off, not as enabled-but-dead. That differs from what spike `A-03` saw and is recorded below. **Not done:** onboarding, the four-slot permission cards, the prominent disclosure screen, and surfacing the snapshot on the dashboard.
 
 **Goal.** Ship the first-run experience and the permission lifecycle, including recovery when a permission is revoked.
 
@@ -1535,30 +1535,30 @@ Tests green, six scenarios verified.
 - [ ] Implement the accessibility permission flow with prominent disclosure and consent
 - [ ] Implement the usage access flow separately
 - [ ] Request notifications only when first needed
-- [ ] Verify permission results on return from system settings
-- [ ] Build the protection health screen with per-requirement status and a repair action
-- [ ] Add OEM background-restriction guidance
-- [ ] Handle revocation at any time without a crash
+- [x] Verify permission results on return from system settings
+- [x] Build the protection health screen with per-requirement status and a repair action
+- [x] Add OEM background-restriction guidance
+- [x] Handle revocation at any time without a crash
 - [ ] Persist the permission snapshot and surface changes on the dashboard
-- [ ] Detect that the accessibility service is enabled in settings but delivering no events, and report it as broken rather than healthy — carried over from spike A-03, where a reinstall left the service listed under `Bound services` with a live process and no event delivery
-- [ ] Detect that force-stop has killed the service, and say so — carried over from spike A-03, where `am force-stop` left `Bound services:{}` with no rebind and blocking silently stopped
-- [ ] State plainly what a dead service means: rules stay saved, blocking does not run
+- [x] Detect that the accessibility service is enabled in settings but delivering no events, and report it as broken rather than healthy — carried over from spike A-03, where a reinstall left the service listed under `Bound services` with a live process and no event delivery
+- [x] Detect that force-stop has killed the service, and say so — carried over from spike A-03, where `am force-stop` left `Bound services:{}` with no rebind and blocking silently stopped
+- [x] State plainly what a dead service means: rules stay saved, blocking does not run
 
 **Expected result.** A first run that earns permissions honestly and a health screen that explains and repairs any degraded state.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes for the permission state reducer across every transition — agent runs
+- [x] `./gradlew test` passes for the permission state reducer across every transition — agent runs
 - [ ] Test asserting rules save but stay inactive without accessibility access — agent runs
-- [ ] Compose UI tests for granted, denied, and revoked states — agent runs
-- [ ] Accessibility labels on every status item — agent runs
+- [x] Compose UI tests for granted, denied, and revoked states — agent runs
+- [x] Accessibility labels on every status item — agent runs
 
 ### Agent checklist
 
-- [ ] No screen resembles a system dialog
+- [x] No screen resembles a system dialog
 - [ ] Every permission card states what is read and what is never read
-- [ ] Denial leaves a usable path, never a dead end
-- [ ] Health items use shape as well as color for status
+- [x] Denial leaves a usable path, never a dead end
+- [x] Health items use shape as well as color for status
 - [ ] The disclosure text matches the phase 06 policy package exactly
 
 ### Manual scenarios for the user
