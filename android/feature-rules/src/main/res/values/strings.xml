@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rules_title">Rules</string>
+    <string name="rules_empty">No rules yet. Add one and BlockSocial will pause you when it applies.</string>
+    <string name="rules_paused">Paused, not blocking</string>
+    <string name="rules_active">Active</string>
+
+    <string name="rule_mode_always">Always on</string>
+    <string name="rule_mode_schedule">Schedule</string>
+    <string name="rule_mode_daily_limit">Daily limit</string>
+
+    <string name="rule_days">Days</string>
+    <string name="rule_from">From</string>
+    <string name="rule_to">To</string>
+    <string name="rule_overnight">Overnight</string>
+    <string name="rule_overnight_explained">%1$s tonight until %2$s the next morning</string>
+    <string name="rule_same_day_explained">%1$s until %2$s the same day</string>
+    <string name="rule_midnight_marker">midnight</string>
+    <string name="rule_limit_minutes">Minutes per day</string>
+
+    <string name="rule_problem_no_days">Pick at least one day. A schedule with no days never applies.</string>
+    <string name="rule_problem_empty_interval">Start and end are both %1$s. Move the end time so the interval has a length.</string>
+    <string name="rule_problem_limit_range">Set a limit between %1$d and %2$d minutes.</string>
+
+    <string name="rule_save">Save rule</string>
+    <string name="rule_delete">Delete rule</string>
+</resources>
