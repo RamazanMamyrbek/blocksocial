@@ -9,7 +9,7 @@ class ProtectionBannerReducerTest {
     fun aWorkingServiceReadsAsRunning() {
         assertEquals(
             ProtectionBanner.RUNNING,
-            ProtectionBannerReducer.reduce(RequirementStatus.HEALTHY, enabledWhenLastSeen = true),
+            ProtectionBannerReducer.reduce(RequirementStatus.HEALTHY, protectionEverWorked = true),
         )
     }
 
@@ -17,7 +17,7 @@ class ProtectionBannerReducerTest {
     fun aServiceThatWasNeverAskedForIsNotReportedAsStopped() {
         assertEquals(
             ProtectionBanner.NEVER_SET_UP,
-            ProtectionBannerReducer.reduce(RequirementStatus.NOT_ASKED, enabledWhenLastSeen = false),
+            ProtectionBannerReducer.reduce(RequirementStatus.NOT_ASKED, protectionEverWorked = false),
         )
     }
 
@@ -31,7 +31,7 @@ class ProtectionBannerReducerTest {
             assertEquals(
                 "$status should be reported as a change",
                 ProtectionBanner.STOPPED_SINCE_LAST_OPEN,
-                ProtectionBannerReducer.reduce(status, enabledWhenLastSeen = true),
+                ProtectionBannerReducer.reduce(status, protectionEverWorked = true),
             )
         }
     }
@@ -46,7 +46,7 @@ class ProtectionBannerReducerTest {
             assertEquals(
                 "$status should not be reported as a change",
                 ProtectionBanner.STOPPED,
-                ProtectionBannerReducer.reduce(status, enabledWhenLastSeen = false),
+                ProtectionBannerReducer.reduce(status, protectionEverWorked = false),
             )
         }
     }
@@ -61,7 +61,7 @@ class ProtectionBannerReducerTest {
 
         assertEquals(
             ProtectionBanner.RUNNING,
-            ProtectionBannerReducer.reduce(items, enabledWhenLastSeen = true),
+            ProtectionBannerReducer.reduce(items, protectionEverWorked = true),
         )
     }
 
@@ -69,7 +69,7 @@ class ProtectionBannerReducerTest {
     fun anEmptyReadingClaimsNothing() {
         assertEquals(
             ProtectionBanner.NEVER_SET_UP,
-            ProtectionBannerReducer.reduce(emptyList(), enabledWhenLastSeen = true),
+            ProtectionBannerReducer.reduce(emptyList(), protectionEverWorked = true),
         )
     }
 }

@@ -12,14 +12,16 @@ object DetectionLog {
     }
 
     fun decision(result: DetectionResult, latencyMillis: Long) {
+        write(decisionLine(result, latencyMillis))
+    }
+
+    internal fun decisionLine(result: DetectionResult, latencyMillis: Long): String {
         val app = result.app?.value ?: "none"
         val reasons = result.decision?.allReasons?.joinToString("|") { it.name } ?: "none"
         val primary = result.decision?.primaryReason?.name ?: "none"
         val grant = result.decision?.bypass?.evaluation?.name ?: "none"
-        write(
-            "event=decision transition=${result.transition} app=$app block=${result.shouldBlock} " +
-                "primaryReason=$primary allReasons=$reasons grant=$grant latencyMillis=$latencyMillis",
-        )
+        return "event=decision transition=${result.transition} app=$app block=${result.shouldBlock} " +
+            "primaryReason=$primary allReasons=$reasons grant=$grant latencyMillis=$latencyMillis"
     }
 
     private fun write(line: String) {

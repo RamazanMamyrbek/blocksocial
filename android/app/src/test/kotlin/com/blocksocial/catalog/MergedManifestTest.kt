@@ -32,4 +32,32 @@ class MergedManifestTest {
             )
         }
     }
+
+    @Test
+    fun nothingRunsAsAPermanentForegroundService() {
+        val manifests = mergedManifests()
+        assertTrue("no merged manifest found; build the app before running this", manifests.isNotEmpty())
+
+        manifests.forEach { manifest ->
+            val text = manifest.readText()
+            listOf(
+                "android.permission.FOREGROUND_SERVICE",
+                "foregroundServiceType",
+            ).forEach { marker ->
+                assertFalse("${manifest.path} declares $marker", text.contains(marker))
+            }
+        }
+
+        val sources = File(repositoryRoot, "android/app/src/main/kotlin")
+            .walkTopDown()
+            .filter { it.extension == "kt" }
+            .toList()
+
+        sources.forEach { source ->
+            assertFalse(
+                "${source.name} calls startForeground",
+                source.readText().contains("startForeground"),
+            )
+        }
+    }
 }

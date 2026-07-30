@@ -82,7 +82,7 @@ class BlockingStopsWithoutAccessibilityTest {
     fun theDashboardSaysBlockingStoppedRatherThanThatTheRulesAreGone() {
         assertEquals(
             ProtectionBanner.STOPPED_SINCE_LAST_OPEN,
-            ProtectionBannerReducer.reduce(health(RequirementStatus.DENIED), enabledWhenLastSeen = true),
+            ProtectionBannerReducer.reduce(health(RequirementStatus.DENIED), protectionEverWorked = true),
         )
     }
 

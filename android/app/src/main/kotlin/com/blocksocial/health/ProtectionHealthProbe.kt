@@ -68,9 +68,11 @@ class ProtectionHealthProbe @Inject constructor(
 
     suspend fun read(now: Instant = Instant.now()): ProtectionHealth {
         val health = assemble(now, preferences.preferences.first())
+        val enabledNow = accessibilityEnabledInSettings()
+        if (enabledNow) preferences.rememberAccessibilityHasRun()
         preferences.setPermissionSnapshot(
             PermissionSnapshot(
-                accessibilityServiceEnabled = accessibilityEnabledInSettings(),
+                accessibilityServiceEnabled = enabledNow,
                 usageAccessGranted = usageStats.hasUsageAccess(),
                 notificationsGranted = NotificationManagerCompat.from(context).areNotificationsEnabled(),
                 capturedAt = now,
@@ -110,7 +112,8 @@ class ProtectionHealthProbe @Inject constructor(
                 status = ProtectionHealthReducer.accessibility(
                     AccessibilityObservation(
                         enabledInSettings = accessibilityEnabledInSettings(),
-                        everAsked = stored.acceptedConsentVersion > 0,
+                        everAsked = stored.acceptedConsentVersion > 0 ||
+                            stored.accessibilityEverEnabled,
                         connectedInThisProcess = heartbeat.isConnected,
                         connectedAt = heartbeat.connectedAt,
                         lastEventAt = heartbeat.lastEvent,
@@ -135,7 +138,7 @@ class ProtectionHealthProbe @Inject constructor(
         return ProtectionHealth(
             items = items,
             blockingRuns = ProtectionHealthReducer.blockingRuns(items),
-            banner = ProtectionBannerReducer.reduce(items, snapshot.accessibilityServiceEnabled),
+            banner = ProtectionBannerReducer.reduce(items, stored.accessibilityEverEnabled),
         )
     }
 }
