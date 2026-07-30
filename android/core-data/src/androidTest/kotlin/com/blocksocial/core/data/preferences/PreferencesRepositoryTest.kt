@@ -52,6 +52,7 @@ class PreferencesRepositoryTest {
         repository.setTheme(ThemePreference.DARK)
         repository.setLanguageTag("ru")
         repository.setAcceptedConsentVersion(3)
+        repository.setNotificationRequestMade(true)
         repository.setDebugLoggingEnabled(true)
 
         val preferences = repository.preferences.first()
@@ -60,6 +61,7 @@ class PreferencesRepositoryTest {
         assertEquals(ThemePreference.DARK, preferences.theme)
         assertEquals("ru", preferences.languageTag)
         assertEquals(3, preferences.acceptedConsentVersion)
+        assertEquals(true, preferences.notificationRequestMade)
         assertEquals(true, preferences.debugLoggingEnabled)
     }
 

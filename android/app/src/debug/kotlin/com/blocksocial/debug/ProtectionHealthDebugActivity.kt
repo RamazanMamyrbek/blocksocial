@@ -1,11 +1,14 @@
 package com.blocksocial.debug
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
+import com.blocksocial.core.domain.NotificationAsk
 import com.blocksocial.core.domain.ProtectionRequirement
 import com.blocksocial.core.ui.theme.BlockSocialTheme
 import com.blocksocial.core.ui.theme.Spacing
@@ -61,6 +65,10 @@ class ProtectionHealthDebugActivity : ComponentActivity() {
         }
     }
 
+    private val notificationRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { lifecycleScope.launch { health = probe.read() } }
+
     override fun onResume() {
         super.onResume()
         probe.startProbe()
@@ -68,6 +76,17 @@ class ProtectionHealthDebugActivity : ComponentActivity() {
             health = probe.read()
             delay(PROBE_SETTLE_MILLIS)
             health = probe.read()
+            askForNotificationsIfNeeded()
+        }
+    }
+
+    private suspend fun askForNotificationsIfNeeded() {
+        if (probe.notificationAsk(health) != NotificationAsk.ASK_NOW) return
+        probe.rememberNotificationRequest()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            repair(ProtectionRequirement.NOTIFICATIONS)
         }
     }
 

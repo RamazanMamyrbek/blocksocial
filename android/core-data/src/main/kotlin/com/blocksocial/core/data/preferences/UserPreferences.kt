@@ -26,6 +26,7 @@ data class UserPreferences(
     val languageTag: String?,
     val acceptedConsentVersion: Int,
     val permissionSnapshot: PermissionSnapshot,
+    val notificationRequestMade: Boolean,
     val debugLoggingEnabled: Boolean,
 ) {
     companion object {
@@ -35,6 +36,7 @@ data class UserPreferences(
             languageTag = null,
             acceptedConsentVersion = 0,
             permissionSnapshot = PermissionSnapshot.Unknown,
+            notificationRequestMade = false,
             debugLoggingEnabled = false,
         )
     }

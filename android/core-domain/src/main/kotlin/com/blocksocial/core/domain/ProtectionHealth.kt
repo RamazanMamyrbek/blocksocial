@@ -17,6 +17,7 @@ data class AccessibilityObservation(
     val enabledInSettings: Boolean,
     val everAsked: Boolean,
     val connectedInThisProcess: Boolean,
+    val connectedAt: Instant?,
     val lastEventAt: Instant?,
     val probeStartedAt: Instant?,
     val now: Instant,
@@ -49,6 +50,9 @@ object ProtectionHealthReducer {
         val probeStartedAt = observation.probeStartedAt ?: return RequirementStatus.HEALTHY
         if (observation.now < probeStartedAt.plus(PROBE_GRACE)) return RequirementStatus.HEALTHY
 
+        val connectedAt = observation.connectedAt
+        if (connectedAt != null && connectedAt.isAfter(probeStartedAt)) return RequirementStatus.HEALTHY
+
         val lastEventAt = observation.lastEventAt
         val answeredTheProbe = lastEventAt != null && !lastEventAt.isBefore(probeStartedAt)
         return if (answeredTheProbe) RequirementStatus.HEALTHY else RequirementStatus.RUNNING_BUT_SILENT
@@ -61,4 +65,30 @@ object ProtectionHealthReducer {
     }
 
     fun blockingRuns(items: List<RequirementHealth>): Boolean = items.none { it.blocksProtection }
+}
+
+enum class ProtectionBanner { RUNNING, NEVER_SET_UP, STOPPED, STOPPED_SINCE_LAST_OPEN }
+
+object ProtectionBannerReducer {
+
+    fun reduce(accessibility: RequirementStatus, enabledWhenLastSeen: Boolean): ProtectionBanner =
+        when (accessibility) {
+            RequirementStatus.HEALTHY -> ProtectionBanner.RUNNING
+            RequirementStatus.NOT_ASKED -> ProtectionBanner.NEVER_SET_UP
+            RequirementStatus.DENIED,
+            RequirementStatus.ENABLED_BUT_NOT_RUNNING,
+            RequirementStatus.RUNNING_BUT_SILENT,
+            -> if (enabledWhenLastSeen) {
+                ProtectionBanner.STOPPED_SINCE_LAST_OPEN
+            } else {
+                ProtectionBanner.STOPPED
+            }
+        }
+
+    fun reduce(items: List<RequirementHealth>, enabledWhenLastSeen: Boolean): ProtectionBanner {
+        val accessibility = items.firstOrNull {
+            it.requirement == ProtectionRequirement.ACCESSIBILITY_SERVICE
+        } ?: return ProtectionBanner.NEVER_SET_UP
+        return reduce(accessibility.status, enabledWhenLastSeen)
+    }
 }

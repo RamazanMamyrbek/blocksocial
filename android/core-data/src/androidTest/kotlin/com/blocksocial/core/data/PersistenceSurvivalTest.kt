@@ -20,8 +20,10 @@ import com.blocksocial.core.model.UserAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -35,6 +37,12 @@ import java.time.ZoneId
 class PersistenceSurvivalTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    @After
+    fun releaseTheStore() {
+        scope.cancel()
+    }
 
     private fun database(): BlockSocialDatabase = Room.databaseBuilder(
         context,
@@ -44,7 +52,7 @@ class PersistenceSurvivalTest {
 
     private fun preferences() = PreferencesRepository(
         PreferenceDataStoreFactory.create(
-            scope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
+            scope = scope,
             produceFile = { context.preferencesDataStoreFile(PREFERENCES_NAME) },
         ),
     )

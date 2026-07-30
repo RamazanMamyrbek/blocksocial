@@ -7,9 +7,15 @@ import androidx.core.app.NotificationManagerCompat
 import com.blocksocial.core.data.preferences.PermissionSnapshot
 import com.blocksocial.core.data.preferences.PreferencesRepository
 import com.blocksocial.core.domain.AccessibilityObservation
+import com.blocksocial.core.domain.NotificationAsk
+import com.blocksocial.core.domain.NotificationNeed
+import com.blocksocial.core.domain.NotificationPromptPolicy
+import com.blocksocial.core.domain.ProtectionBanner
+import com.blocksocial.core.domain.ProtectionBannerReducer
 import com.blocksocial.core.domain.ProtectionHealthReducer
 import com.blocksocial.core.domain.ProtectionRequirement
 import com.blocksocial.core.domain.RequirementHealth
+import com.blocksocial.core.domain.RequirementStatus
 import com.blocksocial.detection.BlockSocialAccessibilityService
 import com.blocksocial.usage.UsageStatsReader
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,9 +29,17 @@ import javax.inject.Singleton
 data class ProtectionHealth(
     val items: List<RequirementHealth>,
     val blockingRuns: Boolean,
+    val banner: ProtectionBanner,
 ) {
+    val statuses: Map<ProtectionRequirement, RequirementStatus> =
+        items.associate { it.requirement to it.status }
+
     companion object {
-        val Unknown = ProtectionHealth(emptyList(), blockingRuns = false)
+        val Unknown = ProtectionHealth(
+            items = emptyList(),
+            blockingRuns = false,
+            banner = ProtectionBanner.NEVER_SET_UP,
+        )
     }
 }
 
@@ -68,6 +82,20 @@ class ProtectionHealthProbe @Inject constructor(
     fun observe(now: () -> Instant = Instant::now): Flow<ProtectionHealth> =
         preferences.preferences.map { assemble(now(), it.permissionSnapshot) }
 
+    suspend fun notificationAsk(health: ProtectionHealth): NotificationAsk =
+        NotificationPromptPolicy.evaluate(
+            NotificationNeed(
+                notifications = health.statuses[ProtectionRequirement.NOTIFICATIONS]
+                    ?: RequirementStatus.NOT_ASKED,
+                blockingRuns = health.blockingRuns,
+                alreadyAsked = preferences.preferences.first().notificationRequestMade,
+            ),
+        )
+
+    suspend fun rememberNotificationRequest() {
+        preferences.setNotificationRequestMade(true)
+    }
+
     private fun assemble(now: Instant, snapshot: PermissionSnapshot): ProtectionHealth {
         val everAsked = snapshot.capturedAt != null
 
@@ -79,6 +107,7 @@ class ProtectionHealthProbe @Inject constructor(
                         enabledInSettings = accessibilityEnabledInSettings(),
                         everAsked = everAsked,
                         connectedInThisProcess = heartbeat.isConnected,
+                        connectedAt = heartbeat.connectedAt,
                         lastEventAt = heartbeat.lastEvent,
                         probeStartedAt = heartbeat.probeStarted,
                         now = now,
@@ -98,6 +127,10 @@ class ProtectionHealthProbe @Inject constructor(
             ),
         )
 
-        return ProtectionHealth(items = items, blockingRuns = ProtectionHealthReducer.blockingRuns(items))
+        return ProtectionHealth(
+            items = items,
+            blockingRuns = ProtectionHealthReducer.blockingRuns(items),
+            banner = ProtectionBannerReducer.reduce(items, snapshot.accessibilityServiceEnabled),
+        )
     }
 }

@@ -1449,7 +1449,7 @@ Tests green, six scenarios verified on two devices.
 
 ## Phase 18 — Android: History, Statistics, Dashboard
 
-**Status:** partial. Dashboard and history both run on an Android 16 emulator against real recorded events, with 12 Compose tests and 10 statistics tests. **Three items remain**, all for reasons outside this phase's reach: marking estimated values needs an estimated metric to exist, which is the approximate time-in-app tile, and putting protection state most prominently on the dashboard needs the protection health work in phase 19. `Q-01` is answered and recorded, which unblocks this phase permanently: a day counts towards the streak when bypasses are at or below a configured maximum, default two. The statistics domain is built and tested — 10 tests covering the streak rule, the zone-correct day grouping, and the two honesty rules, that `UNKNOWN` and `DISMISSED_BY_SYSTEM` count as neither refusal nor bypass and that a rate with nothing to divide is hidden rather than shown as zero. **Not done:** the history screen, the dashboard UI, and every manual scenario.
+**Status:** partial. Dashboard and history both run on an Android 16 emulator against real recorded events, with 15 Compose tests and 10 statistics tests. **One item remains.** Marking estimated values needs an estimated metric to exist, which is the approximate time-in-app tile from phase 17. Protection state now leads the dashboard: phase 19 supplied the reading, and the banner names a change since the last visit rather than reporting a flat "off". `Q-01` is answered and recorded, which unblocks this phase permanently: a day counts towards the streak when bypasses are at or below a configured maximum, default two. The statistics domain is built and tested — 10 tests covering the streak rule, the zone-correct day grouping, and the two honesty rules, that `UNKNOWN` and `DISMISSED_BY_SYSTEM` count as neither refusal nor bypass and that a rate with nothing to divide is hidden rather than shown as zero.
 
 **Goal.** Ship the surfaces that show the user what they decided, with honest numbers.
 
@@ -1467,7 +1467,7 @@ Tests green, six scenarios verified on two devices.
 - [ ] Mark estimated values distinctly from measured values
 - [x] Hide any metric the platform cannot measure, rather than showing zero
 - [x] Implement the streak using the rule decided in `docs/PRODUCT.md` question `Q-01`
-- [ ] Build the dashboard with protection state most prominent
+- [x] Build the dashboard with protection state most prominent
 - [x] Implement empty states for history and statistics
 
 **Expected result.** A dashboard and history that report decisions accurately and never inflate them.
@@ -1518,7 +1518,15 @@ Tests green, six scenarios verified.
 
 ## Phase 19 — Android: Onboarding, Permissions, Protection Health
 
-**Status:** partial. Protection health is built and closes the reporting half of risk `R-07`: both silent-failure modes are implemented as distinct states and covered by 9 reducer tests and 9 Compose tests, and every degraded item states what stops working, what keeps working, and offers one repair action. Verified on an Android 16 emulator, including revocation with no crash. **One state could not be reproduced on device:** force-stopping the app on Android 16 *cleared* `enabled_accessibility_services` rather than leaving it enabled, so the platform reported it as turned off, not as enabled-but-dead. That differs from what spike `A-03` saw and is recorded below. **Not done:** onboarding, the four-slot permission cards, the prominent disclosure screen, and surfacing the snapshot on the dashboard.
+**Status:** partial. Every task and every automated check in this phase is done. Protection health closes the reporting half of risk `R-07`: both silent-failure modes are distinct states covered by 11 reducer tests and 9 Compose tests, and every degraded item states what stops working, what keeps working, and offers one repair action. Onboarding is three intro steps and a setup screen carrying one four-slot card per permission; the accessibility flow passes through the prominent disclosure and affirmative consent before Android's own screen, usage access is asked for on its own with no disclosure in the way, and notifications are asked for only when protection is first found to be down. The dashboard leads with protection state and names a change since the last visit rather than reporting a flat "off". Verified on an Android 16 emulator, including revocation with no crash.
+
+**One state could not be reproduced on device:** force-stopping the app on Android 16 *cleared* `enabled_accessibility_services` rather than leaving it enabled, so the platform reported it as turned off, not as enabled-but-dead. That differs from what spike `A-03` saw and is recorded in `docs/ARCHITECTURE.md`.
+
+**Defect found and fixed here.** Android unbinds and rebinds the accessibility service on its own. The heartbeat forgets the last event on disconnect, so a rebind inside the probe window made a healthy service look silent — and, once the notification request was hung off that reading, produced a permission prompt the user had done nothing to deserve. A probe older than the current connection is now treated as stale. Two regression tests cover it.
+
+**Conflict reported, not silently resolved.** `design/UI_UX_BRIEF.md` section 6.2 lists five things a permission card must say, including "what stops working without it". `design/DESIGN_EXPORT_ANALYSIS.md` and this phase's task both specify **four** fixed slots, which omit that one. The four slots ship as designed; the consequence of denial is carried by the setup screen's own line and by protection health, which states it for every degraded state. Someone should decide which document is wrong.
+
+**Why this phase is not closed.** Manual scenario 1 says "complete onboarding on a fresh install and reach a working first rule". Nothing can reach anything: every screen is still its own launcher entry in the debug build, and **no phase in this plan owns the application shell or navigation between screens**. That is a gap in the plan, not work this phase deliberately deferred. Phase 19 cannot report done until a shell exists.
 
 **Goal.** Ship the first-run experience and the permission lifecycle, including recovery when a permission is revoked.
 
@@ -1530,16 +1538,16 @@ Tests green, six scenarios verified.
 
 ### Tasks
 
-- [ ] Build onboarding explaining the product in a few steps
-- [ ] Build the permission explanation card with four fixed slots per permission
+- [x] Build onboarding explaining the product in a few steps
+- [x] Build the permission explanation card with four fixed slots per permission
 - [x] Implement the accessibility permission flow with prominent disclosure and consent
-- [ ] Implement the usage access flow separately
-- [ ] Request notifications only when first needed
+- [x] Implement the usage access flow separately
+- [x] Request notifications only when first needed
 - [x] Verify permission results on return from system settings
 - [x] Build the protection health screen with per-requirement status and a repair action
 - [x] Add OEM background-restriction guidance
 - [x] Handle revocation at any time without a crash
-- [ ] Persist the permission snapshot and surface changes on the dashboard
+- [x] Persist the permission snapshot and surface changes on the dashboard
 - [x] Detect that the accessibility service is enabled in settings but delivering no events, and report it as broken rather than healthy — carried over from spike A-03, where a reinstall left the service listed under `Bound services` with a live process and no event delivery
 - [x] Detect that force-stop has killed the service, and say so — carried over from spike A-03, where `am force-stop` left `Bound services:{}` with no rebind and blocking silently stopped
 - [x] State plainly what a dead service means: rules stay saved, blocking does not run
@@ -1549,7 +1557,7 @@ Tests green, six scenarios verified.
 ### Automated checks
 
 - [x] `./gradlew test` passes for the permission state reducer across every transition — agent runs
-- [ ] Test asserting rules save but stay inactive without accessibility access — agent runs
+- [x] Test asserting rules save but stay inactive without accessibility access — agent runs
 - [x] Compose UI tests for granted, denied, and revoked states — agent runs
 - [x] Accessibility labels on every status item — agent runs
 
