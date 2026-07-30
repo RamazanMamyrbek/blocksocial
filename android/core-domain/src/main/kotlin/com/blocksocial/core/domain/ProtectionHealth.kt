@@ -71,24 +71,24 @@ enum class ProtectionBanner { RUNNING, NEVER_SET_UP, STOPPED, STOPPED_SINCE_LAST
 
 object ProtectionBannerReducer {
 
-    fun reduce(accessibility: RequirementStatus, enabledWhenLastSeen: Boolean): ProtectionBanner =
+    fun reduce(accessibility: RequirementStatus, protectionEverWorked: Boolean): ProtectionBanner =
         when (accessibility) {
             RequirementStatus.HEALTHY -> ProtectionBanner.RUNNING
             RequirementStatus.NOT_ASKED -> ProtectionBanner.NEVER_SET_UP
             RequirementStatus.DENIED,
             RequirementStatus.ENABLED_BUT_NOT_RUNNING,
             RequirementStatus.RUNNING_BUT_SILENT,
-            -> if (enabledWhenLastSeen) {
+            -> if (protectionEverWorked) {
                 ProtectionBanner.STOPPED_SINCE_LAST_OPEN
             } else {
                 ProtectionBanner.STOPPED
             }
         }
 
-    fun reduce(items: List<RequirementHealth>, enabledWhenLastSeen: Boolean): ProtectionBanner {
+    fun reduce(items: List<RequirementHealth>, protectionEverWorked: Boolean): ProtectionBanner {
         val accessibility = items.firstOrNull {
             it.requirement == ProtectionRequirement.ACCESSIBILITY_SERVICE
         } ?: return ProtectionBanner.NEVER_SET_UP
-        return reduce(accessibility.status, enabledWhenLastSeen)
+        return reduce(accessibility.status, protectionEverWorked)
     }
 }

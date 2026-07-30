@@ -216,6 +216,10 @@ Screens are content, not frames. A screen never applies `safeDrawingPadding`, a 
 
 The accessibility service is the runtime mechanism. WorkManager handles only deferrable work: daily aggregation, old-event cleanup, consistency checks, and statistics preparation. There is no permanent foreground service and no polling.
 
+Both halves of that sentence are tested rather than asserted. No `FOREGROUND_SERVICE` permission, no `foregroundServiceType`, no `startForeground` call anywhere in the sources, and no ongoing notification. On the emulator `dumpsys alarm` lists nothing for the package and no wakelock is held by any of our code.
+
+One consequence is worth stating before a beta tester reports it as a defect: Android holds the process at bound-foreground-service importance for as long as the accessibility service is enabled, so battery settings will attribute time to BlockSocial. That is the platform hosting an accessibility service, not a service the application starts.
+
 Daily limits read accumulated usage from `UsageStatsManager` and mark the application as restricted once the limit is reached; the block itself still comes from the accessibility service on the next launch. The limit is never enforced by polling.
 
 Usage is derived from `queryEvents`, not from `queryUsageStats`. The bucketed source agrees on totals but does not reset at local midnight and cannot report sessions or an arbitrary window, so it cannot carry a daily limit. A session ends only when a **different** package is resumed, when the screen goes non-interactive, or when the day window ends. `ACTIVITY_PAUSED` and `ACTIVITY_STOPPED` are never read: they fire when a single activity becomes invisible, which happens whenever an application navigates inside itself, and reading them under-reported one browser by 93 percent in spike `A-05`. Events are queried from before the window start, so a session already running at midnight is counted from midnight rather than lost.
@@ -223,6 +227,10 @@ Usage is derived from `queryEvents`, not from `queryUsageStats`. The bucketed so
 ### Recovery
 
 After reboot, rules remain in Room, grants are recomputed, expired grants are removed, and the dashboard reports the resulting health state. After process death, service state is restored from persistence; overlay logic never depends on an Activity being alive.
+
+Phase 20 checked all of that on an Android 16 emulator rather than assuming it. A reboot with a saved rule blocked the restricted application on the next launch without the application ever being opened. Killing the process outright left the permission intact, Android rebound the service, and the next launch blocked under a new pid. Moving the device from GMT to Asia/Tokyo flipped an overnight rule from inactive to active in the same untouched process, because the zone is read on every evaluation and never captured.
+
+Force-stop is the exception, and it is the platform's decision rather than ours. On Android 16 force-stopping BlockSocial clears `enabled_accessibility_services` and leaves `Bound services:{}`. Blocking cannot resume on its own because the permission is gone. The application therefore owes an accurate report, which means it has to remember that protection once worked: the permission snapshot is overwritten on every read, so a sticky `accessibilityEverEnabled` preference records that the service has run at least once and is never cleared. Without it the dashboard tells a user whose protection ran for hours that it was never set up.
 
 A grant stores its expiry on **two** clocks: the device wall clock and a monotonic counter that restarts at boot. Within one boot the monotonic clock decides, so moving the device clock changes nothing — spike `A-03` moved it back an hour and the grant still expired on time. A reboot is recognised by the monotonic counter running backwards, and only then does the wall clock take over; a wall clock earlier than the grant's own creation makes the grant untrustworthy and it is discarded. Expiry is evaluated on every detection, never on a timer, and no grant state is read from disk inside an accessibility callback. A grant that evaluates as spent is deleted at the moment it is noticed, and the service sweeps spent grants once when it connects, so storage never accumulates dead ones.
 

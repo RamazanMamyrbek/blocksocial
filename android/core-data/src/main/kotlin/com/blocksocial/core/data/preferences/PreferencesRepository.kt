@@ -37,6 +37,10 @@ class PreferencesRepository @Inject constructor(private val dataStore: DataStore
         dataStore.edit { it[Keys.AcceptedConsentVersion] = version }
     }
 
+    suspend fun rememberAccessibilityHasRun() {
+        dataStore.edit { it[Keys.AccessibilityEverEnabled] = true }
+    }
+
     suspend fun setNotificationRequestMade(made: Boolean) {
         dataStore.edit { it[Keys.NotificationRequestMade] = made }
     }
@@ -68,6 +72,8 @@ class PreferencesRepository @Inject constructor(private val dataStore: DataStore
             notificationsGranted = this[Keys.NotificationsGranted] ?: false,
             capturedAt = this[Keys.PermissionsCapturedAt]?.let(Instant::ofEpochMilli),
         ),
+        accessibilityEverEnabled = this[Keys.AccessibilityEverEnabled]
+            ?: UserPreferences.Default.accessibilityEverEnabled,
         notificationRequestMade = this[Keys.NotificationRequestMade]
             ?: UserPreferences.Default.notificationRequestMade,
         debugLoggingEnabled = this[Keys.DebugLoggingEnabled] ?: UserPreferences.Default.debugLoggingEnabled,
@@ -82,6 +88,7 @@ class PreferencesRepository @Inject constructor(private val dataStore: DataStore
         val UsageAccessGranted = booleanPreferencesKey("usage_access_granted")
         val NotificationsGranted = booleanPreferencesKey("notifications_granted")
         val PermissionsCapturedAt = longPreferencesKey("permissions_captured_at")
+        val AccessibilityEverEnabled = booleanPreferencesKey("accessibility_ever_enabled")
         val NotificationRequestMade = booleanPreferencesKey("notification_request_made")
         val DebugLoggingEnabled = booleanPreferencesKey("debug_logging_enabled")
     }

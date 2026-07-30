@@ -52,6 +52,7 @@ class PreferencesRepositoryTest {
         repository.setTheme(ThemePreference.DARK)
         repository.setLanguageTag("ru")
         repository.setAcceptedConsentVersion(3)
+        repository.rememberAccessibilityHasRun()
         repository.setNotificationRequestMade(true)
         repository.setDebugLoggingEnabled(true)
 
@@ -61,8 +62,27 @@ class PreferencesRepositoryTest {
         assertEquals(ThemePreference.DARK, preferences.theme)
         assertEquals("ru", preferences.languageTag)
         assertEquals(3, preferences.acceptedConsentVersion)
+        assertEquals(true, preferences.accessibilityEverEnabled)
         assertEquals(true, preferences.notificationRequestMade)
         assertEquals(true, preferences.debugLoggingEnabled)
+    }
+
+    @Test
+    fun onceProtectionHasRunTheApplicationNeverForgetsThatItDid() = runTest {
+        repository.rememberAccessibilityHasRun()
+        repository.setPermissionSnapshot(
+            PermissionSnapshot(
+                accessibilityServiceEnabled = false,
+                usageAccessGranted = false,
+                notificationsGranted = false,
+                capturedAt = Instant.ofEpochMilli(1),
+            ),
+        )
+
+        val stored = repository.preferences.first()
+
+        assertEquals(false, stored.permissionSnapshot.accessibilityServiceEnabled)
+        assertEquals(true, stored.accessibilityEverEnabled)
     }
 
     @Test

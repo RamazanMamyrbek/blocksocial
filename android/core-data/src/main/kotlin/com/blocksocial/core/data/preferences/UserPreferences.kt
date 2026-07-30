@@ -26,6 +26,7 @@ data class UserPreferences(
     val languageTag: String?,
     val acceptedConsentVersion: Int,
     val permissionSnapshot: PermissionSnapshot,
+    val accessibilityEverEnabled: Boolean,
     val notificationRequestMade: Boolean,
     val debugLoggingEnabled: Boolean,
 ) {
@@ -36,6 +37,7 @@ data class UserPreferences(
             languageTag = null,
             acceptedConsentVersion = 0,
             permissionSnapshot = PermissionSnapshot.Unknown,
+            accessibilityEverEnabled = false,
             notificationRequestMade = false,
             debugLoggingEnabled = false,
         )
