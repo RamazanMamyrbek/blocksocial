@@ -115,7 +115,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 13 | Android: block screen | Android MVP | 12 | done |
 | 14 | Android: temporary bypass | Android MVP | 13 | done |
 | 15 | Android: application selection | Android MVP | 11 | done |
-| 16 | Android: rule editor | Android MVP | 15 | not started |
+| 16 | Android: rule editor | Android MVP | 15 | done |
 | 17 | Android: daily limits | Android MVP | 16 | not started |
 | 18 | Android: history, statistics, dashboard | Android MVP | 17 | not started |
 | 19 | Android: onboarding, permissions, protection health | Android MVP | 18 | not started |
@@ -1311,7 +1311,7 @@ Tests green, five scenarios verified.
 
 ## Phase 16 — Android: Rule Editor
 
-**Status:** not started
+**Status:** done — the editor runs on an Android 16 emulator and states an overnight interval three ways at once: the word, a two-segment bar with midnight labelled at the crossing, and the plain sentence. 300 tests green, lint clean. The twenty schedule fixtures were re-run end to end from rules that had been through storage, not from literals. A debug host was added so the six scenarios can be run at all.
 
 **Goal.** Ship rule creation and editing for schedule and always-on modes, with the daily-limit mode present but not yet enforced.
 
@@ -1323,30 +1323,30 @@ Tests green, five scenarios verified.
 
 ### Tasks
 
-- [ ] Build the rule editor with mode selection
-- [ ] Show only the fields the selected mode uses
-- [ ] Implement weekday selection and time pickers
-- [ ] Make the overnight interval unambiguous in three ways
-- [ ] Implement the bypass policy field
-- [ ] Validate and explain every error in plain language
-- [ ] Persist rules and reflect them in the evaluator
-- [ ] Build the rule list with enabled and paused states
+- [x] Build the rule editor with mode selection
+- [x] Show only the fields the selected mode uses
+- [x] Implement weekday selection and time pickers
+- [x] Make the overnight interval unambiguous in three ways
+- [x] Implement the bypass policy field
+- [x] Validate and explain every error in plain language
+- [x] Persist rules and reflect them in the evaluator
+- [x] Build the rule list with enabled and paused states
 
 **Expected result.** Users can create, edit, pause, and delete rules, and the evaluator honors them immediately.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes for validation and persistence — agent runs
-- [ ] Schedule fixtures still pass end to end from stored rules — agent runs
-- [ ] Compose UI tests for create, edit, overnight, and error states — agent runs
-- [ ] Accessibility labels on every control — agent runs
+- [x] `./gradlew test` passes for validation and persistence — agent runs
+- [x] Schedule fixtures still pass end to end from stored rules — agent runs
+- [x] Compose UI tests for create, edit, overnight, and error states — agent runs
+- [x] Accessibility labels on every control — agent runs
 
 ### Agent checklist
 
-- [ ] Overnight interval cannot be misread as its inverse
-- [ ] Validation errors state how to fix them
-- [ ] A paused rule says it is not blocking
-- [ ] Editing a rule takes effect without an app restart
+- [x] Overnight interval cannot be misread as its inverse
+- [x] Validation errors state how to fix them
+- [x] A paused rule says it is not blocking
+- [x] Editing a rule takes effect without an app restart
 
 ### Manual scenarios for the user
 

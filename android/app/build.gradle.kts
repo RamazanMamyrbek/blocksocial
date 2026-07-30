@@ -86,6 +86,7 @@ dependencies {
     implementation(project(":feature-dashboard"))
     implementation(project(":feature-app-selection"))
     implementation(project(":feature-rules"))
+    implementation(project(":feature-rules"))
     implementation(project(":feature-history"))
     implementation(project(":feature-settings"))
 
