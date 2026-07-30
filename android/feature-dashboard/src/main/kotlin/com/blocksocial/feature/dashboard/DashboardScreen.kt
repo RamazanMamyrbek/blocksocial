@@ -152,12 +152,13 @@ private fun ProtectionBannerCard(banner: ProtectionBanner, onOpenProtection: () 
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            OutlinedButton(
-                onClick = onOpenProtection,
-                modifier = Modifier.testTag(DashboardTags.OPEN_PROTECTION),
-            ) {
-                Text(stringResource(R.string.dashboard_open_protection))
-            }
+        }
+
+        OutlinedButton(
+            onClick = onOpenProtection,
+            modifier = Modifier.testTag(DashboardTags.OPEN_PROTECTION),
+        ) {
+            Text(stringResource(R.string.dashboard_open_protection))
         }
     }
 }

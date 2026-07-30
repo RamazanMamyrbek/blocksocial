@@ -246,6 +246,16 @@ One correction to the record. Phase 19 tried to reproduce the force-stop case on
 
 Two failure modes are not recoverable from inside the application and must therefore be **reported** rather than repaired. Force-stopping BlockSocial kills the accessibility service and Android does not rebind it. Reinstalling can leave the service listed as bound, with a live process, delivering no events. In both cases blocking stops while the system settings screen still shows the service as enabled, so protection health must detect a service that is enabled but silent, not merely a permission that was revoked.
 
+### Accessibility and language
+
+Screens carry no literal text. `Text`, `contentDescription`, `label` and `title` may not take a string literal in shipped Kotlin, and a test enforces it, because a screen reader reads content descriptions aloud and a literal cannot be translated. Every string file has a Russian counterpart with exactly the same names, checked by the same test and by Android lint's `MissingTranslation` running as an error.
+
+Time is never formatted with a fixed pattern. `core-ui/text` derives the clock from the locale and the device 12/24-hour setting through `getBestDateTimePattern`, and the weekday chips start on the locale's first day rather than always Monday. `LocalUse24HourClock` lets a test pin the format so assertions do not depend on emulator settings.
+
+Nothing truncates: no `maxLines`, no `TextOverflow`, no `softWrap = false`, enforced by test, so Russian at double font scale wraps instead of cutting. The one deliberate exception is the bottom navigation bar, whose labels cap at 1.3x — at 2x a ten-character Russian word breaks mid-word in a third of the screen, and Material caps navigation labels for the same reason.
+
+The block overlay was verified operable with TalkBack on an Android 16 emulator: it is exposed as a focused `TYPE_ACCESSIBILITY_OVERLAY` with a translated window title, TalkBack places accessibility focus inside it, and a TalkBack double-tap completes the decision. That closes what spike `A-02` could not settle with adb tooling alone.
+
 ### Stack
 
 Coroutines and Flow, Hilt, Room, DataStore, WorkManager, `java.time`. Tests: JUnit, kotlinx-coroutines-test, Turbine, AndroidX Test, Compose UI Test. Versions pinned through a Version Catalog.

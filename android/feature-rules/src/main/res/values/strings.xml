@@ -17,11 +17,17 @@
     <string name="rule_same_day_explained">%1$s until %2$s the same day</string>
     <string name="rule_midnight_marker">midnight</string>
     <string name="rule_limit_minutes">Minutes per day</string>
+    <string name="rule_limit_less">−%1$d</string>
+    <string name="rule_limit_more">+%1$d</string>
+    <string name="rule_limit_less_description">Lower the daily limit by %1$d minutes</string>
+    <string name="rule_limit_more_description">Raise the daily limit by %1$d minutes</string>
+    <string name="rule_time_field">%1$s %2$s</string>
 
     <string name="rule_problem_no_days">Pick at least one day. A schedule with no days never applies.</string>
     <string name="rule_problem_empty_interval">Start and end are both %1$s. Move the end time so the interval has a length.</string>
     <string name="rule_problem_limit_range">Set a limit between %1$d and %2$d minutes.</string>
 
+    <string name="rule_edit">Edit</string>
     <string name="rule_save">Save rule</string>
     <string name="rule_delete">Delete rule</string>
 </resources>

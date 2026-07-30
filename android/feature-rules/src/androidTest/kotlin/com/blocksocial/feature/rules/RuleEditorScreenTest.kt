@@ -1,5 +1,6 @@
 package com.blocksocial.feature.rules
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.blocksocial.core.model.RuleMode
+import com.blocksocial.core.ui.text.LocalUse24HourClock
 import com.blocksocial.core.ui.theme.BlockSocialTheme
 import org.junit.Rule
 import org.junit.Test
@@ -29,8 +31,10 @@ class RuleEditorScreenTest {
     private fun show(initial: RuleDraft, onSave: () -> Unit = {}) {
         composeRule.setContent {
             var draft by remember { mutableStateOf(initial) }
-            BlockSocialTheme(darkTheme = true) {
-                RuleEditorScreen(draft = draft, onDraftChange = { draft = it }, onSave = onSave)
+            CompositionLocalProvider(LocalUse24HourClock provides true) {
+                BlockSocialTheme(darkTheme = true) {
+                    RuleEditorScreen(draft = draft, onDraftChange = { draft = it }, onSave = onSave)
+                }
             }
         }
     }

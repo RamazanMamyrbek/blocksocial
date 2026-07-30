@@ -18,9 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -28,6 +30,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.blocksocial.R
 import com.blocksocial.core.ui.theme.Radius
@@ -120,17 +123,19 @@ private fun Tab(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.xs),
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            color = if (selected) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            textAlign = TextAlign.Center,
-        )
+        CompositionLocalProvider(LocalDensity provides tabLabelDensity()) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                color = if (selected) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                textAlign = TextAlign.Center,
+            )
+        }
         Box(
             modifier = Modifier
                 .height(Spacing.xs)
@@ -143,7 +148,14 @@ private fun Tab(
     }
 }
 
+@Composable
+private fun tabLabelDensity(): Density {
+    val current = LocalDensity.current
+    return Density(current.density, current.fontScale.coerceAtMost(TAB_LABEL_MAX_FONT_SCALE))
+}
+
 private const val INDICATOR_WIDTH = 0.5f
+private const val TAB_LABEL_MAX_FONT_SCALE = 1.3f
 
 @StringRes
 private fun tabLabel(tab: Destination): Int = when (tab) {

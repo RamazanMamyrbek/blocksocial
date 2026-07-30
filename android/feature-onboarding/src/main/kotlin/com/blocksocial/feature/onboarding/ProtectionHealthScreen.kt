@@ -84,6 +84,7 @@ private fun HealthItem(item: RequirementHealth, onRepair: (ProtectionRequirement
     val name = requirementName(item.requirement)
     val statusWord = statusWord(item.status)
     val explanation = explanation(item)
+    val description = stringResource(R.string.health_item_description, name, statusWord)
 
     Column(
         modifier = Modifier
@@ -91,9 +92,7 @@ private fun HealthItem(item: RequirementHealth, onRepair: (ProtectionRequirement
             .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(Radius.md))
             .padding(Spacing.lg)
             .testTag(ProtectionHealthTags.item(item.requirement))
-            .semantics {
-                contentDescription = "$name, $statusWord"
-            },
+            .semantics { contentDescription = description },
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         Row(

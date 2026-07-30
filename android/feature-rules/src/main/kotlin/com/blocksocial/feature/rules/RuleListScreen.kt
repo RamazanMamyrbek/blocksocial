@@ -72,7 +72,7 @@ fun RuleListScreen(
                         modifier = Modifier.testTag(RuleListTags.state(rule.id)),
                     )
                 }
-                TextButton(onClick = { onEdit(rule) }) { Text("Edit") }
+                TextButton(onClick = { onEdit(rule) }) { Text(stringResource(R.string.rule_edit)) }
                 Switch(
                     checked = rule.enabled,
                     onCheckedChange = { onEnabledChange(rule, it) },

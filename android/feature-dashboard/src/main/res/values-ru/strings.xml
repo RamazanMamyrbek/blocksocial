@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_title">Сегодня</string>
+    <string name="dashboard_protection_running">Блокировка включена.</string>
+    <string name="dashboard_protection_never_set_up">Блокировка ещё не настроена.</string>
+    <string name="dashboard_protection_stopped">Блокировка выключена.</string>
+    <string name="dashboard_protection_stopped_since">Блокировка перестала работать с тех пор, как вы в последний раз открывали BlockSocial.</string>
+    <string name="dashboard_open_protection">Открыть защиту</string>
+    <string name="dashboard_protection_consequence">Ваши правила сохранены и не изменились. Прямо сейчас ничего не приостанавливается.</string>
+    <string name="dashboard_stayed">Остались в фокусе</string>
+    <string name="dashboard_stayed_value">%1$d из %2$d открытий</string>
+    <string name="dashboard_bypassed">Всё равно открыли</string>
+    <string name="dashboard_refusal_rate">Отказались</string>
+    <string name="dashboard_refusal_rate_value">%1$d%% открытий за последние 7 дней</string>
+    <string name="dashboard_refusal_rate_absent">Пока слишком мало решений</string>
+    <string name="dashboard_rules">Правила</string>
+    <string name="dashboard_rules_value">%1$d действует, %2$d на паузе</string>
+    <string name="dashboard_streak">Серия</string>
+    <plurals name="dashboard_streak_value">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дня</item>
+    </plurals>
+    <string name="dashboard_streak_rule">День засчитывается, если вы осознанно открыли приложение не больше %1$d раз.</string>
+    <string name="dashboard_hours_saved">Сэкономленные часы не показываются. BlockSocial не может измерить их честно, поэтому их здесь нет вовсе, а не ноль.</string>
+    <string name="dashboard_nothing_yet">Пока ничего не записано. Числа появятся после первой паузы.</string>
+</resources>

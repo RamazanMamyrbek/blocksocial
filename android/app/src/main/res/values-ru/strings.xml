@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shell_back">Назад</string>
+    <string name="shell_tab_today">Сегодня</string>
+    <string name="shell_tab_apps">Приложения</string>
+    <string name="shell_tab_history">История</string>
+    <string name="accessibility_service_label">Защита BlockSocial</string>
+    <string name="accessibility_service_description">BlockSocial нужно знать, какое приложение вышло на передний план, чтобы остановить вас до того, как откроется соцсеть, и дать выбрать: остаться в фокусе или всё же открыть. Он читает только то, какое приложение появилось и когда. Он никогда не читает текст на экране, ваши сообщения и то, что вы набираете, и никогда ничего не делает внутри других приложений за вас.</string>
+</resources>

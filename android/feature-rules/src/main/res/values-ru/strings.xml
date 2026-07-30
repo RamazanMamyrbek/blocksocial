@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rules_title">Правила</string>
+    <string name="rules_empty">Правил пока нет. Добавьте одно, и BlockSocial будет останавливать вас, когда оно действует.</string>
+    <string name="rules_paused">На паузе, не блокирует</string>
+    <string name="rules_active">Действует</string>
+
+    <string name="rule_mode_always">Всегда</string>
+    <string name="rule_mode_schedule">Расписание</string>
+    <string name="rule_mode_daily_limit">Дневной лимит</string>
+
+    <string name="rule_days">Дни</string>
+    <string name="rule_from">С</string>
+    <string name="rule_to">До</string>
+    <string name="rule_overnight">Через полночь</string>
+    <string name="rule_overnight_explained">с %1$s сегодня и до %2$s следующего утра</string>
+    <string name="rule_same_day_explained">с %1$s до %2$s в тот же день</string>
+    <string name="rule_midnight_marker">полночь</string>
+    <string name="rule_limit_minutes">Минут в день</string>
+    <string name="rule_limit_less">−%1$d</string>
+    <string name="rule_limit_more">+%1$d</string>
+    <string name="rule_limit_less_description">Уменьшить дневной лимит на %1$d минут</string>
+    <string name="rule_limit_more_description">Увеличить дневной лимит на %1$d минут</string>
+    <string name="rule_time_field">%1$s %2$s</string>
+
+    <string name="rule_problem_no_days">Выберите хотя бы один день. Расписание без дней не срабатывает никогда.</string>
+    <string name="rule_problem_empty_interval">Начало и конец совпадают: %1$s. Сдвиньте конец, чтобы у интервала появилась длина.</string>
+    <string name="rule_problem_limit_range">Задайте лимит от %1$d до %2$d минут.</string>
+
+    <string name="rule_edit">Изменить</string>
+    <string name="rule_save">Сохранить правило</string>
+    <string name="rule_delete">Удалить правило</string>
+</resources>

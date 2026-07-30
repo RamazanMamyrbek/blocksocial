@@ -43,6 +43,7 @@ fun PermissionCard(
 ) {
     val name = stringResource(permissionName(requirement))
     val statusWord = stringResource(permissionStatusWord(status))
+    val description = stringResource(R.string.health_item_description, name, statusWord)
 
     Column(
         modifier = Modifier
@@ -50,7 +51,7 @@ fun PermissionCard(
             .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(Radius.md))
             .padding(Spacing.lg)
             .testTag(PermissionCardTags.card(requirement))
-            .semantics { contentDescription = "$name, $statusWord" },
+            .semantics { contentDescription = description },
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
         Text(
