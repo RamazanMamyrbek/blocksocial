@@ -52,6 +52,14 @@ class DashboardScreenTest {
     }
 
     @Test
+    fun aOneDayStreakIsNotWrittenAsOneDays() {
+        show(busyDay.copy(streakDays = 1))
+
+        composeRule.onNodeWithText("1 day").assertIsDisplayed()
+        composeRule.onNodeWithText("1 days").assertDoesNotExist()
+    }
+
+    @Test
     fun anUnmeasurableMetricIsNamedAndExplainedRatherThanHidden() {
         show(busyDay)
 

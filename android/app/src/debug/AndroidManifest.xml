@@ -41,6 +41,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".debug.HistoryDebugActivity"
+            android:exported="true"
+            android:label="@string/history_debug_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

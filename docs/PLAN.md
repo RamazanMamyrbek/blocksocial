@@ -1449,7 +1449,7 @@ Tests green, six scenarios verified on two devices.
 
 ## Phase 18 — Android: History, Statistics, Dashboard
 
-**Status:** partial, dashboard now built. The dashboard runs on an Android 16 emulator against real recorded events, with 5 Compose tests. **Still not done:** the history screen, and the streak value says "1 days" because it needs a plural resource. `Q-01` is answered and recorded, which unblocks this phase permanently: a day counts towards the streak when bypasses are at or below a configured maximum, default two. The statistics domain is built and tested — 10 tests covering the streak rule, the zone-correct day grouping, and the two honesty rules, that `UNKNOWN` and `DISMISSED_BY_SYSTEM` count as neither refusal nor bypass and that a rate with nothing to divide is hidden rather than shown as zero. **Not done:** the history screen, the dashboard UI, and every manual scenario.
+**Status:** partial. Dashboard and history both run on an Android 16 emulator against real recorded events, with 12 Compose tests and 10 statistics tests. **Three items remain**, all for reasons outside this phase's reach: marking estimated values needs an estimated metric to exist, which is the approximate time-in-app tile, and putting protection state most prominently on the dashboard needs the protection health work in phase 19. `Q-01` is answered and recorded, which unblocks this phase permanently: a day counts towards the streak when bypasses are at or below a configured maximum, default two. The statistics domain is built and tested — 10 tests covering the streak rule, the zone-correct day grouping, and the two honesty rules, that `UNKNOWN` and `DISMISSED_BY_SYSTEM` count as neither refusal nor bypass and that a rate with nothing to divide is hidden rather than shown as zero. **Not done:** the history screen, the dashboard UI, and every manual scenario.
 
 **Goal.** Ship the surfaces that show the user what they decided, with honest numbers.
 
@@ -1461,30 +1461,30 @@ Tests green, six scenarios verified on two devices.
 
 ### Tasks
 
-- [ ] Build the history screen with equal visual weight for stayed and bypassed
-- [ ] Show why each rule was active on every entry
-- [ ] Build the statistics tiles for interventions, stayed, bypassed, refusal rate
+- [x] Build the history screen with equal visual weight for stayed and bypassed
+- [x] Show why each rule was active on every entry
+- [x] Build the statistics tiles for interventions, stayed, bypassed, refusal rate
 - [ ] Mark estimated values distinctly from measured values
-- [ ] Hide any metric the platform cannot measure, rather than showing zero
-- [ ] Implement the streak using the rule decided in `docs/PRODUCT.md` question `Q-01`
+- [x] Hide any metric the platform cannot measure, rather than showing zero
+- [x] Implement the streak using the rule decided in `docs/PRODUCT.md` question `Q-01`
 - [ ] Build the dashboard with protection state most prominent
-- [ ] Implement empty states for history and statistics
+- [x] Implement empty states for history and statistics
 
 **Expected result.** A dashboard and history that report decisions accurately and never inflate them.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes for aggregation, refusal rate, and streak arithmetic — agent runs
-- [ ] Test asserting an unmeasurable metric is absent, not zero — agent runs
-- [ ] Compose UI tests for empty, populated, and degraded states — agent runs
-- [ ] Accessibility labels on every statistic — agent runs
+- [x] `./gradlew test` passes for aggregation, refusal rate, and streak arithmetic — agent runs
+- [x] Test asserting an unmeasurable metric is absent, not zero — agent runs
+- [x] Compose UI tests for empty, populated, and degraded states — agent runs
+- [x] Accessibility labels on every statistic — agent runs
 
 ### Agent checklist
 
-- [ ] A bypass row is the same size and weight as a stayed row
+- [x] A bypass row is the same size and weight as a stayed row
 - [ ] Estimated values carry a marker and a tilde
-- [ ] The streak rule matches the answered `Q-01`, and the rule is explained in the UI
-- [ ] No metric claims precision the data cannot support
+- [x] The streak rule matches the answered `Q-01`, and the rule is explained in the UI
+- [x] No metric claims precision the data cannot support
 
 ### Manual scenarios for the user
 
