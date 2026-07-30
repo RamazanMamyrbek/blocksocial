@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="selection_title">Choose applications</string>
+    <string name="selection_explanation">BlockSocial works with the supported applications below. It cannot see the other applications on your phone, and this list will not grow on its own.</string>
+    <string name="selection_not_installed">Not installed on this phone</string>
+    <string name="selection_not_installed_short">N/A</string>
+    <string name="selection_empty">None of the supported applications are installed on this phone yet. Install one and it will appear here.</string>
+    <string name="selection_row_description">%1$s, %2$s</string>
+    <string name="selection_state_selected">selected</string>
+    <string name="selection_state_not_selected">not selected</string>
+</resources>

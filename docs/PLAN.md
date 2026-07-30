@@ -114,7 +114,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 12 | Android: detection service | Android MVP | 11 | done |
 | 13 | Android: block screen | Android MVP | 12 | done |
 | 14 | Android: temporary bypass | Android MVP | 13 | done |
-| 15 | Android: application selection | Android MVP | 11 | not started |
+| 15 | Android: application selection | Android MVP | 11 | done |
 | 16 | Android: rule editor | Android MVP | 15 | not started |
 | 17 | Android: daily limits | Android MVP | 16 | not started |
 | 18 | Android: history, statistics, dashboard | Android MVP | 17 | not started |
@@ -1244,7 +1244,7 @@ Tests green, six scenarios verified.
 
 ## Phase 15 — Android: Application Selection
 
-**Status:** not started
+**Status:** done — the selection screen runs on an Android 16 emulator and reflects real device state: YouTube installed and selected, nine catalog entries shown as normal not-installed rows rather than errors. 7 Compose tests plus the merged-manifest check. The catalog loader moved from `app` to `core-data` so a feature module can reach it. The `<queries>` drift guard was already delivered in phase 12 and is proven to fail on a mismatch. A debug entry point was added because the screen had no host and none of the five scenarios could otherwise be run.
 
 **Goal.** Ship the supported-app selection screen using the catalog proven in phase 03.
 
@@ -1256,30 +1256,30 @@ Tests green, six scenarios verified.
 
 ### Tasks
 
-- [ ] Load the catalog and resolve installed entries
-- [ ] Build the selection screen from the design components
-- [ ] Show installed, selected, and not-installed states distinctly
-- [ ] Persist the selection
-- [ ] Explain that the list is supported applications, not all applications
-- [ ] Handle an app uninstalled after selection
-- [ ] Handle an empty catalog result without a dead end
-- [ ] Stop `<queries>` and the catalog from drifting apart, by generating the manifest entries from `catalog.json` or by a test that fails when they disagree — carried over from spike A-04, where twelve manifest lines mirror twelve package names by hand and a mismatch would silently resolve to not-installed on every device
+- [x] Load the catalog and resolve installed entries
+- [x] Build the selection screen from the design components
+- [x] Show installed, selected, and not-installed states distinctly
+- [x] Persist the selection
+- [x] Explain that the list is supported applications, not all applications
+- [x] Handle an app uninstalled after selection
+- [x] Handle an empty catalog result without a dead end
+- [x] Stop `<queries>` and the catalog from drifting apart, by generating the manifest entries from `catalog.json` or by a test that fails when they disagree — carried over from spike A-04, where twelve manifest lines mirror twelve package names by hand and a mismatch would silently resolve to not-installed on every device
 
 **Expected result.** A selection screen that reflects reality and never implies hidden inspection of the device.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes for selection persistence and uninstall handling — agent runs
-- [ ] Compose UI tests for all three row states — agent runs
-- [ ] Merged manifest still free of `QUERY_ALL_PACKAGES` — agent verifies
-- [ ] Accessibility labels present on every row — agent runs
+- [x] `./gradlew test` passes for selection persistence and uninstall handling — agent runs
+- [x] Compose UI tests for all three row states — agent runs
+- [x] Merged manifest still free of `QUERY_ALL_PACKAGES` — agent verifies
+- [x] Accessibility labels present on every row — agent runs
 
 ### Agent checklist
 
-- [ ] Not-installed rows are not presented as errors
-- [ ] Copy never says "all your apps"
-- [ ] Selection survives process death
-- [ ] Icons load without blocking the main thread
+- [x] Not-installed rows are not presented as errors
+- [x] Copy never says "all your apps"
+- [x] Selection survives process death
+- [x] Icons load without blocking the main thread
 
 ### Manual scenarios for the user
 

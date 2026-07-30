@@ -1,4 +1,4 @@
-package com.blocksocial.catalog
+package com.blocksocial.core.data.catalog
 
 import android.content.Context
 import com.blocksocial.core.model.AppRef
