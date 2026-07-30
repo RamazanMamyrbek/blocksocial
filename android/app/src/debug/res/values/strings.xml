@@ -3,4 +3,5 @@
     <string name="token_preview_title">BlockSocial tokens</string>
     <string name="selection_debug_title">BlockSocial apps</string>
     <string name="rules_debug_title">BlockSocial rules</string>
+    <string name="dashboard_debug_title">BlockSocial today</string>
 </resources>

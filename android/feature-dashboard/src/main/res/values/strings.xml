@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_title">Today</string>
+    <string name="dashboard_stayed">Stayed focused</string>
+    <string name="dashboard_stayed_value">%1$d of %2$d opens</string>
+    <string name="dashboard_bypassed">Opened anyway</string>
+    <string name="dashboard_refusal_rate">Declined</string>
+    <string name="dashboard_refusal_rate_value">%1$d%% of opens, last 7 days</string>
+    <string name="dashboard_refusal_rate_absent">Not enough decisions yet</string>
+    <string name="dashboard_rules">Rules</string>
+    <string name="dashboard_rules_value">%1$d active, %2$d paused</string>
+    <string name="dashboard_streak">Streak</string>
+    <string name="dashboard_streak_value">%1$d days</string>
+    <string name="dashboard_streak_rule">A day counts when you open no more than %1$d times on purpose.</string>
+    <string name="dashboard_hours_saved">Hours saved is not shown. BlockSocial cannot measure it honestly, so it is absent rather than reported as zero.</string>
+    <string name="dashboard_nothing_yet">Nothing recorded yet. Numbers appear after your first pause.</string>
+</resources>

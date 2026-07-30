@@ -1449,7 +1449,7 @@ Tests green, six scenarios verified on two devices.
 
 ## Phase 18 — Android: History, Statistics, Dashboard
 
-**Status:** partial. `Q-01` is answered and recorded, which unblocks this phase permanently: a day counts towards the streak when bypasses are at or below a configured maximum, default two. The statistics domain is built and tested — 10 tests covering the streak rule, the zone-correct day grouping, and the two honesty rules, that `UNKNOWN` and `DISMISSED_BY_SYSTEM` count as neither refusal nor bypass and that a rate with nothing to divide is hidden rather than shown as zero. **Not done:** the history screen, the dashboard UI, and every manual scenario.
+**Status:** partial, dashboard now built. The dashboard runs on an Android 16 emulator against real recorded events, with 5 Compose tests. **Still not done:** the history screen, and the streak value says "1 days" because it needs a plural resource. `Q-01` is answered and recorded, which unblocks this phase permanently: a day counts towards the streak when bypasses are at or below a configured maximum, default two. The statistics domain is built and tested — 10 tests covering the streak rule, the zone-correct day grouping, and the two honesty rules, that `UNKNOWN` and `DISMISSED_BY_SYSTEM` count as neither refusal nor bypass and that a rate with nothing to divide is hidden rather than shown as zero. **Not done:** the history screen, the dashboard UI, and every manual scenario.
 
 **Goal.** Ship the surfaces that show the user what they decided, with honest numbers.
 
