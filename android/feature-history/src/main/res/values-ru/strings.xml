@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">История</string>
+    <string name="history_empty">Пока пусто. Здесь окажется каждая пауза, каким бы ни было ваше решение.</string>
+    <string name="history_stayed">Остались в фокусе</string>
+    <string name="history_bypassed">Открыли ненадолго</string>
+    <string name="history_unresolved">Закрыто без решения</string>
+    <string name="history_reason_always">Всегда</string>
+    <string name="history_reason_schedule">Расписание</string>
+    <string name="history_reason_daily_limit">Дневной лимит</string>
+    <string name="history_row_description">%1$s, %2$s, %3$s</string>
+    <string name="history_outcome_and_reason">%1$s · %2$s</string>
+</resources>

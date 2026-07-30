@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="block_window_title">Пауза BlockSocial</string>
+    <string name="block_app_line">Вы открыли %1$s</string>
+    <string name="block_headline_always">Вы решили держать это приложение закрытым</string>
+    <string name="block_headline_schedule_until">Расписание держит его до %1$s</string>
+    <string name="block_headline_schedule">Его держит расписание</string>
+    <string name="block_headline_daily_limit">Ваше время на сегодня вышло</string>
+    <string name="block_supporting">Здесь ничего не заперто. Вы можете изменить или удалить это правило в любой момент.</string>
+    <string name="block_stay_focused">Остаться в фокусе</string>
+    <string name="block_open_temporarily">Открыть ненадолго</string>
+    <string name="block_footnote">%1$d из %2$d открытий сегодня закончились здесь</string>
+</resources>

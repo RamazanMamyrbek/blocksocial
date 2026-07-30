@@ -110,10 +110,13 @@ class DashboardScreenTest {
     }
 
     @Test
-    fun aWorkingProtectionOffersNothingToRepair() {
+    fun protectionCanBeOpenedEvenWhenNothingIsWrongWithIt() {
         show(busyDay.copy(protection = ProtectionBanner.RUNNING))
 
-        composeRule.onNodeWithTag(DashboardTags.OPEN_PROTECTION).assertDoesNotExist()
+        composeRule.onNodeWithTag(DashboardTags.OPEN_PROTECTION).assertIsDisplayed()
+        composeRule.onNodeWithText(
+            "Your rules are saved and unchanged. Nothing is being paused right now.",
+        ).assertDoesNotExist()
     }
 
     @Test

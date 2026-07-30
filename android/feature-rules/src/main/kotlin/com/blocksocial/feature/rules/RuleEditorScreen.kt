@@ -30,9 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.blocksocial.core.model.RuleMode
+import com.blocksocial.core.ui.text.rememberClockFormatter
+import com.blocksocial.core.ui.text.rememberIs24Hour
+import com.blocksocial.core.ui.text.rememberWeekOrder
 import com.blocksocial.core.ui.theme.Numeric
 import com.blocksocial.core.ui.theme.Radius
 import com.blocksocial.core.ui.theme.Spacing
@@ -114,7 +119,8 @@ private fun ScheduleFields(draft: RuleDraft, onDraftChange: (RuleDraft) -> Unit)
     )
     val locale = LocalLocale.current.platformLocale
     Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        DayOfWeek.entries.forEach { day ->
+        rememberWeekOrder().forEach { day ->
+            val fullName = day.getDisplayName(TextStyle.FULL, locale)
             FilterChip(
                 selected = day in draft.daysOfWeek,
                 onClick = {
@@ -122,7 +128,9 @@ private fun ScheduleFields(draft: RuleDraft, onDraftChange: (RuleDraft) -> Unit)
                     onDraftChange(draft.copy(daysOfWeek = days))
                 },
                 label = { Text(day.getDisplayName(TextStyle.NARROW, locale)) },
-                modifier = Modifier.testTag(RuleEditorTags.day(day)),
+                modifier = Modifier
+                    .testTag(RuleEditorTags.day(day))
+                    .semantics { contentDescription = fullName },
             )
         }
     }
@@ -147,8 +155,9 @@ private fun ScheduleFields(draft: RuleDraft, onDraftChange: (RuleDraft) -> Unit)
 
 @Composable
 fun IntervalSummary(interval: IntervalDescription) {
-    val start = interval.startLocalTime.toString()
-    val end = interval.endLocalTime.toString()
+    val clock = rememberClockFormatter()
+    val start = clock(interval.startLocalTime)
+    val end = clock(interval.endLocalTime)
 
     if (interval.crossesMidnight) {
         Text(
@@ -222,6 +231,9 @@ private fun IntervalBar(interval: IntervalDescription) {
 
 @Composable
 private fun LimitField(draft: RuleDraft, onDraftChange: (RuleDraft) -> Unit) {
+    val decreaseDescription = stringResource(R.string.rule_limit_less_description, LIMIT_STEP)
+    val increaseDescription = stringResource(R.string.rule_limit_more_description, LIMIT_STEP)
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
         verticalAlignment = Alignment.CenterVertically,
@@ -231,16 +243,26 @@ private fun LimitField(draft: RuleDraft, onDraftChange: (RuleDraft) -> Unit) {
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        OutlinedButton(onClick = { onDraftChange(draft.copy(dailyLimitMinutes = draft.dailyLimitMinutes - 5)) }) {
-            Text("-5")
+        OutlinedButton(
+            onClick = { onDraftChange(draft.copy(dailyLimitMinutes = draft.dailyLimitMinutes - LIMIT_STEP)) },
+            modifier = Modifier.semantics {
+                contentDescription = decreaseDescription
+            },
+        ) {
+            Text(stringResource(R.string.rule_limit_less, LIMIT_STEP))
         }
         Text(
             text = draft.dailyLimitMinutes.toString(),
             style = Numeric,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        OutlinedButton(onClick = { onDraftChange(draft.copy(dailyLimitMinutes = draft.dailyLimitMinutes + 5)) }) {
-            Text("+5")
+        OutlinedButton(
+            onClick = { onDraftChange(draft.copy(dailyLimitMinutes = draft.dailyLimitMinutes + LIMIT_STEP)) },
+            modifier = Modifier.semantics {
+                contentDescription = increaseDescription
+            },
+        ) {
+            Text(stringResource(R.string.rule_limit_more, LIMIT_STEP))
         }
     }
 }
@@ -249,25 +271,34 @@ private fun LimitField(draft: RuleDraft, onDraftChange: (RuleDraft) -> Unit) {
 @Composable
 private fun TimeField(tag: String, label: String, value: LocalTime, onChange: (LocalTime) -> Unit) {
     var picking by remember { mutableStateOf(false) }
+    val clock = rememberClockFormatter()
+    val is24Hour = rememberIs24Hour()
 
     OutlinedButton(onClick = { picking = true }, modifier = Modifier.testTag(tag)) {
-        Text("$label $value")
+        Text(stringResource(R.string.rule_time_field, label, clock(value)))
     }
 
     if (picking) {
-        val state = rememberTimePickerState(value.hour, value.minute, true)
+        val state = rememberTimePickerState(value.hour, value.minute, is24Hour)
         AlertDialog(
             onDismissRequest = { picking = false },
             confirmButton = {
                 TextButton(onClick = {
                     onChange(LocalTime.of(state.hour, state.minute))
                     picking = false
-                }) { Text("OK") }
+                }) { Text(stringResource(android.R.string.ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { picking = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
             },
             text = { TimePicker(state = state) },
         )
     }
 }
+
+private const val LIMIT_STEP = 5
 
 @Composable
 private fun modeLabel(mode: RuleMode): String = when (mode) {

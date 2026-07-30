@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -27,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import com.blocksocial.core.model.BlockEvent
 import com.blocksocial.core.model.RuleMode
 import com.blocksocial.core.model.UserAction
+import com.blocksocial.core.ui.text.rememberEventFormatter
 import com.blocksocial.core.ui.theme.Numeric
 import com.blocksocial.core.ui.theme.Radius
 import com.blocksocial.core.ui.theme.Spacing
-import java.time.format.DateTimeFormatter
 
 object HistoryTags {
     const val LIST = "history-list"
@@ -72,16 +71,14 @@ fun HistoryScreen(events: List<BlockEvent>, displayNameOf: (BlockEvent) -> Strin
 private fun HistoryRow(event: BlockEvent, displayName: String) {
     val outcome = outcomeLabel(event.userAction)
     val reason = reasonLabel(event.primaryReason)
-    val time = remember(event.zone) { DateTimeFormatter.ofPattern("d MMM HH:mm").withZone(event.zone) }
-        .format(event.occurredAt)
+    val time = rememberEventFormatter(event.zone)(event.occurredAt)
+    val description = stringResource(R.string.history_row_description, displayName, outcome, time)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .testTag(HistoryTags.row(event.id))
-            .semantics {
-                contentDescription = "$displayName, $outcome, $time"
-            }
+            .semantics { contentDescription = description }
             .padding(vertical = Spacing.sm),
         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
         verticalAlignment = Alignment.CenterVertically,
@@ -95,7 +92,7 @@ private fun HistoryRow(event: BlockEvent, displayName: String) {
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = "$outcome · $reason",
+                text = stringResource(R.string.history_outcome_and_reason, outcome, reason),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

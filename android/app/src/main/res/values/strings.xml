@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BlockSocial</string>
+    <string name="app_name" translatable="false">BlockSocial</string>
     <string name="shell_back">Back</string>
     <string name="shell_tab_today">Today</string>
     <string name="shell_tab_apps">Apps</string>

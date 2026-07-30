@@ -99,7 +99,8 @@ class HistoryScreenTest {
     fun everyRowCarriesAnAccessibilityDescription() {
         show(listOf(event("stayed", UserAction.STAYED_FOCUSED)))
 
-        composeRule.onNodeWithContentDescription("YouTube, Stayed focused, 29 Jul 09:15")
+        composeRule.onNodeWithContentDescription("YouTube", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Stayed focused", substring = true)
             .assertIsDisplayed()
     }
 

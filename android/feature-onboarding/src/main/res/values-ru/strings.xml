@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">Состояние защиты</string>
+    <string name="health_running">Блокировка работает.</string>
+    <string name="health_not_running">Блокировка не работает. Ваши правила сохранены и не изменились, но прямо сейчас ничего не приостанавливается.</string>
+
+    <string name="health_accessibility">Специальные возможности</string>
+    <string name="health_usage">Доступ к статистике использования</string>
+    <string name="health_notifications">Уведомления</string>
+
+    <string name="health_status_healthy">Работает</string>
+    <string name="health_status_not_asked">Ещё не настроено</string>
+    <string name="health_status_denied">Выключено</string>
+    <string name="health_status_not_running">Включено в настройках, но не запущено</string>
+    <string name="health_status_silent">Включено, но ничего не передаёт</string>
+
+    <string name="health_accessibility_not_asked">Пока вы это не включите, блокировка не работает. Правила, которые вы создадите, сохранятся и начнут действовать сразу, как только вы включите доступ.</string>
+    <string name="health_accessibility_denied">Блокировка не работает. Правила остаются сохранёнными, история сохраняется, ничего не потеряно.</string>
+    <string name="health_accessibility_not_running">Android показывает доступ как включённый, но служба не запущена. Обычно так бывает после принудительной остановки приложения. Правила сохранены; блокировка не заработает, пока вы не выключите и снова не включите доступ.</string>
+    <string name="health_accessibility_silent">Android показывает доступ как включённый и запущенный, но события не приходят, поэтому заблокировать ничего нельзя. Так бывает после обновления. Правила сохранены; выключите и включите доступ снова, чтобы оживить службу.</string>
+    <string name="health_usage_denied">Без этого дневные лимиты нельзя измерить. Расписания и режим «всегда» продолжают работать ровно как раньше.</string>
+    <string name="health_notifications_denied">Вы не узнаете, когда защита перестанет работать. На саму блокировку это не влияет.</string>
+
+    <string name="health_repair_accessibility">Открыть настройки специальных возможностей</string>
+    <string name="health_repair_usage">Открыть настройки доступа к статистике</string>
+    <string name="health_repair_notifications">Открыть настройки уведомлений</string>
+
+    <string name="health_oem_title">Если блокировка выключается сама</string>
+    <string name="health_oem_body">Некоторые производители останавливают фоновые службы ради экономии батареи. Если это произошло, разрешите BlockSocial работать в фоне в настройках телефона. Этот совет написан по документации производителей и не проверен нами на устройстве.</string>
+    <string name="health_item_description">%1$s, %2$s</string>
+
+    <string name="disclosure_title">Как BlockSocial блокирует приложение</string>
+    <string name="disclosure_intro">Чтобы остановить приложение в момент открытия, BlockSocial использует службу специальных возможностей Android.</string>
+    <string name="disclosure_lead">Вот что именно это значит.</string>
+    <string name="disclosure_reads">Что BlockSocial читает. Только имя приложения, которое только что вышло на передний план, и момент, когда это произошло. Это весь список.</string>
+    <string name="disclosure_never_reads">Что BlockSocial не читает никогда. Ни текст на вашем экране. Ни ваши сообщения. Ни то, что вы набираете. Ни ваши пароли. Разрешение читать содержимое экрана выключено в самом приложении, поэтому это не обещание о наших намерениях — это настройка, которую соблюдает система.</string>
+    <string name="disclosure_does">Что BlockSocial делает. Когда вы открываете приложение, которое сами ограничили, он показывает полноэкранную паузу с двумя вариантами. Если вы выбираете остаться в фокусе, он нажимает кнопку «Домой» за вас. Он никогда не нажимает, не набирает и не действует внутри другого приложения.</string>
+    <string name="disclosure_where">Куда это уходит. Никуда. У BlockSocial нет разрешения на доступ в интернет. Ничего о ваших приложениях и ваших решениях не покидает этот телефон.</string>
+    <string name="disclosure_continue">Продолжить</string>
+    <string name="disclosure_not_now">Не сейчас</string>
+    <string name="disclosure_footnote">Следующий экран — собственный экран Android, а не наш.</string>
+
+    <string name="consent_title">Включить блокировку?</string>
+    <string name="consent_body">BlockSocial будет использовать службу специальных возможностей, чтобы замечать открытие ограниченного приложения и показывать вам экран паузы.</string>
+    <string name="consent_detail">Он читает имя приложения на переднем плане и больше ничего. Вы можете выключить это в любой момент в настройках Android или на экране «Защита» внутри BlockSocial.</string>
+    <string name="consent_agree">Согласен, открыть настройки</string>
+    <string name="consent_cancel">Отмена</string>
+
+    <string name="onboarding_position">Шаг %1$d из %2$d</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_back">Назад</string>
+    <string name="onboarding_skip">Пропустить</string>
+
+    <string name="onboarding_soft_block_title">Пауза, а не стена</string>
+    <string name="onboarding_soft_block_body">Когда вы открываете приложение, которое сами ограничили, BlockSocial показывает полноэкранную паузу с двумя вариантами: остаться в фокусе или всё же открыть на несколько минут. Это момент для решения, а не замок, который нужно взломать.</string>
+    <string name="onboarding_in_control_title">Всё решаете вы</string>
+    <string name="onboarding_in_control_body">Вы выбираете, какие приложения ограничить и когда. Вы можете открыть ограниченное приложение в любой момент, выключить любое правило или удалить BlockSocial. Ничто здесь не работает против вас.</string>
+    <string name="onboarding_on_this_phone_title">Всё остаётся на этом телефоне</string>
+    <string name="onboarding_on_this_phone_body">Нет аккаунта, нет входа и нет разрешения на интернет. Ваши правила, ваши решения и ваша история хранятся на этом телефоне и удаляются вместе с приложением.</string>
+
+    <string name="onboarding_setup_title">Что нужно BlockSocial</string>
+    <string name="onboarding_setup_denial">Любое из двух можно пропустить. Правила сохранятся в любом случае, а включить это можно позже на экране «Защита».</string>
+    <string name="onboarding_finish">Готово</string>
+
+    <string name="permission_action_accessibility">Настроить блокировку</string>
+    <string name="permission_action_usage">Включить дневные лимиты</string>
+    <string name="permission_action_notifications">Включить оповещения</string>
+
+    <string name="permission_accessibility_enables">Что это даёт. BlockSocial замечает момент, когда ограниченное приложение выходит на передний план, и показывает вам экран паузы. Без этого не блокируется ничего.</string>
+    <string name="permission_accessibility_reads">Что читается. Только имя приложения, которое только что вышло на передний план, и момент, когда это произошло. Это весь список.</string>
+    <string name="permission_accessibility_never_reads">Что не читается никогда. Ни текст на вашем экране. Ни ваши сообщения. Ни то, что вы набираете. Ни ваши пароли. Чтение содержимого экрана выключено в самом приложении, поэтому это соблюдает система, а не мы.</string>
+    <string name="permission_accessibility_revoke">Как выключить. Настройки Android, «Специальные возможности», BlockSocial. Или экран «Защита» внутри BlockSocial. Ваши правила и ваша история останутся.</string>
+
+    <string name="permission_usage_enables">Что это даёт. Дневные лимиты. BlockSocial сможет измерять, сколько ограниченное приложение было на переднем плане сегодня. Без этого расписания и режим «всегда» всё равно работают.</string>
+    <string name="permission_usage_reads">Что читается. Сколько времени приложения, которые вы ограничили, были на переднем плане, и когда.</string>
+    <string name="permission_usage_never_reads">Что не читается никогда. Ничего внутри этих приложений. Ни содержимое экрана, ни сообщения, ни уведомления, ни история просмотров.</string>
+    <string name="permission_usage_revoke">Как выключить. Настройки Android, «Специальный доступ», «Доступ к данным об использовании», BlockSocial. Дневные лимиты перестанут измеряться; больше ничего не изменится.</string>
+
+    <string name="permission_notifications_enables">Что это даёт. BlockSocial сможет сообщить вам, что блокировка перестала работать, и вы узнаете об этом от приложения, а не по пропущенному блоку.</string>
+    <string name="permission_notifications_reads">Что читается. Ничего. Это разрешение позволяет BlockSocial только показать вам сообщение.</string>
+    <string name="permission_notifications_never_reads">Что не читается никогда. Уведомления других приложений. BlockSocial их не видит.</string>
+    <string name="permission_notifications_revoke">Как выключить. Настройки Android, «Уведомления», BlockSocial. На саму блокировку это не влияет.</string>
+</resources>
