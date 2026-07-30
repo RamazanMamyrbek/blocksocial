@@ -118,7 +118,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 16 | Android: rule editor | Android MVP | 15 | done |
 | 17 | Android: daily limits | Android MVP | 16 | partial |
 | 18 | Android: history, statistics, dashboard | Android MVP | 17 | partial |
-| 19 | Android: onboarding, permissions, protection health | Android MVP | 18 | partial |
+| 19 | Android: onboarding, permissions, protection health, application shell | Android MVP | 18 | done |
 | 20 | Android: recovery and reliability hardening | Android MVP | 19 | not started |
 | 21 | Android: accessibility and localization | Android MVP | 20 | not started |
 | 22 | Android: API-level matrix and defect fixing | Android MVP | 21 | not started |
@@ -1518,7 +1518,7 @@ Tests green, six scenarios verified.
 
 ## Phase 19 — Android: Onboarding, Permissions, Protection Health
 
-**Status:** partial. Every task and every automated check in this phase is done. Protection health closes the reporting half of risk `R-07`: both silent-failure modes are distinct states covered by 11 reducer tests and 9 Compose tests, and every degraded item states what stops working, what keeps working, and offers one repair action. Onboarding is three intro steps and a setup screen carrying one four-slot card per permission; the accessibility flow passes through the prominent disclosure and affirmative consent before Android's own screen, usage access is asked for on its own with no disclosure in the way, and notifications are asked for only when protection is first found to be down. The dashboard leads with protection state and names a change since the last visit rather than reporting a flat "off". Verified on an Android 16 emulator, including revocation with no crash.
+**Status:** done. Every task and every automated check in this phase is done. Protection health closes the reporting half of risk `R-07`: both silent-failure modes are distinct states covered by 11 reducer tests and 9 Compose tests, and every degraded item states what stops working, what keeps working, and offers one repair action. Onboarding is three intro steps and a setup screen carrying one four-slot card per permission; the accessibility flow passes through the prominent disclosure and affirmative consent before Android's own screen, usage access is asked for on its own with no disclosure in the way, and notifications are asked for only when protection is first found to be down. The dashboard leads with protection state and names a change since the last visit rather than reporting a flat "off". Verified on an Android 16 emulator, including revocation with no crash.
 
 **One state could not be reproduced on device:** force-stopping the app on Android 16 *cleared* `enabled_accessibility_services` rather than leaving it enabled, so the platform reported it as turned off, not as enabled-but-dead. That differs from what spike `A-03` saw and is recorded in `docs/ARCHITECTURE.md`.
 
@@ -1526,7 +1526,11 @@ Tests green, six scenarios verified.
 
 **Conflict reported, not silently resolved.** `design/UI_UX_BRIEF.md` section 6.2 lists five things a permission card must say, including "what stops working without it". `design/DESIGN_EXPORT_ANALYSIS.md` and this phase's task both specify **four** fixed slots, which omit that one. The four slots ship as designed; the consequence of denial is carried by the setup screen's own line and by protection health, which states it for every degraded state. Someone should decide which document is wrong.
 
-**Why this phase is not closed.** Manual scenario 1 says "complete onboarding on a fresh install and reach a working first rule". Nothing can reach anything: every screen is still its own launcher entry in the debug build, and **no phase in this plan owns the application shell or navigation between screens**. That is a gap in the plan, not work this phase deliberately deferred. Phase 19 cannot report done until a shell exists.
+**Gap closed here.** No phase in this plan owned the application shell, yet manual scenario 1 requires one: "complete onboarding on a fresh install and reach a working first rule". Rather than leave the gap open, the shell was built inside this phase — one launcher entry, three tabs, a back stack, and every existing screen routed through it. The debug activities remain as harnesses but no longer appear in the launcher. Navigation is a hand-written state machine over a sealed `Destination`; no navigation library was added.
+
+**Second defect found and fixed here.** Nesting a screen that scrolls itself inside a host that also scrolls crashes Compose with an infinity-height error. It had already been hit once in phase 16 and hit again the first time the history list was put in the shell. The fix is two named frames, `ScrollingScreen` and `ScrollsItselfScreen`, and a test that renders every screen inside the real shell — so the next screen that scrolls itself fails a test rather than the application.
+
+**Verified end to end on an Android 16 emulator**, driven over adb from a fresh install: onboarding, skip, finish setup, Apps, select YouTube, open its rules, save an always-on rule, launch YouTube, meet the block screen, choose Stay Focused, and find the decision in History with its reason and time. A screenshot was needed to confirm the block screen itself, because `uiautomator dump` cannot retrieve an accessibility overlay's node tree — the same limitation spike `A-02` recorded, and the reason phase 21 owns proving the overlay with a screen reader.
 
 **Goal.** Ship the first-run experience and the permission lifecycle, including recovery when a permission is revoked.
 
@@ -1551,6 +1555,8 @@ Tests green, six scenarios verified.
 - [x] Detect that the accessibility service is enabled in settings but delivering no events, and report it as broken rather than healthy — carried over from spike A-03, where a reinstall left the service listed under `Bound services` with a live process and no event delivery
 - [x] Detect that force-stop has killed the service, and say so — carried over from spike A-03, where `am force-stop` left `Bound services:{}` with no rebind and blocking silently stopped
 - [x] State plainly what a dead service means: rules stay saved, blocking does not run
+- [x] Build the application shell: one launcher entry, a Today, Apps and History tab bar, and a back stack that survives rotation
+- [x] Route onboarding, application selection, rules, history and protection health through the shell
 
 **Expected result.** A first run that earns permissions honestly and a health screen that explains and repairs any degraded state.
 
@@ -1560,6 +1566,8 @@ Tests green, six scenarios verified.
 - [x] Test asserting rules save but stay inactive without accessibility access — agent runs
 - [x] Compose UI tests for granted, denied, and revoked states — agent runs
 - [x] Accessibility labels on every status item — agent runs
+- [x] Navigation tests for the back stack, tab switching and the saved history — agent runs
+- [x] A frame test rendering every screen inside the real shell, so a nested scrolling container fails a test instead of the application — agent runs
 
 ### Agent checklist
 
@@ -1601,7 +1609,7 @@ Tests green, six scenarios verified on the emulator, OEM guidance labelled unver
 
 ## Phase 20 — Android: Recovery and Reliability Hardening
 
-**Status:** not started
+**Status:** not started. One defect belonging to this phase was found and fixed early, in phase 19, because it was caught by running the product: block events and grants were written on the accessibility service's own coroutine scope, which `onUnbind` cancels, so a decision made moments before the service was torn down was silently lost. Durable writes now run on an application-scoped writer, `DurableWrites`, and three tests cover it, one of which reproduces the old loss. Do not redo it here; do look for other writes on the wrong scope.
 
 **Goal.** Make the application behave correctly after reboot, process death, permission changes, and time changes.
 

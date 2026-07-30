@@ -4,9 +4,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.blocksocial.core.domain.ProtectionBanner
 import com.blocksocial.core.ui.theme.BlockSocialTheme
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -102,9 +104,33 @@ class DashboardScreenTest {
         composeRule.onNodeWithText("Blocking stopped since you last opened BlockSocial.")
             .assertIsDisplayed()
         composeRule.onNodeWithText(
-            "Your rules are saved and unchanged. Nothing is being paused right now. " +
-                "Open Protection to see why and to fix it.",
+            "Your rules are saved and unchanged. Nothing is being paused right now.",
         ).assertIsDisplayed()
+        composeRule.onNodeWithTag(DashboardTags.OPEN_PROTECTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun aWorkingProtectionOffersNothingToRepair() {
+        show(busyDay.copy(protection = ProtectionBanner.RUNNING))
+
+        composeRule.onNodeWithTag(DashboardTags.OPEN_PROTECTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun theRepairPathLeadsSomewhere() {
+        var opened = 0
+        composeRule.setContent {
+            BlockSocialTheme(darkTheme = true) {
+                DashboardScreen(
+                    state = busyDay.copy(protection = ProtectionBanner.STOPPED),
+                    onOpenProtection = { opened++ },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(DashboardTags.OPEN_PROTECTION).performClick()
+
+        assertEquals(1, opened)
     }
 
     @Test
