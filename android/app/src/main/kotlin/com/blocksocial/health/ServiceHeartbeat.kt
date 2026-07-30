@@ -14,6 +14,8 @@ class ServiceHeartbeat @Inject constructor() {
 
     val isConnected: Boolean get() = connectedSince.get() != null
 
+    val connectedAt: Instant? get() = connectedSince.get()
+
     val lastEvent: Instant? get() = lastEventAt.get()
 
     val probeStarted: Instant? get() = probeStartedAt.get()

@@ -15,6 +15,7 @@ class ProtectionHealthReducerTest {
         enabledInSettings: Boolean = true,
         everAsked: Boolean = true,
         connectedInThisProcess: Boolean = true,
+        connectedAt: Instant? = this.probeStartedAt.minusSeconds(60),
         lastEventAt: Instant? = null,
         probeStartedAt: Instant? = this.probeStartedAt,
         now: Instant = afterGrace,
@@ -22,6 +23,7 @@ class ProtectionHealthReducerTest {
         enabledInSettings = enabledInSettings,
         everAsked = everAsked,
         connectedInThisProcess = connectedInThisProcess,
+        connectedAt = connectedAt,
         lastEventAt = lastEventAt,
         probeStartedAt = probeStartedAt,
         now = now,
@@ -79,6 +81,30 @@ class ProtectionHealthReducerTest {
         )
 
         assertEquals(RequirementStatus.HEALTHY, status)
+    }
+
+    @Test
+    fun aServiceThatRebindsDuringTheProbeIsNotAccusedOfSilence() {
+        val status = ProtectionHealthReducer.accessibility(
+            observation(connectedAt = probeStartedAt.plusSeconds(1), lastEventAt = null),
+        )
+
+        assertEquals(RequirementStatus.HEALTHY, status)
+    }
+
+    @Test
+    fun aRebindDoesNotExcuseSilenceOnceTheNextProbeHasRun() {
+        val rebindAt = probeStartedAt.plusSeconds(1)
+        val status = ProtectionHealthReducer.accessibility(
+            observation(
+                connectedAt = rebindAt,
+                lastEventAt = null,
+                probeStartedAt = rebindAt.plusSeconds(1),
+                now = rebindAt.plusSeconds(1).plus(ProtectionHealthReducer.PROBE_GRACE).plusMillis(1),
+            ),
+        )
+
+        assertEquals(RequirementStatus.RUNNING_BUT_SILENT, status)
     }
 
     @Test

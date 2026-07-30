@@ -14,13 +14,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.blocksocial.core.ui.theme.BlockSocialTheme
 import com.blocksocial.core.ui.theme.Spacing
 import com.blocksocial.feature.dashboard.DashboardController
 import com.blocksocial.feature.dashboard.DashboardScreen
 import com.blocksocial.feature.dashboard.DashboardState
+import com.blocksocial.health.ProtectionHealthProbe
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -29,12 +32,16 @@ class DashboardDebugActivity : ComponentActivity() {
     @Inject
     lateinit var controller: DashboardController
 
+    @Inject
+    lateinit var probe: ProtectionHealthProbe
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             BlockSocialTheme {
-                val state by controller.state().collectAsState(initial = DashboardState.Empty)
+                val states = remember { controller.state(probe.observe().map { it.banner }) }
+                val state by states.collectAsState(initial = DashboardState.Empty)
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

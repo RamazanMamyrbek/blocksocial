@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.blocksocial.core.domain.ProtectionBanner
 import com.blocksocial.core.ui.theme.BlockSocialTheme
 import org.junit.Rule
 import org.junit.Test
@@ -23,6 +24,7 @@ class DashboardScreenTest {
     }
 
     private val busyDay = DashboardState(
+        protection = ProtectionBanner.RUNNING,
         interventionsToday = 6,
         stayedFocusedToday = 4,
         bypassedToday = 2,
@@ -83,5 +85,34 @@ class DashboardScreenTest {
         show(DashboardState.Empty)
 
         composeRule.onNodeWithTag(DashboardTags.EMPTY).assertIsDisplayed()
+    }
+
+    @Test
+    fun protectionStateIsTheFirstThingOnTheScreen() {
+        show(busyDay)
+
+        composeRule.onNodeWithTag(DashboardTags.PROTECTION).assertIsDisplayed()
+        composeRule.onNodeWithText("Blocking is on.").assertIsDisplayed()
+    }
+
+    @Test
+    fun aChangeSinceTheLastVisitIsNamedAsAChange() {
+        show(busyDay.copy(protection = ProtectionBanner.STOPPED_SINCE_LAST_OPEN))
+
+        composeRule.onNodeWithText("Blocking stopped since you last opened BlockSocial.")
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(
+            "Your rules are saved and unchanged. Nothing is being paused right now. " +
+                "Open Protection to see why and to fix it.",
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun aStateThatWasNeverSetUpIsNotDescribedAsSomethingThatStopped() {
+        show(busyDay.copy(protection = ProtectionBanner.NEVER_SET_UP))
+
+        composeRule.onNodeWithText("Blocking is not set up yet.").assertIsDisplayed()
+        composeRule.onNodeWithText("Blocking stopped since you last opened BlockSocial.")
+            .assertDoesNotExist()
     }
 }

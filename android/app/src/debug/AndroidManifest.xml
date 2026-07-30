@@ -52,6 +52,16 @@
         </activity>
 
         <activity
+            android:name=".debug.OnboardingDebugActivity"
+            android:exported="true"
+            android:label="@string/onboarding_debug_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".debug.ProtectionHealthDebugActivity"
             android:exported="true"
             android:label="@string/health_debug_title">
