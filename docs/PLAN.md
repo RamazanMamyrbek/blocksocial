@@ -116,7 +116,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 14 | Android: temporary bypass | Android MVP | 13 | done |
 | 15 | Android: application selection | Android MVP | 11 | done |
 | 16 | Android: rule editor | Android MVP | 15 | done |
-| 17 | Android: daily limits | Android MVP | 16 | not started |
+| 17 | Android: daily limits | Android MVP | 16 | partial |
 | 18 | Android: history, statistics, dashboard | Android MVP | 17 | not started |
 | 19 | Android: onboarding, permissions, protection health | Android MVP | 18 | not started |
 | 20 | Android: recovery and reliability hardening | Android MVP | 19 | not started |
@@ -1380,7 +1380,7 @@ Tests green, six scenarios verified.
 
 ## Phase 17 — Android: Daily Limits
 
-**Status:** not started
+**Status:** done except two items, both left unticked rather than glossed. Daily limits work end to end on an Android 16 emulator: usage measured through `queryEvents`, a one-minute limit reached, and the next launch blocked with `primaryReason=DAILY_LIMIT`. Revoking usage access degrades only the limit and leaves schedules blocking. 324 tests green, lint clean. **Not done:** the WorkManager aggregation job, and the second emulator image at a different API level. `android.permission.PACKAGE_USAGE_STATS` is now declared, which contradicts the phase 06 data inventory claim that the manifest declares no permissions; phase 23 must re-run it.
 
 **Goal.** Ship the `DAILY_LIMIT` mode using the usage measurement validated in phase 05.
 
@@ -1392,30 +1392,30 @@ Tests green, six scenarios verified.
 
 ### Tasks
 
-- [ ] Request and verify usage access with its own explanation
-- [ ] Accumulate per-application usage for the current local day
-- [ ] Evaluate the limit and mark the application restricted when reached
-- [ ] Block on the next launch after the limit is reached
-- [ ] Reset the counter at local midnight
-- [ ] Show remaining time as an estimate, never an exact countdown
-- [ ] Handle usage access denied or revoked without breaking schedule blocking
+- [x] Request and verify usage access with its own explanation
+- [x] Accumulate per-application usage for the current local day
+- [x] Evaluate the limit and mark the application restricted when reached
+- [x] Block on the next launch after the limit is reached
+- [x] Reset the counter at local midnight
+- [x] Show remaining time as an estimate, never an exact countdown
+- [x] Handle usage access denied or revoked without breaking schedule blocking
 - [ ] Add a WorkManager job for daily aggregation and cleanup
 
 **Expected result.** Daily limits that trigger reliably, presented honestly as approximate.
 
 ### Automated checks
 
-- [ ] `./gradlew test` passes with every daily-limit fixture case — agent runs
-- [ ] Midnight reset test across a simulated day boundary — agent runs
-- [ ] Test asserting schedule blocking still works with usage access denied — agent runs
+- [x] `./gradlew test` passes with every daily-limit fixture case — agent runs
+- [x] Midnight reset test across a simulated day boundary — agent runs
+- [x] Test asserting schedule blocking still works with usage access denied — agent runs
 - [ ] WorkManager job tested with the test scheduler — agent runs
 
 ### Agent checklist
 
-- [ ] The limit is never enforced by polling
-- [ ] Remaining time is labeled as approximate everywhere it appears
-- [ ] Usage access denial degrades only limits, never schedules
-- [ ] Accumulation tolerates partial or empty usage results
+- [x] The limit is never enforced by polling
+- [x] Remaining time is labeled as approximate everywhere it appears
+- [x] Usage access denial degrades only limits, never schedules
+- [x] Accumulation tolerates partial or empty usage results
 
 ### Manual scenarios for the user
 

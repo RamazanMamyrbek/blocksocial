@@ -31,6 +31,8 @@ import com.blocksocial.core.model.RestrictionRule
 import com.blocksocial.core.model.RuleMode
 import com.blocksocial.core.model.UserAction
 import com.blocksocial.core.ui.theme.BlockSocialTheme
+import com.blocksocial.usage.UsageReading
+import com.blocksocial.usage.UsageStatsReader
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +56,12 @@ class BlockSocialAccessibilityService : AccessibilityService() {
 
     @Inject
     lateinit var grants: TemporaryAccessGrantRepository
+
+    @Inject
+    lateinit var usageStats: UsageStatsReader
+
+    @Volatile
+    private var usage: UsageReading = UsageReading.Unavailable
 
     @Volatile
     private var snapshot: ProtectionSnapshot = ProtectionSnapshot.Empty
@@ -97,6 +105,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
                 .catch { failure -> DetectionLog.lifecycle("snapshot-failed", failure.javaClass.simpleName) }
                 .collect { restored ->
                     snapshot = restored
+                    refreshUsage(restored)
                     DetectionLog.lifecycle(
                         state = "snapshot",
                         detail = "targets=${restored.packageToApp.size} " +
@@ -117,6 +126,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
             packageName = event.packageName?.toString(),
             className = event.className?.toString(),
             snapshot = current,
+            usage = usage,
         )
 
         DetectionLog.decision(result, SystemClock.uptimeMillis() - event.eventTime)
@@ -124,6 +134,8 @@ class BlockSocialAccessibilityService : AccessibilityService() {
         if (result.transition.movesTheForeground()) {
             overlay?.dismissIfForegroundLeft(result.app)
         }
+
+        if (result.transition.endsAVisit()) refreshUsage(current)
 
         val evaluation = result.decision?.bypass?.evaluation
         if (result.app != null && evaluation != null && evaluation.isSpent()) {
@@ -152,6 +164,20 @@ class BlockSocialAccessibilityService : AccessibilityService() {
                     },
                 )
             }
+        }
+    }
+
+    private fun refreshUsage(current: ProtectionSnapshot) {
+        scope?.launch {
+            val at = readDeviceTime()
+            val reading = runCatching {
+                usageStats.readToday(current.packageToApp, at.wallClock, at.zone)
+            }.getOrDefault(UsageReading.Unavailable)
+            usage = reading
+            DetectionLog.lifecycle(
+                state = "usage",
+                detail = "available=${reading.measurementAvailable} apps=${reading.sessionsByApp.size}",
+            )
         }
     }
 
@@ -265,6 +291,20 @@ class BlockSocialAccessibilityService : AccessibilityService() {
         monotonicMillis = SystemClock.elapsedRealtime(),
         zone = ZoneId.systemDefault(),
     )
+}
+
+private fun TransitionOutcome.endsAVisit(): Boolean = when (this) {
+    TransitionOutcome.IGNORED_SYSTEM,
+    TransitionOutcome.IGNORED_NOT_A_TARGET,
+    -> true
+
+    TransitionOutcome.TARGET_ENTERED,
+    TransitionOutcome.IGNORED_UNKNOWN_PACKAGE,
+    TransitionOutcome.IGNORED_SELF,
+    TransitionOutcome.IGNORED_OVERLAY,
+    TransitionOutcome.IGNORED_NOT_AN_ACTIVITY,
+    TransitionOutcome.IGNORED_ALREADY_FOREGROUND,
+    -> false
 }
 
 private fun GrantEvaluation.isSpent(): Boolean = when (this) {
