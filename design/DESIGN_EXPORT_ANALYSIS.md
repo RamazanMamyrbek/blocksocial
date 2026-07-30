@@ -272,7 +272,9 @@ Deliberately not designed: accounts, sync, paywalls, ad slots, coach surfaces; c
 
 ## 9. Findings Requiring a Decision
 
-### 9.1 Streak rule conflicts with the concept
+### 9.1 Streak rule conflicts with the concept — resolved
+
+Resolved in favour of `docs/PRODUCT.md`: a day counts when bypasses that day are at or below a configured maximum, default two. The export's copy in option 2e is wrong and must be replaced when the dashboard is designed. The original finding follows.
 
 Option 2e states: "A streak counts days where you stayed with every rule. Opening an app ends it, and it starts again the next day."
 
