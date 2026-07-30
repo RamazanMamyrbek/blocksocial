@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import com.blocksocial.core.data.preferences.PermissionSnapshot
 import com.blocksocial.core.data.preferences.PreferencesRepository
+import com.blocksocial.core.data.preferences.UserPreferences
 import com.blocksocial.core.domain.AccessibilityObservation
 import com.blocksocial.core.domain.NotificationAsk
 import com.blocksocial.core.domain.NotificationNeed
@@ -66,8 +67,7 @@ class ProtectionHealthProbe @Inject constructor(
     }
 
     suspend fun read(now: Instant = Instant.now()): ProtectionHealth {
-        val snapshot = preferences.preferences.first().permissionSnapshot
-        val health = assemble(now, snapshot)
+        val health = assemble(now, preferences.preferences.first())
         preferences.setPermissionSnapshot(
             PermissionSnapshot(
                 accessibilityServiceEnabled = accessibilityEnabledInSettings(),
@@ -80,24 +80,29 @@ class ProtectionHealthProbe @Inject constructor(
     }
 
     fun observe(now: () -> Instant = Instant::now): Flow<ProtectionHealth> =
-        preferences.preferences.map { assemble(now(), it.permissionSnapshot) }
+        preferences.preferences.map { assemble(now(), it) }
 
-    suspend fun notificationAsk(health: ProtectionHealth): NotificationAsk =
-        NotificationPromptPolicy.evaluate(
+    suspend fun notificationAsk(health: ProtectionHealth): NotificationAsk {
+        val stored = preferences.preferences.first()
+        return NotificationPromptPolicy.evaluate(
             NotificationNeed(
                 notifications = health.statuses[ProtectionRequirement.NOTIFICATIONS]
                     ?: RequirementStatus.NOT_ASKED,
-                blockingRuns = health.blockingRuns,
-                alreadyAsked = preferences.preferences.first().notificationRequestMade,
+                accessibility = health.statuses[ProtectionRequirement.ACCESSIBILITY_SERVICE]
+                    ?: RequirementStatus.NOT_ASKED,
+                setupFinished = stored.onboardingCompleted,
+                alreadyAsked = stored.notificationRequestMade,
             ),
         )
+    }
 
     suspend fun rememberNotificationRequest() {
         preferences.setNotificationRequestMade(true)
     }
 
-    private fun assemble(now: Instant, snapshot: PermissionSnapshot): ProtectionHealth {
-        val everAsked = snapshot.capturedAt != null
+    private fun assemble(now: Instant, stored: UserPreferences): ProtectionHealth {
+        val snapshot = stored.permissionSnapshot
+        val everLooked = snapshot.capturedAt != null
 
         val items = listOf(
             RequirementHealth(
@@ -105,7 +110,7 @@ class ProtectionHealthProbe @Inject constructor(
                 status = ProtectionHealthReducer.accessibility(
                     AccessibilityObservation(
                         enabledInSettings = accessibilityEnabledInSettings(),
-                        everAsked = everAsked,
+                        everAsked = stored.acceptedConsentVersion > 0,
                         connectedInThisProcess = heartbeat.isConnected,
                         connectedAt = heartbeat.connectedAt,
                         lastEventAt = heartbeat.lastEvent,
@@ -116,13 +121,13 @@ class ProtectionHealthProbe @Inject constructor(
             ),
             RequirementHealth(
                 requirement = ProtectionRequirement.USAGE_ACCESS,
-                status = ProtectionHealthReducer.granted(usageStats.hasUsageAccess(), everAsked),
+                status = ProtectionHealthReducer.granted(usageStats.hasUsageAccess(), everLooked),
             ),
             RequirementHealth(
                 requirement = ProtectionRequirement.NOTIFICATIONS,
                 status = ProtectionHealthReducer.granted(
                     NotificationManagerCompat.from(context).areNotificationsEnabled(),
-                    everAsked,
+                    stored.notificationRequestMade,
                 ),
             ),
         )

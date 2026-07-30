@@ -5,7 +5,8 @@
     <string name="dashboard_protection_never_set_up">Blocking is not set up yet.</string>
     <string name="dashboard_protection_stopped">Blocking is off.</string>
     <string name="dashboard_protection_stopped_since">Blocking stopped since you last opened BlockSocial.</string>
-    <string name="dashboard_protection_consequence">Your rules are saved and unchanged. Nothing is being paused right now. Open Protection to see why and to fix it.</string>
+    <string name="dashboard_open_protection">Open Protection</string>
+    <string name="dashboard_protection_consequence">Your rules are saved and unchanged. Nothing is being paused right now.</string>
     <string name="dashboard_stayed">Stayed focused</string>
     <string name="dashboard_stayed_value">%1$d of %2$d opens</string>
     <string name="dashboard_bypassed">Opened anyway</string>

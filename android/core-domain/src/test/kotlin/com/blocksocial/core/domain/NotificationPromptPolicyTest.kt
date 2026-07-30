@@ -7,23 +7,49 @@ class NotificationPromptPolicyTest {
 
     private fun need(
         notifications: RequirementStatus = RequirementStatus.NOT_ASKED,
-        blockingRuns: Boolean = true,
+        accessibility: RequirementStatus = RequirementStatus.HEALTHY,
+        setupFinished: Boolean = true,
         alreadyAsked: Boolean = false,
-    ) = NotificationNeed(notifications, blockingRuns, alreadyAsked)
+    ) = NotificationNeed(notifications, accessibility, setupFinished, alreadyAsked)
 
     @Test
     fun nothingIsAskedWhileProtectionIsWorking() {
         assertEquals(
             NotificationAsk.NOT_NEEDED,
-            NotificationPromptPolicy.evaluate(need(blockingRuns = true)),
+            NotificationPromptPolicy.evaluate(need(accessibility = RequirementStatus.HEALTHY)),
         )
     }
 
     @Test
     fun theRequestArrivesTheFirstTimeThereIsSomethingToReport() {
+        listOf(
+            RequirementStatus.DENIED,
+            RequirementStatus.ENABLED_BUT_NOT_RUNNING,
+            RequirementStatus.RUNNING_BUT_SILENT,
+        ).forEach { broken ->
+            assertEquals(
+                "protection is $broken and nobody would be told",
+                NotificationAsk.ASK_NOW,
+                NotificationPromptPolicy.evaluate(need(accessibility = broken)),
+            )
+        }
+    }
+
+    @Test
+    fun nothingIsAskedDuringSetup() {
         assertEquals(
-            NotificationAsk.ASK_NOW,
-            NotificationPromptPolicy.evaluate(need(blockingRuns = false)),
+            NotificationAsk.NOT_NEEDED,
+            NotificationPromptPolicy.evaluate(
+                need(accessibility = RequirementStatus.DENIED, setupFinished = false),
+            ),
+        )
+    }
+
+    @Test
+    fun aProtectionThatWasNeverSetUpIsNotAFailureToReport() {
+        assertEquals(
+            NotificationAsk.NOT_NEEDED,
+            NotificationPromptPolicy.evaluate(need(accessibility = RequirementStatus.NOT_ASKED)),
         )
     }
 
@@ -31,7 +57,9 @@ class NotificationPromptPolicyTest {
     fun theRequestIsNeverRepeated() {
         assertEquals(
             NotificationAsk.NOT_NEEDED,
-            NotificationPromptPolicy.evaluate(need(blockingRuns = false, alreadyAsked = true)),
+            NotificationPromptPolicy.evaluate(
+                need(accessibility = RequirementStatus.DENIED, alreadyAsked = true),
+            ),
         )
     }
 
@@ -40,7 +68,10 @@ class NotificationPromptPolicyTest {
         assertEquals(
             NotificationAsk.NOT_NEEDED,
             NotificationPromptPolicy.evaluate(
-                need(notifications = RequirementStatus.HEALTHY, blockingRuns = false),
+                need(
+                    notifications = RequirementStatus.HEALTHY,
+                    accessibility = RequirementStatus.DENIED,
+                ),
             ),
         )
     }

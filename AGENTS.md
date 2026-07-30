@@ -69,7 +69,11 @@ Accessibility access is used only for the declared blocking feature. Never read 
 7. Update the English documentation.
 8. Report changed files, commands run, results, and remaining risks.
 
-When documents conflict, report the conflict. Do not silently pick whichever is convenient.
+When documents conflict, decide. Pick the option that serves the product, do it, and record the decision and its reason in the document that was wrong, so the conflict is settled rather than carried. Say in the report what was chosen and what was overruled. Never leave a conflict open and waiting for the owner unless the choice is genuinely theirs: scope, money, privacy, or anything with a legal edge.
+
+`design/UI_UX_BRIEF.md` and `design/DESIGN_EXPORT_ANALYSIS.md` are direction, not law. Depart from them when the product is better for it, and write down why. The same freedom applies to gaps: when the plan is missing something the product plainly needs, build it and add it to `docs/PLAN.md` rather than stopping at the gap.
+
+None of this loosens the honesty rules. Deciding what to build is yours; claiming something works is still earned by running it.
 
 Instruction precedence: the user's current request, then this file, then the documents under `docs/`, then existing code and tests, then reasonable engineering defaults.
 

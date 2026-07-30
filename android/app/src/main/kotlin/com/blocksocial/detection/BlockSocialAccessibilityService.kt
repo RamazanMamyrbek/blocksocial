@@ -16,7 +16,6 @@ import com.blocksocial.block.BlockOutcome
 import com.blocksocial.block.BlockOverlayController
 import com.blocksocial.block.BlockPresentation
 import com.blocksocial.block.BlockScreen
-import com.blocksocial.core.data.repository.BlockEventRepository
 import com.blocksocial.core.data.repository.TemporaryAccessGrantRepository
 import com.blocksocial.core.domain.BypassEvaluator
 import com.blocksocial.core.domain.GrantEvaluation
@@ -53,9 +52,6 @@ class BlockSocialAccessibilityService : AccessibilityService() {
     lateinit var snapshotSource: ProtectionSnapshotSource
 
     @Inject
-    lateinit var blockEvents: BlockEventRepository
-
-    @Inject
     lateinit var grants: TemporaryAccessGrantRepository
 
     @Inject
@@ -63,6 +59,9 @@ class BlockSocialAccessibilityService : AccessibilityService() {
 
     @Inject
     lateinit var heartbeat: ServiceHeartbeat
+
+    @Inject
+    lateinit var writes: DurableWrites
 
     @Volatile
     private var usage: UsageReading = UsageReading.Unavailable
@@ -203,16 +202,13 @@ class BlockSocialAccessibilityService : AccessibilityService() {
         grantedDurationMinutes = grant.durationMinutes
         snapshot = snapshot.copy(grantsByApp = snapshot.grantsByApp + (app to grant))
         DetectionLog.lifecycle("granted", "app=${app.value} minutes=${grant.durationMinutes}")
-        scope?.launch {
-            runCatching { grants.put(grant) }
-                .onFailure { DetectionLog.lifecycle("grant-failed", it.javaClass.simpleName) }
-        }
+        writes.keep(grant)
     }
 
     private fun forgetGrant(app: AppRef, evaluation: GrantEvaluation) {
         snapshot = snapshot.copy(grantsByApp = snapshot.grantsByApp - app)
         DetectionLog.lifecycle("grant-cleared", "app=${app.value} evaluation=$evaluation")
-        scope?.launch { runCatching { grants.clear(app) } }
+        writes.forget(app)
     }
 
     private fun presentationFor(
@@ -262,10 +258,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
             platform = Platform.ANDROID,
         )
         DetectionLog.lifecycle("dismissed", "app=${app.value} outcome=$outcome")
-        scope?.launch {
-            runCatching { blockEvents.record(event) }
-                .onFailure { DetectionLog.lifecycle("record-failed", it.javaClass.simpleName) }
-        }
+        writes.record(event)
     }
 
     override fun onInterrupt() = Unit

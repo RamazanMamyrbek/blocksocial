@@ -139,7 +139,9 @@ Purpose: earn the permission before requesting it.
 Android surfaces: Accessibility access, Usage Access, notifications when needed.
 iOS surfaces: Screen Time authorization, notifications when needed.
 
-Content per permission: what it enables, exactly what data is and is not read, how to revoke it, what stops working without it.
+Content per permission: four fixed slots in a fixed order — what it enables, what is read, what is never read, how to revoke it.
+
+This once listed a fifth item, what stops working without the permission. Phase 19 dropped it as a slot and kept it as information. Five slots across three cards is fifteen paragraphs on one screen, and the fifth repeated the first from the other side. The consequence of refusing is now stated once by the setup screen, which says outright that either permission can be skipped and that rules are saved anyway, and again by protection health, which states for every degraded state what stops working and what keeps working. The design record in `DESIGN_EXPORT_ANALYSIS.md` section 5 already specified four slots; this section was the outlier.
 
 States: not requested, system sheet open, granted, denied, revoked later.
 

@@ -70,6 +70,10 @@ android {
     lint {
         abortOnError = true
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 kotlin {
@@ -105,6 +109,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.org.json)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     androidTestImplementation(libs.androidx.room.runtime)
     androidTestImplementation(platform(libs.androidx.compose.bom))

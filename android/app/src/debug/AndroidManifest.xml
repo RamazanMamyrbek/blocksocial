@@ -5,71 +5,36 @@
         <activity
             android:name=".debug.TokenPreviewActivity"
             android:exported="true"
-            android:label="@string/token_preview_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/token_preview_title" />
         <activity
             android:name=".debug.AppSelectionDebugActivity"
             android:exported="true"
-            android:label="@string/selection_debug_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/selection_debug_title" />
 
         <activity
             android:name=".debug.RuleEditorDebugActivity"
             android:exported="true"
-            android:label="@string/rules_debug_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/rules_debug_title" />
 
         <activity
             android:name=".debug.DashboardDebugActivity"
             android:exported="true"
-            android:label="@string/dashboard_debug_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/dashboard_debug_title" />
 
         <activity
             android:name=".debug.HistoryDebugActivity"
             android:exported="true"
-            android:label="@string/history_debug_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/history_debug_title" />
 
         <activity
             android:name=".debug.OnboardingDebugActivity"
             android:exported="true"
-            android:label="@string/onboarding_debug_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/onboarding_debug_title" />
 
         <activity
             android:name=".debug.ProtectionHealthDebugActivity"
             android:exported="true"
-            android:label="@string/health_debug_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/health_debug_title" />
 
     </application>
 

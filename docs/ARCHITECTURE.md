@@ -200,6 +200,18 @@ Rules reference the catalog identifier, never a package name, and deleting an ap
 
 Both survival guarantees were verified on an Android 16 emulator by seeding the database and preferences, then reading them back after a force-stop and again after a reboot, without reseeding.
 
+### Writes that must outlive the service
+
+A write the user's record depends on — a block event, a taken grant, a cleared grant — runs on an application-scoped writer, `DurableWrites`, not on the accessibility service's own scope. The service scope is cancelled in `onUnbind`, and Android unbinds the service at times of its own choosing. Phase 19 caught a decision being lost exactly that way: the block screen was dismissed because the service was stopping, and the record of that dismissal was cancelled a moment later. Reads into memory, such as refreshing usage, stay on the service scope, because they are worthless once the service is gone.
+
+### The application shell
+
+One launcher entry, `MainActivity`. It decides between setup and the shell from `onboardingCompleted`, and hosts every screen.
+
+Navigation is a hand-written state machine: a sealed `Destination`, a `ShellNavigator` holding a back stack, and a saver that encodes it so rotation and process death do not lose the user's place. Switching a tab clears the stack; opening a screen pushes onto it; `Protection` and a rule list belong to the tab they were opened from. No navigation library is used, and none is needed for five destinations without deep links.
+
+Screens are content, not frames. A screen never applies `safeDrawingPadding`, a background, or its own outer scroll — the shell owns those. Two frames exist because two kinds of screen exist: `ScrollingScreen` for content that must be scrolled by its host, and `ScrollsItselfScreen` for content that already contains a `LazyColumn`. Nesting one inside the other crashes Compose with an infinity-height error, so a test renders every screen inside the real shell.
+
 ### Background work
 
 The accessibility service is the runtime mechanism. WorkManager handles only deferrable work: daily aggregation, old-event cleanup, consistency checks, and statistics preparation. There is no permanent foreground service and no polling.

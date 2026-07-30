@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import kotlin.math.roundToInt
 
 object DashboardTags {
     const val PROTECTION = "dashboard-protection"
+    const val OPEN_PROTECTION = "dashboard-open-protection"
     const val STAYED = "dashboard-stayed"
     const val BYPASSED = "dashboard-bypassed"
     const val REFUSAL_RATE = "dashboard-refusal-rate"
@@ -32,7 +34,7 @@ object DashboardTags {
 }
 
 @Composable
-fun DashboardScreen(state: DashboardState) {
+fun DashboardScreen(state: DashboardState, onOpenProtection: () -> Unit = {}) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
@@ -43,7 +45,7 @@ fun DashboardScreen(state: DashboardState) {
             color = MaterialTheme.colorScheme.onSurface,
         )
 
-        ProtectionBannerCard(state.protection)
+        ProtectionBannerCard(banner = state.protection, onOpenProtection = onOpenProtection)
 
         if (state.interventionsToday == 0) {
             Text(
@@ -111,7 +113,7 @@ fun DashboardScreen(state: DashboardState) {
 }
 
 @Composable
-private fun ProtectionBannerCard(banner: ProtectionBanner) {
+private fun ProtectionBannerCard(banner: ProtectionBanner, onOpenProtection: () -> Unit) {
     val headline = when (banner) {
         ProtectionBanner.RUNNING -> R.string.dashboard_protection_running
         ProtectionBanner.NEVER_SET_UP -> R.string.dashboard_protection_never_set_up
@@ -150,6 +152,12 @@ private fun ProtectionBannerCard(banner: ProtectionBanner) {
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            OutlinedButton(
+                onClick = onOpenProtection,
+                modifier = Modifier.testTag(DashboardTags.OPEN_PROTECTION),
+            ) {
+                Text(stringResource(R.string.dashboard_open_protection))
+            }
         }
     }
 }
