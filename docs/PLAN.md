@@ -1532,7 +1532,7 @@ Tests green, six scenarios verified.
 
 - [ ] Build onboarding explaining the product in a few steps
 - [ ] Build the permission explanation card with four fixed slots per permission
-- [ ] Implement the accessibility permission flow with prominent disclosure and consent
+- [x] Implement the accessibility permission flow with prominent disclosure and consent
 - [ ] Implement the usage access flow separately
 - [ ] Request notifications only when first needed
 - [x] Verify permission results on return from system settings
@@ -1556,10 +1556,10 @@ Tests green, six scenarios verified.
 ### Agent checklist
 
 - [x] No screen resembles a system dialog
-- [ ] Every permission card states what is read and what is never read
+- [x] Every permission card states what is read and what is never read
 - [x] Denial leaves a usable path, never a dead end
 - [x] Health items use shape as well as color for status
-- [ ] The disclosure text matches the phase 06 policy package exactly
+- [x] The disclosure text matches the phase 06 policy package exactly
 
 ### Manual scenarios for the user
 

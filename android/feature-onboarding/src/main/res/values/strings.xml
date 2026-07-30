@@ -28,4 +28,21 @@
     <string name="health_oem_title">If blocking stops on its own</string>
     <string name="health_oem_body">Some manufacturers stop background services to save battery. If that happens, allow BlockSocial to run in the background in your phone settings. This guidance is written from vendor documentation and has not been observed on a device by us.</string>
     <string name="health_item_description">%1$s, %2$s</string>
+
+    <string name="disclosure_title">How BlockSocial blocks an app</string>
+    <string name="disclosure_intro">To interrupt an app the moment you open it, BlockSocial uses Android\'s Accessibility service.</string>
+    <string name="disclosure_lead">Here is exactly what that means.</string>
+    <string name="disclosure_reads">What BlockSocial reads. Only the name of the app that just came to the front, and the moment it happened. That is the whole list.</string>
+    <string name="disclosure_never_reads">What BlockSocial never reads. Not the text on your screen. Not your messages. Not what you type. Not your passwords. The permission to read screen content is switched off in the app itself, so this is not a promise about our intentions — it is a setting the system enforces.</string>
+    <string name="disclosure_does">What BlockSocial does. When you open an app you chose to restrict, it shows you a full-screen pause with two options. If you choose to stay focused, it presses the home button for you. It never taps, types, or acts inside another app.</string>
+    <string name="disclosure_where">Where it goes. Nowhere. BlockSocial has no internet permission. Nothing about your apps or your choices leaves this phone.</string>
+    <string name="disclosure_continue">Continue</string>
+    <string name="disclosure_not_now">Not now</string>
+    <string name="disclosure_footnote">The next screen is Android\'s own, not ours.</string>
+
+    <string name="consent_title">Turn on blocking?</string>
+    <string name="consent_body">BlockSocial will use the Accessibility service to notice when a restricted app opens, and to show you the pause screen.</string>
+    <string name="consent_detail">It reads the name of the app in front and nothing else. You can turn this off at any time in Android Settings, or from the Protection screen inside BlockSocial.</string>
+    <string name="consent_agree">I agree, open Settings</string>
+    <string name="consent_cancel">Cancel</string>
 </resources>
