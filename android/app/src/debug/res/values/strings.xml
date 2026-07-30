@@ -5,4 +5,5 @@
     <string name="rules_debug_title">BlockSocial rules</string>
     <string name="dashboard_debug_title">BlockSocial today</string>
     <string name="history_debug_title">BlockSocial history</string>
+    <string name="health_debug_title">BlockSocial health</string>
 </resources>

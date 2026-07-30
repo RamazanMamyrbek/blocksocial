@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">Protection health</string>
+    <string name="health_running">Blocking is running.</string>
+    <string name="health_not_running">Blocking is not running. Your rules are saved and unchanged, but nothing is being paused right now.</string>
+
+    <string name="health_accessibility">Accessibility access</string>
+    <string name="health_usage">Usage access</string>
+    <string name="health_notifications">Notifications</string>
+
+    <string name="health_status_healthy">Working</string>
+    <string name="health_status_not_asked">Not set up yet</string>
+    <string name="health_status_denied">Turned off</string>
+    <string name="health_status_not_running">Turned on in settings, but not running</string>
+    <string name="health_status_silent">Turned on, but delivering nothing</string>
+
+    <string name="health_accessibility_not_asked">Blocking cannot run until you turn this on. Rules you create are saved and will start working the moment you do.</string>
+    <string name="health_accessibility_denied">Blocking does not run. Your rules stay saved, your history is kept, and nothing is lost.</string>
+    <string name="health_accessibility_not_running">Android shows this as on, but the service is not running. This usually happens after the app is force-stopped. Rules stay saved; blocking does not run until you turn it off and on again.</string>
+    <string name="health_accessibility_silent">Android shows this as on and running, but no events are arriving, so nothing can be blocked. This can happen after an update. Rules stay saved; turn it off and on again to revive it.</string>
+    <string name="health_usage_denied">Daily limits cannot be measured without this. Schedules and always-on rules keep working exactly as before.</string>
+    <string name="health_notifications_denied">You will not be told when protection stops. Blocking itself is unaffected.</string>
+
+    <string name="health_repair_accessibility">Open accessibility settings</string>
+    <string name="health_repair_usage">Open usage access settings</string>
+    <string name="health_repair_notifications">Open notification settings</string>
+
+    <string name="health_oem_title">If blocking stops on its own</string>
+    <string name="health_oem_body">Some manufacturers stop background services to save battery. If that happens, allow BlockSocial to run in the background in your phone settings. This guidance is written from vendor documentation and has not been observed on a device by us.</string>
+    <string name="health_item_description">%1$s, %2$s</string>
+</resources>
