@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">History</string>
+    <string name="history_empty">Nothing here yet. Every pause you meet will be listed, whichever way you decide.</string>
+    <string name="history_stayed">Stayed focused</string>
+    <string name="history_bypassed">Opened for a while</string>
+    <string name="history_unresolved">Closed without a decision</string>
+    <string name="history_reason_always">Always on</string>
+    <string name="history_reason_schedule">Schedule</string>
+    <string name="history_reason_daily_limit">Daily limit</string>
+    <string name="history_row_description">%1$s, %2$s, %3$s</string>
+</resources>

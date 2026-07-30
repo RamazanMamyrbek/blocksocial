@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.blocksocial.core.ui.theme.Numeric
 import com.blocksocial.core.ui.theme.Radius
@@ -82,7 +83,11 @@ fun DashboardScreen(state: DashboardState) {
         Tile(
             tag = DashboardTags.STREAK,
             label = stringResource(R.string.dashboard_streak),
-            value = stringResource(R.string.dashboard_streak_value, state.streakDays),
+            value = pluralStringResource(
+                R.plurals.dashboard_streak_value,
+                state.streakDays,
+                state.streakDays,
+            ),
         )
 
         Text(
