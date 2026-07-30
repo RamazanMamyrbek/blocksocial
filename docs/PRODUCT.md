@@ -136,7 +136,7 @@ The block screen is a pause, not an alarm.
 
 | ID | Question | Blocks |
 |---|---|---|
-| Q-01 | Streak rule: allow a configured number of bypasses per day, or does any bypass end the streak? | dashboard design, block-screen copy |
+| Q-01 | ~~Streak rule~~ | **answered** |
 | Q-02 | ~~Which Android block-screen direction is the baseline~~ | **answered** |
 | Q-03 | ~~Source of the approximate time-in-app metric~~ | **answered** |
 | Q-04 | Default bypass duration on iOS, which depends on what the platform can actually deliver | iOS copy |
@@ -148,4 +148,8 @@ Questions are answered in this file when decided.
 
 **Q-03, answered.** Time in an application comes from Android usage statistics, read as events rather than as daily buckets, not from the length of bypass grants. Spike `A-05` measured the error at under 0.1 percent over a five-minute session on two emulator images, and showed that the bucketed source does not reset at local midnight and so cannot carry a daily limit. Evidence is in `docs/spikes/SPIKE_A-05_RESULT.md`. A session still running is shown as in progress rather than as a final number.
 
-**`Q-01` is now the only question blocking Android work**, and it blocks one phase: the dashboard in phase 18. Nothing before it depends on the streak rule.
+**Q-01, answered.** A day counts towards the streak when the number of bypasses that day is **at or below a configured maximum**, default two. A bypass inside the allowance does not break the streak; exceeding it means the day is not counted, and the streak starts again the next day. The streak explains its own rule inline, before it can be lost, and never appears in a warning colour.
+
+This resolves the conflict recorded in `design/DESIGN_EXPORT_ANALYSIS.md` section 9.1 in favour of this document. The design export's option 2e states the opposite — that opening an app ends the streak — and that copy must be replaced when the dashboard is designed. The stricter rule was rejected because it turns a legitimate bypass into a failure, which contradicts the principle that a bypass is a legitimate outcome and the rule that the interface never scores the user as a failure.
+
+**No open question now blocks Android work.** `Q-04` is iOS and `Q-05` is not MVP-blocking.

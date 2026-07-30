@@ -117,7 +117,7 @@ Mark the status line of each phase as work proceeds: `not started` → `in progr
 | 15 | Android: application selection | Android MVP | 11 | done |
 | 16 | Android: rule editor | Android MVP | 15 | done |
 | 17 | Android: daily limits | Android MVP | 16 | partial |
-| 18 | Android: history, statistics, dashboard | Android MVP | 17 | not started |
+| 18 | Android: history, statistics, dashboard | Android MVP | 17 | partial |
 | 19 | Android: onboarding, permissions, protection health | Android MVP | 18 | not started |
 | 20 | Android: recovery and reliability hardening | Android MVP | 19 | not started |
 | 21 | Android: accessibility and localization | Android MVP | 20 | not started |
@@ -1449,7 +1449,7 @@ Tests green, six scenarios verified on two devices.
 
 ## Phase 18 — Android: History, Statistics, Dashboard
 
-**Status:** not started
+**Status:** partial. `Q-01` is answered and recorded, which unblocks this phase permanently: a day counts towards the streak when bypasses are at or below a configured maximum, default two. The statistics domain is built and tested — 10 tests covering the streak rule, the zone-correct day grouping, and the two honesty rules, that `UNKNOWN` and `DISMISSED_BY_SYSTEM` count as neither refusal nor bypass and that a rate with nothing to divide is hidden rather than shown as zero. **Not done:** the history screen, the dashboard UI, and every manual scenario.
 
 **Goal.** Ship the surfaces that show the user what they decided, with honest numbers.
 
