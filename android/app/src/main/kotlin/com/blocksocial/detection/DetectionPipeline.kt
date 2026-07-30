@@ -4,6 +4,7 @@ import com.blocksocial.core.domain.RestrictionDecision
 import com.blocksocial.core.domain.RuleEvaluator
 import com.blocksocial.core.model.AppRef
 import com.blocksocial.core.model.DeviceTime
+import com.blocksocial.usage.UsageReading
 
 data class DetectionResult(
     val transition: TransitionOutcome,
@@ -27,6 +28,7 @@ class DetectionPipeline(
         packageName: String?,
         className: String?,
         snapshot: ProtectionSnapshot,
+        usage: UsageReading = UsageReading.Unavailable,
     ): DetectionResult {
         val app = packageName?.let(snapshot.packageToApp::get)
         val transition = tracker.onWindowStateChanged(
@@ -42,17 +44,13 @@ class DetectionPipeline(
         val decision = RuleEvaluator.evaluate(
             rules = snapshot.rulesByApp[app].orEmpty(),
             grant = snapshot.grantsByApp[app],
-            usageSessions = emptyList(),
+            usageSessions = usage.sessionsByApp[app].orEmpty(),
             forApp = app,
             at = readDeviceTime(),
-            usageMeasurementAvailable = USAGE_MEASUREMENT_ARRIVES_IN_PHASE_SEVENTEEN,
+            usageMeasurementAvailable = usage.measurementAvailable,
         )
         return DetectionResult(transition, app, decision)
     }
 
     fun forgetForeground() = tracker.forget()
-
-    private companion object {
-        const val USAGE_MEASUREMENT_ARRIVES_IN_PHASE_SEVENTEEN = false
-    }
 }

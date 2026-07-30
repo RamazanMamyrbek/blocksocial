@@ -48,6 +48,26 @@ class DetectionScenarioSeed {
     }
 
     @Test
+    fun seedAOneMinuteDailyLimitForYoutube() = runTest {
+        val database = database()
+        try {
+            database.clearAllTables()
+            database.restrictedAppDao().upsert(
+                RestrictedApp(ref = YOUTUBE, displayName = "YouTube", selected = true)
+                    .toEntity(Instant.now()),
+            )
+            database.restrictionRuleDao().upsert(
+                RestrictionRule.DailyLimit(id = "scenario-daily-limit", enabled = true, limitMinutes = 1)
+                    .toEntity(YOUTUBE, Instant.now(), Instant.now()),
+            )
+
+            assertEquals(1, database.restrictionRuleDao().enabledRulesFor(YOUTUBE.value).size)
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
     fun reportRecordedBlockEvents() = runTest {
         val database = database()
         try {
