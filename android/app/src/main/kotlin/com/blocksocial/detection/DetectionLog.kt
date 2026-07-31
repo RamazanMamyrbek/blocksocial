@@ -20,8 +20,11 @@ object DetectionLog {
         val reasons = result.decision?.allReasons?.joinToString("|") { it.name } ?: "none"
         val primary = result.decision?.primaryReason?.name ?: "none"
         val grant = result.decision?.bypass?.evaluation?.name ?: "none"
+        val measured = result.decision?.dailyLimit?.measuredMinutesToday?.toString() ?: "none"
+        val limit = result.decision?.dailyLimitMinutes?.toString() ?: "none"
         return "event=decision transition=${result.transition} app=$app block=${result.shouldBlock} " +
-            "primaryReason=$primary allReasons=$reasons grant=$grant latencyMillis=$latencyMillis"
+            "primaryReason=$primary allReasons=$reasons grant=$grant " +
+            "measuredMinutes=$measured limitMinutes=$limit latencyMillis=$latencyMillis"
     }
 
     private fun write(line: String) {

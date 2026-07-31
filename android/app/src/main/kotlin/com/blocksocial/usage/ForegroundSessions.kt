@@ -4,7 +4,7 @@ import com.blocksocial.core.model.AppRef
 import com.blocksocial.core.model.UsageSession
 import java.time.Instant
 
-enum class UsageEventType { MOVED_TO_FOREGROUND, SCREEN_NON_INTERACTIVE }
+enum class UsageEventType { MOVED_TO_FOREGROUND, LEFT_FOREGROUND, SCREEN_NON_INTERACTIVE }
 
 data class UsageEvent(
     val packageName: String,
@@ -19,15 +19,17 @@ object ForegroundSessions {
         packageToApp: Map<String, AppRef>,
         windowStartMillis: Long,
         windowEndMillis: Long,
+        deviceBootedAtMillis: Long,
     ): Map<AppRef, List<UsageSession>> {
         val sessions = mutableMapOf<AppRef, MutableList<UsageSession>>()
+        val earliestCountableMillis = maxOf(windowStartMillis, deviceBootedAtMillis)
         var openApp: AppRef? = null
         var openSinceMillis = 0L
 
         fun close(atMillis: Long, stillRunning: Boolean) {
             val app = openApp ?: return
             openApp = null
-            val from = openSinceMillis.coerceAtLeast(windowStartMillis)
+            val from = openSinceMillis.coerceAtLeast(earliestCountableMillis)
             val to = atMillis.coerceAtMost(windowEndMillis)
             if (to > from) {
                 sessions.getOrPut(app) { mutableListOf() } += UsageSession(
@@ -51,6 +53,11 @@ object ForegroundSessions {
                             openSinceMillis = event.timestampMillis
                         }
                     }
+
+                    UsageEventType.LEFT_FOREGROUND ->
+                        if (packageToApp[event.packageName] == openApp) {
+                            close(event.timestampMillis, stillRunning = false)
+                        }
 
                     UsageEventType.SCREEN_NON_INTERACTIVE ->
                         close(event.timestampMillis, stillRunning = false)

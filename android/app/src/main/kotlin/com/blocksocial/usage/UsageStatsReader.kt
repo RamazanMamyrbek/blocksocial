@@ -6,6 +6,7 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.os.Build
 import android.os.Process
+import android.os.SystemClock
 import com.blocksocial.core.model.AppRef
 import com.blocksocial.core.model.UsageSession
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -59,6 +60,7 @@ class UsageStatsReader @Inject constructor(@ApplicationContext private val conte
                 packageToApp = packageToApp,
                 windowStartMillis = dayStart.toEpochMilli(),
                 windowEndMillis = now.toEpochMilli(),
+                deviceBootedAtMillis = System.currentTimeMillis() - SystemClock.elapsedRealtime(),
             ),
             measurementAvailable = true,
         )
@@ -75,6 +77,10 @@ class UsageStatsReader @Inject constructor(@ApplicationContext private val conte
             cursor.getNextEvent(event)
             val type = when (event.eventType) {
                 UsageEvents.Event.MOVE_TO_FOREGROUND -> UsageEventType.MOVED_TO_FOREGROUND
+                UsageEvents.Event.MOVE_TO_BACKGROUND,
+                UsageEvents.Event.ACTIVITY_STOPPED,
+                -> UsageEventType.LEFT_FOREGROUND
+
                 UsageEvents.Event.SCREEN_NON_INTERACTIVE -> UsageEventType.SCREEN_NON_INTERACTIVE
                 else -> null
             }

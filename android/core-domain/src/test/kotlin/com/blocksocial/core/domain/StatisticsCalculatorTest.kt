@@ -102,6 +102,7 @@ class StatisticsCalculatorTest {
         assertEquals(1, outcome.stayedFocused)
         assertEquals(0, outcome.bypassed)
         assertEquals(2, outcome.unresolved)
+        assertEquals(1, outcome.decided)
         assertEquals(1.0, StatisticsCalculator.refusalRate(listOf(outcome))!!, 0.0001)
     }
 

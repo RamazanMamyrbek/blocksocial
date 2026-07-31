@@ -6,6 +6,7 @@
     <string name="block_headline_schedule_until">A schedule is holding this until %1$s</string>
     <string name="block_headline_schedule">A schedule is holding this</string>
     <string name="block_headline_daily_limit">You have reached your time for today</string>
+    <string name="block_daily_limit_measurement">About %1$d minutes in %2$s today, against a limit of %3$d.</string>
     <string name="block_supporting">Nothing here is locked. You can change or remove this rule whenever you want.</string>
     <string name="block_stay_focused">Stay Focused</string>
     <string name="block_open_temporarily">Open Temporarily</string>

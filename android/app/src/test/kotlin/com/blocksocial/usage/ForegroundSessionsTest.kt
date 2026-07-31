@@ -21,17 +21,21 @@ class ForegroundSessionsTest {
 
     private val dayStart = Instant.parse("2026-07-28T00:00:00+09:00").toEpochMilli()
     private val now = Instant.parse("2026-07-28T10:00:00+09:00").toEpochMilli()
+    private val bootedYesterday = Instant.parse("2026-07-27T08:00:00+09:00").toEpochMilli()
 
     private fun at(text: String) = Instant.parse(text).toEpochMilli()
 
     private fun foreground(packageName: String, text: String) =
         UsageEvent(packageName, at(text), UsageEventType.MOVED_TO_FOREGROUND)
 
+    private fun leftForeground(packageName: String, text: String) =
+        UsageEvent(packageName, at(text), UsageEventType.LEFT_FOREGROUND)
+
     private fun screenOff(text: String) =
         UsageEvent("android", at(text), UsageEventType.SCREEN_NON_INTERACTIVE)
 
-    private fun accumulate(events: List<UsageEvent>) =
-        ForegroundSessions.accumulate(events, packageToApp, dayStart, now)
+    private fun accumulate(events: List<UsageEvent>, bootedAt: Long = bootedYesterday) =
+        ForegroundSessions.accumulate(events, packageToApp, dayStart, now, bootedAt)
 
     private fun minutesOf(sessions: List<com.blocksocial.core.model.UsageSession>): Int =
         DailyLimitEvaluator.evaluate(
@@ -116,9 +120,60 @@ class ForegroundSessionsTest {
     }
 
     @Test
-    fun theOnlyEventTypesRecognisedAreTheTwoThatCanCloseAVisit() {
+    fun leavingTheForegroundClosesTheSessionWithoutWaitingForAnotherApplication() {
+        val sessions = accumulate(
+            listOf(
+                foreground("com.google.android.youtube", "2026-07-28T09:00:00+09:00"),
+                leftForeground("com.google.android.youtube", "2026-07-28T09:10:00+09:00"),
+            ),
+        )
+
+        assertEquals(10, minutesOf(sessions.getValue(youtube)))
+    }
+
+    @Test
+    fun anotherApplicationLeavingTheForegroundDoesNotCloseThisSession() {
+        val sessions = accumulate(
+            listOf(
+                foreground("com.google.android.youtube", "2026-07-28T09:00:00+09:00"),
+                leftForeground("com.android.chrome", "2026-07-28T09:10:00+09:00"),
+            ),
+        )
+
+        assertEquals(60, minutesOf(sessions.getValue(youtube)))
+    }
+
+    @Test
+    fun timeWithTheDeviceSwitchedOffIsNotCountedAsTimeInTheApplication() {
+        val sessions = accumulate(
+            listOf(foreground("com.google.android.youtube", "2026-07-27T23:50:00+09:00")),
+            bootedAt = at("2026-07-28T09:30:00+09:00"),
+        )
+
+        assertEquals(30, minutesOf(sessions[youtube].orEmpty()))
+    }
+
+    @Test
+    fun aVisitInterruptedByAShutdownEndsAtTheShutdownRatherThanAtTheNextUnlock() {
+        val sessions = accumulate(
+            listOf(
+                foreground("com.google.android.youtube", "2026-07-27T23:50:00+09:00"),
+                foreground("com.android.chrome", "2026-07-28T09:35:00+09:00"),
+            ),
+            bootedAt = at("2026-07-28T09:30:00+09:00"),
+        )
+
+        assertEquals(5, minutesOf(sessions[youtube].orEmpty()))
+    }
+
+    @Test
+    fun theRecognisedEventTypesAreTheOnesThatOpenOrCloseAVisit() {
         assertEquals(
-            setOf(UsageEventType.MOVED_TO_FOREGROUND, UsageEventType.SCREEN_NON_INTERACTIVE),
+            setOf(
+                UsageEventType.MOVED_TO_FOREGROUND,
+                UsageEventType.LEFT_FOREGROUND,
+                UsageEventType.SCREEN_NON_INTERACTIVE,
+            ),
             UsageEventType.entries.toSet(),
         )
     }

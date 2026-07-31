@@ -13,4 +13,6 @@ data class BlockPresentation(
     val zone: ZoneId,
     val opensToday: Int,
     val endedHereToday: Int,
+    val measuredMinutesToday: Int?,
+    val limitMinutes: Int?,
 )

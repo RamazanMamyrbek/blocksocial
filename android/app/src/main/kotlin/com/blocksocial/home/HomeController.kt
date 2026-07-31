@@ -48,7 +48,7 @@ class HomeController @Inject constructor(
                     )
                 },
             stayedFocusedToday = todayOutcome?.stayedFocused ?: 0,
-            interventionsToday = todayOutcome?.interventions ?: 0,
+            decisionsToday = todayOutcome?.decided ?: 0,
         )
     }
 

@@ -18,7 +18,7 @@ data class HomeState(
     val protection: ProtectionBanner,
     val apps: List<RestrictedAppRow>,
     val stayedFocusedToday: Int,
-    val interventionsToday: Int,
+    val decisionsToday: Int,
 ) {
     val nothingRestrictedYet: Boolean = apps.isEmpty()
 
@@ -27,7 +27,7 @@ data class HomeState(
             protection = ProtectionBanner.NEVER_SET_UP,
             apps = emptyList(),
             stayedFocusedToday = 0,
-            interventionsToday = 0,
+            decisionsToday = 0,
         )
     }
 }

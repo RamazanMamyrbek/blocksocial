@@ -18,6 +18,8 @@ data class DayOutcome(
     val bypassed: Int,
     val unresolved: Int,
 ) {
+    val decided: Int = stayedFocused + bypassed
+
     fun countsTowards(policy: StreakPolicy): Boolean = bypassed <= policy.maximumBypassesPerDay
 }
 

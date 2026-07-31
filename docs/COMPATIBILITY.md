@@ -2,7 +2,7 @@
 
 **Document:** `COMPATIBILITY.md`
 **Covers:** the Android application only. iOS has its own verification path.
-**Last updated by:** phase 22.
+**Last updated by:** the daily-limit test pass that followed phase 22.
 
 ---
 
@@ -70,9 +70,34 @@ Unit tests and lint are platform-independent and run once: **400 tests, 0 failur
 
 The API 33 image is a `default` system image with no Google applications, so none of the ten catalog applications is installed on it. Everything that needs a real restricted application to launch — the block screen itself and everything downstream of it — could only be exercised on API 36, where YouTube is present. What API 33 does show is that the detection service binds, receives window events and classifies them at the same latency, which is the mechanism those scenarios sit on top of.
 
+### The daily limit, measured end to end
+
+The daily limit is the one rule whose correctness depends on data the product does not own, so it was timed rather than inspected. On API 36, with YouTube restricted and usage access granted:
+
+| Measured today | Limit | Entering YouTube | Evidence |
+|---|---|---|---|
+| 67 min | 70 min | no pause | `measuredMinutes=67 limitMinutes=70 block=false` |
+| 67 → 72 min over five minutes held in the foreground | 70 min | nothing interrupts the session in progress | overlay absent throughout |
+| 72 min | 70 min | pause on the next entry | `measuredMinutes=72 limitMinutes=70 block=true` |
+
+Five wall-clock minutes in the application produced exactly five measured minutes, and the pause arrived on the next entry rather than mid-session. That deferral is the designed behaviour, not a delay: BlockSocial interrupts a launch, never a session already under way.
+
+The pause screen now states the measurement that caused it — "About 72 minutes in YouTube today, against a limit of 70" — because a limit block that only asserts "you have reached your time for today" cannot be checked by the person reading it, and a limit counts usage from local midnight including time spent before the rule was created.
+
+### Two lags worth knowing about
+
+Neither is a wrong result; both are a stale one for a single launch.
+
+- **Revoking usage access.** The reading is cached and refreshed asynchronously when the foreground leaves a restricted application. The first launch after access is revoked can still be judged against the last good reading. It corrects itself on the next transition, verified: `measuredMinutes=none block=false` from the second attempt onward.
+- **A limit crossed during a session** is not seen until the session ends, by design as above.
+
 ### Defects found
 
-Phases 19, 20 and 21 each found defects by running the product, and each fixed one with a regression test; they are recorded in `docs/PLAN.md` under their own phases. **This phase found none.** Both images behaved identically wherever both were exercised, and no defect was opened, so the list of open critical or major defects is empty.
+Phases 19, 20 and 21 each found defects by running the product, and each fixed one with a regression test; they are recorded in `docs/PLAN.md` under their own phases. Phase 22 found none.
+
+**Testing the daily limit against a clock found one, after phase 22 closed.** `ForegroundSessions` closed a visit only when another application entered the foreground. Nothing recorded an application *leaving* the foreground, so a visit still open when the device shut down stayed open across the gap, and the start of it was then clamped forward to local midnight — crediting the application with every minute from midnight to now for a device that was switched off. A five-minute limit could be exhausted before the user had opened anything. The fix reads `MOVE_TO_BACKGROUND` and `ACTIVITY_STOPPED` as closing events and refuses to count any minute before the device booted. Regression tests: `ForegroundSessionsTest.timeWithTheDeviceSwitchedOffIsNotCountedAsTimeInTheApplication` and `aVisitInterruptedByAShutdownEndsAtTheShutdownRatherThanAtTheNextUnlock`.
+
+A second, smaller one: the home screen read "you stayed focused N of M times" where M counted every pause ever raised, including the ones the system tore down when it restarted the accessibility service. The user was charged with decisions they were never shown. M is now the number of decisions actually made.
 
 ## 5. What was not verified
 
@@ -121,6 +146,9 @@ Recruit at minimum: **Samsung One UI**, **Xiaomi HyperOS or MIUI**. Desirable: H
 | 8 | Check the phone's battery screen after a day. | Where does BlockSocial appear, and with what figure? |
 | 9 | Update BlockSocial from the store while blocking is on, then open a restricted application. | Did blocking still work, and what did Protection say? |
 | 10 | Force-stop BlockSocial from the phone's application settings, then open Protection. | Does it say blocking stopped, and does the repair action get it running again? |
+| 11 | Set a daily limit well above anything used today, open the restricted application, and read the figure on the pause screen when it eventually appears. Compare it against the phone's own Digital Wellbeing figure for that application. | The two numbers, and the limit. A gap of more than a couple of minutes means the usage-event stream on that firmware does not behave like stock. |
+
+Check 11 is new and exists because the daily limit is the only rule that trusts data the product does not produce. `UsageStatsManager` event streams are the part of Android manufacturers alter most freely, and a limit that measures wrongly does not fail visibly — it blocks the user at the wrong moment and looks like the product deciding on its own. The pause screen naming its own figure is what makes this check possible at all.
 
 Checks 1 to 5 carry risk `R-06`, check 6 carries `R-04`, and checks 9 and 10 carry `R-07`. Nothing in this project has evidence for any of them on manufacturer firmware.
 

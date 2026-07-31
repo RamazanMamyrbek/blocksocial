@@ -29,6 +29,8 @@ class BlockScreenTest {
     private fun presentation(
         reason: RuleMode = RuleMode.SCHEDULE,
         activeUntil: Instant? = Instant.parse("2026-07-27T12:00:00Z"),
+        measuredMinutesToday: Int? = null,
+        limitMinutes: Int? = null,
     ) = BlockPresentation(
         app = AppRef("instagram"),
         appDisplayName = "Instagram",
@@ -37,12 +39,16 @@ class BlockScreenTest {
         zone = ZoneId.of("UTC"),
         opensToday = 6,
         endedHereToday = 4,
+        measuredMinutesToday = measuredMinutesToday,
+        limitMinutes = limitMinutes,
     )
 
     private fun show(
         darkTheme: Boolean = true,
         fontScale: Float = 1f,
         reason: RuleMode = RuleMode.SCHEDULE,
+        measuredMinutesToday: Int? = null,
+        limitMinutes: Int? = null,
         onStayFocused: () -> Unit = {},
         onOpenTemporarily: () -> Unit = {},
     ) {
@@ -53,13 +59,33 @@ class BlockScreenTest {
             ) {
                 BlockSocialTheme(darkTheme = darkTheme) {
                     BlockScreen(
-                        presentation = presentation(reason = reason),
+                        presentation = presentation(
+                            reason = reason,
+                            measuredMinutesToday = measuredMinutesToday,
+                            limitMinutes = limitMinutes,
+                        ),
                         onStayFocused = onStayFocused,
                         onOpenTemporarily = onOpenTemporarily,
                     )
                 }
             }
         }
+    }
+
+    @Test
+    fun aLimitBlockShowsTheMeasurementThatCausedItRatherThanAssertingItAlone() {
+        show(reason = RuleMode.DAILY_LIMIT, measuredMinutesToday = 38, limitMinutes = 5)
+
+        composeRule.onNodeWithTag(BlockScreenTags.MEASUREMENT).assertIsDisplayed()
+        composeRule.onNodeWithText("About 38 minutes in Instagram today, against a limit of 5.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun aBlockThatIsNotAboutTimeDoesNotClaimAMeasurement() {
+        show(reason = RuleMode.ALWAYS)
+
+        composeRule.onNodeWithTag(BlockScreenTags.MEASUREMENT).assertDoesNotExist()
     }
 
     @Test

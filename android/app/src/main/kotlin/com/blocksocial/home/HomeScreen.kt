@@ -109,7 +109,7 @@ fun HomeScreen(
                 text = stringResource(
                     R.string.home_today_summary,
                     state.stayedFocusedToday,
-                    state.interventionsToday,
+                    state.decisionsToday,
                 ),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,

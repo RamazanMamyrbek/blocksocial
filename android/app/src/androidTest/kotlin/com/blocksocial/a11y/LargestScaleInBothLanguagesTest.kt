@@ -69,11 +69,13 @@ class LargestScaleInBothLanguagesTest {
     private val presentation = BlockPresentation(
         app = AppRef("youtube"),
         appDisplayName = "YouTube",
-        primaryReason = RuleMode.ALWAYS,
+        primaryReason = RuleMode.DAILY_LIMIT,
         activeUntil = null,
         zone = ZoneId.of("Europe/Berlin"),
         opensToday = 3,
         endedHereToday = 1,
+        measuredMinutesToday = 38,
+        limitMinutes = 5,
     )
 
     @Test

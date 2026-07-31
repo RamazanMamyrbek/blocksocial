@@ -226,6 +226,8 @@ class BlockSocialAccessibilityService : AccessibilityService() {
             zone = at.zone,
             opensToday = counts.opens + 1,
             endedHereToday = counts.endedHere,
+            measuredMinutesToday = decision.dailyLimit?.measuredMinutesToday,
+            limitMinutes = decision.dailyLimitMinutes,
         )
     }
 

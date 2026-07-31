@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter
 
 object BlockScreenTags {
     const val HEADLINE = "block-headline"
+    const val MEASUREMENT = "block-measurement"
     const val STAY_FOCUSED = "block-stay-focused"
     const val OPEN_TEMPORARILY = "block-open-temporarily"
     const val FOOTNOTE = "block-footnote"
@@ -62,6 +63,22 @@ fun BlockScreen(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.testTag(BlockScreenTags.HEADLINE),
         )
+
+        val measured = presentation.measuredMinutesToday
+        val limit = presentation.limitMinutes
+        if (presentation.primaryReason == RuleMode.DAILY_LIMIT && measured != null && limit != null) {
+            Text(
+                text = stringResource(
+                    R.string.block_daily_limit_measurement,
+                    measured,
+                    presentation.appDisplayName,
+                    limit,
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.testTag(BlockScreenTags.MEASUREMENT),
+            )
+        }
 
         Text(
             text = stringResource(R.string.block_supporting),

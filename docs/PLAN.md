@@ -1790,6 +1790,14 @@ Tests green, five scenarios verified.
 
 **No defects were found in this phase.** Both images behaved the same wherever both were exercised. The defects this project has found were all found by running the product in phases 19, 20 and 21, each recorded in its own phase with a regression test, and none of them is open.
 
+**Two were found afterwards, by timing the daily limit against a clock rather than reading it.** This phase ran the suites; it never held a stopwatch to the one rule whose input comes from outside the product.
+
+The first is the serious one. `ForegroundSessions` had no notion of an application *leaving* the foreground — a visit closed only when some other application entered one. A visit still open when the device shut down therefore stayed open across the gap, and its start was clamped forward to local midnight, crediting the application with every minute from midnight until now on a device that had been switched off. A five-minute limit could be spent before the user opened anything, and the pause screen said only "you have reached your time for today", which is unfalsifiable from the user's chair. Fixed by reading `MOVE_TO_BACKGROUND` and `ACTIVITY_STOPPED` as closing events and refusing to count any minute earlier than the last boot; two regression tests in `ForegroundSessionsTest` cover the shutdown cases.
+
+The second: the home screen said "you stayed focused N of M times" with M counting every pause ever raised, including ones the system tore down when it restarted the accessibility service. That charges the user with decisions they were never shown. M is now the count of decisions actually made.
+
+**The pause screen now names its own evidence.** A daily-limit block states the measured minutes and the limit. The rule was already correct by specification — a daily limit counts from local midnight, including time spent before the rule existed — but a correct block that cannot be checked is indistinguishable from a broken one. Timings and the two remaining lags are in `docs/COMPATIBILITY.md` section 4.
+
 **Rotation, carried over from phase 13, is closed.** Three tests drive the shell through `StateRestorationTester`: the selected tab, the dashboard, and a tab switch all survive a saved-instance-state restore, which is the same mechanism a rotation uses.
 
 **What was handed to phase 24.** `docs/COMPATIBILITY.md` section 6 is a ten-row table, each row a single action and a yes-or-no answer, mapped to risks `R-04`, `R-06` and `R-07`, with the minimum hardware to recruit named as Samsung One UI and Xiaomi HyperOS or MIUI.

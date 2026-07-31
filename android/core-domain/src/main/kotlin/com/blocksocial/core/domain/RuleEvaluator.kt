@@ -12,6 +12,8 @@ data class RestrictionDecision(
     val primaryReason: RuleMode?,
     val allReasons: List<RuleMode>,
     val bypass: BypassDecision,
+    val dailyLimit: DailyLimitDecision? = null,
+    val dailyLimitMinutes: Int? = null,
 )
 
 object RuleEvaluator {
@@ -34,6 +36,21 @@ object RuleEvaluator {
             )
         }
 
+        val tightestLimit = rules
+            .filterIsInstance<RestrictionRule.DailyLimit>()
+            .filter { it.enabled }
+            .minByOrNull { it.limitMinutes }
+
+        val limitDecision = tightestLimit?.let {
+            DailyLimitEvaluator.evaluate(
+                rule = it,
+                sessions = usageSessions,
+                forApp = forApp,
+                at = at,
+                usageMeasurementAvailable = usageMeasurementAvailable,
+            )
+        }
+
         val reasons = rules
             .filter { applies(it, usageSessions, forApp, at, usageMeasurementAvailable) }
             .map { it.mode }
@@ -45,6 +62,8 @@ object RuleEvaluator {
             primaryReason = reasons.firstOrNull(),
             allReasons = reasons,
             bypass = bypass,
+            dailyLimit = limitDecision,
+            dailyLimitMinutes = tightestLimit?.limitMinutes,
         )
     }
 
