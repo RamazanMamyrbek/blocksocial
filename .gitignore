@@ -18,6 +18,7 @@ desktop.ini
 *.jks
 *.keystore
 *.p12
+keystore.properties
 *.mobileprovision
 *.cer
 *.provisionprofile
@@ -54,3 +55,6 @@ temp/
 *.aab
 *.ipa
 *.dSYM.zip
+
+# Locally built APKs for hand testing
+/apk/
