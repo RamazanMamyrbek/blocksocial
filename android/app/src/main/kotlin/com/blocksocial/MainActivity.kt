@@ -52,6 +52,9 @@ import com.blocksocial.feature.rules.RuleListScreen
 import com.blocksocial.feature.rules.RulesController
 import com.blocksocial.health.ProtectionHealth
 import com.blocksocial.health.ProtectionHealthProbe
+import com.blocksocial.home.HomeController
+import com.blocksocial.home.HomeScreen
+import com.blocksocial.home.HomeState
 import com.blocksocial.shell.BlockSocialShell
 import com.blocksocial.shell.Destination
 import com.blocksocial.shell.ScrollingScreen
@@ -75,6 +78,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var dashboard: DashboardController
+
+    @Inject
+    lateinit var home: HomeController
 
     @Inject
     lateinit var apps: AppSelectionController
@@ -144,8 +150,9 @@ class MainActivity : ComponentActivity() {
 
         BlockSocialShell(navigator = navigator) { destination ->
             when (destination) {
-                Destination.Dashboard -> Dashboard(navigator)
-                Destination.Apps -> Apps(navigator)
+                Destination.Home -> Home(navigator)
+                Destination.Today -> Today()
+                Destination.AddApp -> AddApp(navigator)
                 Destination.History -> History()
                 Destination.Protection -> Protection()
                 is Destination.Rules -> Rules(destination.app)
@@ -154,20 +161,34 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Dashboard(navigator: ShellNavigator) {
-        val states = remember { dashboard.state(probe.observe().map { it.banner }) }
-        val state by states.collectAsState(initial = DashboardState.Empty)
+    private fun Home(navigator: ShellNavigator) {
+        val states = remember { home.state(probe.observe().map { it.banner }) }
+        val state by states.collectAsState(initial = HomeState.Empty)
 
         ScrollingScreen {
-            DashboardScreen(
+            HomeScreen(
                 state = state,
                 onOpenProtection = { navigator.open(Destination.Protection) },
+                onOpenApp = { row -> navigator.open(Destination.Rules(row.ref, row.displayName)) },
+                onPausedChange = { row, paused ->
+                    lifecycleScope.launch { home.setPaused(row, paused) }
+                },
+                onAddApp = { navigator.open(Destination.AddApp) },
+                onOpenToday = { navigator.selectTab(Destination.Today) },
             )
         }
     }
 
     @Composable
-    private fun Apps(navigator: ShellNavigator) {
+    private fun Today() {
+        val states = remember { dashboard.state() }
+        val state by states.collectAsState(initial = DashboardState.Empty)
+
+        ScrollingScreen { DashboardScreen(state = state) }
+    }
+
+    @Composable
+    private fun AddApp(navigator: ShellNavigator) {
         val rows by apps.rows().collectAsState(initial = emptyList())
 
         AppSelectionScreen(

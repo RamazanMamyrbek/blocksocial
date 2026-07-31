@@ -18,31 +18,31 @@ data class BlockSocialPalette(
 )
 
 val DarkPalette = BlockSocialPalette(
-    surface = Color(0xFF11171B),
-    surfaceContainer = Color(0xFF1B2127),
-    surfaceContainerHigh = Color(0xFF272F35),
-    onSurface = Color(0xFFE8ECEF),
-    onSurfaceVariant = Color(0xFFA1A9AF),
-    outline = Color(0xFF50565B),
-    primary = Color(0xFF6FBEBE),
-    onPrimary = Color(0xFF11171B),
-    success = Color(0xFF85B99A),
-    warning = Color(0xFFDBB881),
-    danger = Color(0xFFCB7870),
+    surface = Color(0xFF101512),
+    surfaceContainer = Color(0xFF1C241F),
+    surfaceContainerHigh = Color(0xFF27322C),
+    onSurface = Color(0xFFE2EAE5),
+    onSurfaceVariant = Color(0xFF9DA7A2),
+    outline = Color(0xFF57605B),
+    primary = Color(0xFF71D9AE),
+    onPrimary = Color(0xFF101512),
+    success = Color(0xFF81D7A0),
+    warning = Color(0xFFE3B97E),
+    danger = Color(0xFFE58C84),
 )
 
 val LightPalette = BlockSocialPalette(
-    surface = Color(0xFFF5F8FA),
-    surfaceContainer = Color(0xFFE9EDF0),
-    surfaceContainerHigh = Color(0xFFDBE0E4),
-    onSurface = Color(0xFF1B2127),
-    onSurfaceVariant = Color(0xFF565D63),
-    outline = Color(0xFFB7BDC1),
-    primary = Color(0xFF207071),
+    surface = Color(0xFFF2F6F2),
+    surfaceContainer = Color(0xFFFFFFFF),
+    surfaceContainerHigh = Color(0xFFE4ECE5),
+    onSurface = Color(0xFF15211A),
+    onSurfaceVariant = Color(0xFF555F59),
+    outline = Color(0xFFC5CFC9),
+    primary = Color(0xFF1E7557),
     onPrimary = Color(0xFFFFFFFF),
-    success = Color(0xFF3A694F),
-    warning = Color(0xFFA0774A),
-    danger = Color(0xFFA14B45),
+    success = Color(0xFF30744C),
+    warning = Color(0xFF9A620A),
+    danger = Color(0xFFAD3B39),
 )
 
 val LocalBlockSocialPalette = staticCompositionLocalOf { DarkPalette }

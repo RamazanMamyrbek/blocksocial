@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.blocksocial.core.domain.ProtectionBanner
 import com.blocksocial.core.domain.ProtectionRequirement
 import com.blocksocial.core.domain.RequirementHealth
 import com.blocksocial.core.domain.RequirementStatus
@@ -48,7 +47,7 @@ class ScreenFrameContractTest {
                 }
             }
         }
-        composeRule.onNodeWithTag(ShellTags.screen(Destination.Dashboard)).assertExists()
+        composeRule.onNodeWithTag(ShellTags.screen(Destination.Home)).assertExists()
     }
 
     @Test
@@ -116,7 +115,6 @@ class ScreenFrameContractTest {
     }
 
     private val busyDay = DashboardState(
-        protection = ProtectionBanner.STOPPED,
         interventionsToday = 6,
         stayedFocusedToday = 4,
         bypassedToday = 2,

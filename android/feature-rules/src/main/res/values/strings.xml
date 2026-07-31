@@ -30,4 +30,6 @@
     <string name="rule_edit">Edit</string>
     <string name="rule_save">Save rule</string>
     <string name="rule_delete">Delete rule</string>
+    <string name="rule_schedule_summary">%1$s · %2$s–%3$s</string>
+    <string name="rule_daily_limit_summary">%1$d minutes a day</string>
 </resources>

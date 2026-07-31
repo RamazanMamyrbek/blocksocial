@@ -21,9 +21,7 @@ import com.blocksocial.core.ui.theme.Spacing
 import com.blocksocial.feature.dashboard.DashboardController
 import com.blocksocial.feature.dashboard.DashboardScreen
 import com.blocksocial.feature.dashboard.DashboardState
-import com.blocksocial.health.ProtectionHealthProbe
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,15 +30,12 @@ class DashboardDebugActivity : ComponentActivity() {
     @Inject
     lateinit var controller: DashboardController
 
-    @Inject
-    lateinit var probe: ProtectionHealthProbe
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             BlockSocialTheme {
-                val states = remember { controller.state(probe.observe().map { it.banner }) }
+                val states = remember { controller.state() }
                 val state by states.collectAsState(initial = DashboardState.Empty)
                 Column(
                     modifier = Modifier

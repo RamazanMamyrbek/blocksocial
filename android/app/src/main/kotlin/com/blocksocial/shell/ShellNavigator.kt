@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 
-class ShellNavigator(history: List<Destination> = listOf(Destination.Dashboard)) {
+class ShellNavigator(history: List<Destination> = listOf(Destination.Home)) {
 
     private val visited = mutableStateListOf<Destination>().apply {
-        addAll(history.ifEmpty { listOf(Destination.Dashboard) })
+        addAll(history.ifEmpty { listOf(Destination.Home) })
     }
 
     val current: Destination get() = visited.last()

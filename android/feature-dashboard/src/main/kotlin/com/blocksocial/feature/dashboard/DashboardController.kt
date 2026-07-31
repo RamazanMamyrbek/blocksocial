@@ -2,7 +2,6 @@ package com.blocksocial.feature.dashboard
 
 import com.blocksocial.core.data.repository.BlockEventRepository
 import com.blocksocial.core.data.repository.RestrictionRuleRepository
-import com.blocksocial.core.domain.ProtectionBanner
 import com.blocksocial.core.domain.StatisticsCalculator
 import com.blocksocial.core.domain.StreakPolicy
 import kotlinx.coroutines.flow.Flow
@@ -19,15 +18,13 @@ class DashboardController @Inject constructor(
 ) {
 
     fun state(
-        protection: Flow<ProtectionBanner>,
         policy: StreakPolicy = StreakPolicy.Default,
         zone: () -> ZoneId = ZoneId::systemDefault,
         today: () -> LocalDate = LocalDate::now,
     ): Flow<DashboardState> = combine(
         blockEvents.observeRecent(RECENT_EVENT_WINDOW),
         rules.observeRulesByApp(),
-        protection,
-    ) { events, rulesByApp, banner ->
+    ) { events, rulesByApp ->
         val currentZone = zone()
         val currentDay = today()
         val outcomes = StatisticsCalculator.dailyOutcomes(events, currentZone)
@@ -36,7 +33,6 @@ class DashboardController @Inject constructor(
         val allRules = rulesByApp.values.flatten()
 
         DashboardState(
-            protection = banner,
             interventionsToday = todayOutcome?.interventions ?: 0,
             stayedFocusedToday = todayOutcome?.stayedFocused ?: 0,
             bypassedToday = todayOutcome?.bypassed ?: 0,

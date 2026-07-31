@@ -50,11 +50,11 @@ class RotationTest {
     fun theDashboardIsStillTheDashboardAfterRotation() {
         showShell()
 
-        composeRule.onNodeWithTag(ShellTags.screen(Destination.Dashboard)).assertExists()
+        composeRule.onNodeWithTag(ShellTags.screen(Destination.Home)).assertExists()
 
         restoration.emulateSavedInstanceStateRestore()
 
-        composeRule.onNodeWithTag(ShellTags.screen(Destination.Dashboard)).assertExists()
+        composeRule.onNodeWithTag(ShellTags.screen(Destination.Home)).assertExists()
         composeRule.onNodeWithTag(ShellTags.BACK).assertDoesNotExist()
     }
 
@@ -62,12 +62,12 @@ class RotationTest {
     fun switchingTabsAndRotatingLandsOnTheTabTheUserChose() {
         showShell()
 
-        composeRule.onNodeWithTag(ShellTags.tab(Destination.Apps)).performClick()
+        composeRule.onNodeWithTag(ShellTags.tab(Destination.Today)).performClick()
         restoration.emulateSavedInstanceStateRestore()
-        composeRule.onNodeWithTag(ShellTags.screen(Destination.Apps)).assertExists()
+        composeRule.onNodeWithTag(ShellTags.screen(Destination.Today)).assertExists()
 
-        composeRule.onNodeWithTag(ShellTags.tab(Destination.Dashboard)).performClick()
+        composeRule.onNodeWithTag(ShellTags.tab(Destination.Home)).performClick()
         restoration.emulateSavedInstanceStateRestore()
-        composeRule.onNodeWithTag(ShellTags.screen(Destination.Dashboard)).assertExists()
+        composeRule.onNodeWithTag(ShellTags.screen(Destination.Home)).assertExists()
     }
 }

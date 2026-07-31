@@ -7,22 +7,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.blocksocial.core.domain.ProtectionBanner
 import com.blocksocial.core.ui.theme.Numeric
 import com.blocksocial.core.ui.theme.Radius
 import com.blocksocial.core.ui.theme.Spacing
 import kotlin.math.roundToInt
 
 object DashboardTags {
-    const val PROTECTION = "dashboard-protection"
-    const val OPEN_PROTECTION = "dashboard-open-protection"
     const val STAYED = "dashboard-stayed"
     const val BYPASSED = "dashboard-bypassed"
     const val REFUSAL_RATE = "dashboard-refusal-rate"
@@ -34,7 +30,7 @@ object DashboardTags {
 }
 
 @Composable
-fun DashboardScreen(state: DashboardState, onOpenProtection: () -> Unit = {}) {
+fun DashboardScreen(state: DashboardState) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
@@ -44,8 +40,6 @@ fun DashboardScreen(state: DashboardState, onOpenProtection: () -> Unit = {}) {
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
-
-        ProtectionBannerCard(banner = state.protection, onOpenProtection = onOpenProtection)
 
         if (state.interventionsToday == 0) {
             Text(
@@ -113,57 +107,6 @@ fun DashboardScreen(state: DashboardState, onOpenProtection: () -> Unit = {}) {
 }
 
 @Composable
-private fun ProtectionBannerCard(banner: ProtectionBanner, onOpenProtection: () -> Unit) {
-    val headline = when (banner) {
-        ProtectionBanner.RUNNING -> R.string.dashboard_protection_running
-        ProtectionBanner.NEVER_SET_UP -> R.string.dashboard_protection_never_set_up
-        ProtectionBanner.STOPPED -> R.string.dashboard_protection_stopped
-        ProtectionBanner.STOPPED_SINCE_LAST_OPEN -> R.string.dashboard_protection_stopped_since
-    }
-    val consequence = when (banner) {
-        ProtectionBanner.RUNNING -> null
-        ProtectionBanner.NEVER_SET_UP,
-        ProtectionBanner.STOPPED,
-        ProtectionBanner.STOPPED_SINCE_LAST_OPEN,
-        -> R.string.dashboard_protection_consequence
-    }
-    val container = if (banner == ProtectionBanner.RUNNING) {
-        MaterialTheme.colorScheme.surfaceContainer
-    } else {
-        MaterialTheme.colorScheme.surfaceContainerHigh
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(container, RoundedCornerShape(Radius.md))
-            .padding(Spacing.lg)
-            .testTag(DashboardTags.PROTECTION),
-        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-    ) {
-        Text(
-            text = stringResource(headline),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        if (consequence != null) {
-            Text(
-                text = stringResource(consequence),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        OutlinedButton(
-            onClick = onOpenProtection,
-            modifier = Modifier.testTag(DashboardTags.OPEN_PROTECTION),
-        ) {
-            Text(stringResource(R.string.dashboard_open_protection))
-        }
-    }
-}
-
-@Composable
 private fun Tile(tag: String, label: String, value: String) {
     Column(
         modifier = Modifier
@@ -180,8 +123,8 @@ private fun Tile(tag: String, label: String, value: String) {
         )
         Text(
             text = value,
-            style = Numeric,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.headlineMedium.copy(fontFamily = Numeric.fontFamily),
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

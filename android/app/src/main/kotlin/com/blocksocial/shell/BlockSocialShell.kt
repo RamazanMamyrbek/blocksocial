@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -33,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.blocksocial.R
+import com.blocksocial.core.ui.icon.BlockSocialIcons
 import com.blocksocial.core.ui.theme.Radius
 import com.blocksocial.core.ui.theme.Spacing
 
@@ -123,6 +127,16 @@ private fun Tab(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.xs),
     ) {
+        Icon(
+            imageVector = tabIcon(tab),
+            contentDescription = null,
+            tint = if (selected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            modifier = Modifier.size(TAB_GLYPH),
+        )
         CompositionLocalProvider(LocalDensity provides tabLabelDensity()) {
             Text(
                 text = label,
@@ -156,12 +170,20 @@ private fun tabLabelDensity(): Density {
 
 private const val INDICATOR_WIDTH = 0.5f
 private const val TAB_LABEL_MAX_FONT_SCALE = 1.3f
+private val TAB_GLYPH = 22.dp
 
 @StringRes
 private fun tabLabel(tab: Destination): Int = when (tab) {
-    Destination.Dashboard -> R.string.shell_tab_today
-    Destination.Apps -> R.string.shell_tab_apps
+    Destination.Home, Destination.Protection, Destination.AddApp -> R.string.shell_tab_home
+    Destination.Today -> R.string.shell_tab_today
     Destination.History -> R.string.shell_tab_history
-    Destination.Protection -> R.string.shell_tab_today
-    is Destination.Rules -> R.string.shell_tab_apps
+    is Destination.Rules -> R.string.shell_tab_home
+}
+
+@Composable
+private fun tabIcon(tab: Destination): ImageVector = when (tab) {
+    Destination.Home, Destination.Protection, Destination.AddApp -> BlockSocialIcons.Shield
+    Destination.Today -> BlockSocialIcons.Check
+    Destination.History -> BlockSocialIcons.History
+    is Destination.Rules -> BlockSocialIcons.Shield
 }

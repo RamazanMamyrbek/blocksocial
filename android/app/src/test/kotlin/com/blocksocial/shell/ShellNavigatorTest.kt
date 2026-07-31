@@ -12,7 +12,7 @@ class ShellNavigatorTest {
 
     @Test
     fun theApplicationOpensOnTheDashboard() {
-        assertEquals(Destination.Dashboard, ShellNavigator().current)
+        assertEquals(Destination.Home, ShellNavigator().current)
     }
 
     @Test
@@ -21,7 +21,7 @@ class ShellNavigatorTest {
 
         assertFalse(navigator.canGoBack)
         assertFalse(navigator.back())
-        assertEquals(Destination.Dashboard, navigator.current)
+        assertEquals(Destination.Home, navigator.current)
     }
 
     @Test
@@ -31,39 +31,50 @@ class ShellNavigatorTest {
         navigator.open(Destination.Protection)
         assertEquals(Destination.Protection, navigator.current)
         assertTrue(navigator.back())
-        assertEquals(Destination.Dashboard, navigator.current)
+        assertEquals(Destination.Home, navigator.current)
     }
 
     @Test
     fun switchingTabsDoesNotPileUpAHistoryToWalkBackThrough() {
         val navigator = ShellNavigator()
 
-        navigator.selectTab(Destination.Apps)
+        navigator.selectTab(Destination.Today)
         navigator.selectTab(Destination.History)
-        navigator.selectTab(Destination.Dashboard)
+        navigator.selectTab(Destination.Home)
 
         assertFalse(navigator.canGoBack)
-        assertEquals(listOf(Destination.Dashboard), navigator.history())
+        assertEquals(listOf(Destination.Home), navigator.history())
     }
 
     @Test
     fun aScreenOpenedFromATabKeepsThatTabSelected() {
         val navigator = ShellNavigator()
 
-        navigator.selectTab(Destination.Apps)
-        navigator.open(instagram)
+        navigator.selectTab(Destination.Today)
+        navigator.open(Destination.History)
 
-        assertEquals(instagram, navigator.current)
-        assertEquals(Destination.Apps, navigator.selectedTab)
+        assertEquals(Destination.History, navigator.current)
+        assertEquals(Destination.History, navigator.selectedTab)
     }
 
     @Test
-    fun protectionBelongsToTheDashboardTab() {
+    fun aRuleScreenBelongsToTheHomeTabWhereverItWasOpenedFrom() {
+        val navigator = ShellNavigator()
+
+        navigator.selectTab(Destination.Today)
+        navigator.open(instagram)
+
+        assertEquals(instagram, navigator.current)
+        assertEquals(Destination.Home, navigator.selectedTab)
+    }
+
+    @Test
+    fun protectionBelongsToTheHomeTab() {
         val navigator = ShellNavigator()
 
         navigator.open(Destination.Protection)
 
-        assertEquals(Destination.Dashboard, navigator.selectedTab)
+        assertEquals(Destination.Home, navigator.selectedTab)
     }
 
     @Test
@@ -80,10 +91,11 @@ class ShellNavigatorTest {
     @Test
     fun everyDestinationSurvivesBeingWrittenDownAndReadBack() {
         listOf(
-            Destination.Dashboard,
-            Destination.Apps,
+            Destination.Home,
+            Destination.Today,
             Destination.History,
             Destination.Protection,
+            Destination.AddApp,
             instagram,
             Destination.Rules(AppRef("twitter"), "X (Twitter)"),
         ).forEach { destination ->
@@ -92,9 +104,9 @@ class ShellNavigatorTest {
     }
 
     @Test
-    fun aHistoryThatCannotBeReadFallsBackToTheDashboardRatherThanCrashing() {
-        assertEquals(Destination.Dashboard, decodeDestination("nonsense"))
-        assertEquals(Destination.Dashboard, ShellNavigator(emptyList()).current)
+    fun aHistoryThatCannotBeReadFallsBackToHomeRatherThanCrashing() {
+        assertEquals(Destination.Home, decodeDestination("nonsense"))
+        assertEquals(Destination.Home, ShellNavigator(emptyList()).current)
     }
 
     @Test

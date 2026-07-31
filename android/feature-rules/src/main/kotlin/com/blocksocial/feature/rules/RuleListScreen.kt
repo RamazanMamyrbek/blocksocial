@@ -11,10 +11,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.blocksocial.core.model.RestrictionRule
+import java.time.format.TextStyle
 import com.blocksocial.core.model.RuleMode
+import com.blocksocial.core.ui.text.rememberClockFormatter
+import com.blocksocial.core.ui.text.rememberWeekOrder
 import com.blocksocial.core.ui.theme.Numeric
 import com.blocksocial.core.ui.theme.Spacing
 
@@ -57,7 +61,7 @@ fun RuleListScreen(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = summaryOf(rule),
+                        text = ruleSummary(rule),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -84,26 +88,26 @@ fun RuleListScreen(
 }
 
 @Composable
-private fun summaryOf(rule: RestrictionRule): String = when (rule) {
-    is RestrictionRule.AlwaysOn, is RestrictionRule.FocusSession ->
-        stringResource(R.string.rule_mode_always)
-    is RestrictionRule.Schedule -> {
-        val interval = IntervalDescription(rule.startLocalTime, rule.endLocalTime)
-        val times = if (interval.crossesMidnight) {
+fun ruleSummary(rule: RestrictionRule): String {
+    val clock = rememberClockFormatter()
+    val locale = LocalLocale.current.platformLocale
+    return when (rule) {
+        is RestrictionRule.AlwaysOn, is RestrictionRule.FocusSession ->
+            stringResource(R.string.rule_mode_always)
+
+        is RestrictionRule.Schedule -> {
+            val days = rememberWeekOrder()
+                .filter { it in rule.daysOfWeek }
+                .joinToString(" ") { it.getDisplayName(TextStyle.SHORT, locale) }
             stringResource(
-                R.string.rule_overnight_explained,
-                rule.startLocalTime.toString(),
-                rule.endLocalTime.toString(),
-            )
-        } else {
-            stringResource(
-                R.string.rule_same_day_explained,
-                rule.startLocalTime.toString(),
-                rule.endLocalTime.toString(),
+                R.string.rule_schedule_summary,
+                days,
+                clock(rule.startLocalTime),
+                clock(rule.endLocalTime),
             )
         }
-        "${rule.daysOfWeek.sortedBy { it.value }.joinToString(" ") { it.name.take(2) }} · $times"
+
+        is RestrictionRule.DailyLimit ->
+            stringResource(R.string.rule_daily_limit_summary, rule.limitMinutes)
     }
-    is RestrictionRule.DailyLimit ->
-        "${stringResource(R.string.rule_mode_daily_limit)} · ${rule.limitMinutes}"
 }
