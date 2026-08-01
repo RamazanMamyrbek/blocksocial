@@ -84,12 +84,11 @@ Five wall-clock minutes in the application produced exactly five measured minute
 
 The pause screen now states the measurement that caused it — "About 72 minutes in YouTube today, against a limit of 70" — because a limit block that only asserts "you have reached your time for today" cannot be checked by the person reading it, and a limit counts usage from local midnight including time spent before the rule was created.
 
-### Two lags worth knowing about
+### One deferral, by design
 
-Neither is a wrong result; both are a stale one for a single launch.
+**A limit crossed during a session** is not acted on until the session ends. BlockSocial interrupts a launch, never a session already under way.
 
-- **Revoking usage access.** The reading is cached and refreshed asynchronously when the foreground leaves a restricted application. The first launch after access is revoked can still be judged against the last good reading. It corrects itself on the next transition, verified: `measuredMinutes=none block=false` from the second attempt onward.
-- **A limit crossed during a session** is not seen until the session ends, by design as above.
+Nothing else is deferred. The measurement is cached and refreshed asynchronously, but permission to use it is re-checked at the moment of the decision, so revoking usage access takes effect on the very next launch rather than on the one after it. The reading is fetched only when a visit to a restricted application actually begins, so that check costs one `AppOps` call per launch, not one per window event; `UsageDenialTest.theMeasurementIsReadOnlyWhenAVisitToARestrictedApplicationBegins` pins that.
 
 ### Defects found
 

@@ -1796,7 +1796,9 @@ The first is the serious one. `ForegroundSessions` had no notion of an applicati
 
 The second: the home screen said "you stayed focused N of M times" with M counting every pause ever raised, including ones the system tore down when it restarted the accessibility service. That charges the user with decisions they were never shown. M is now the count of decisions actually made.
 
-**The pause screen now names its own evidence.** A daily-limit block states the measured minutes and the limit. The rule was already correct by specification — a daily limit counts from local midnight, including time spent before the rule existed — but a correct block that cannot be checked is indistinguishable from a broken one. Timings and the two remaining lags are in `docs/COMPATIBILITY.md` section 4.
+**The pause screen now names its own evidence.** A daily-limit block states the measured minutes and the limit. The rule was already correct by specification — a daily limit counts from local midnight, including time spent before the rule existed — but a correct block that cannot be checked is indistinguishable from a broken one. Timings are in `docs/COMPATIBILITY.md` section 4.
+
+**A third defect, found while writing that section up.** Revoking usage access left one launch judged against the measurement taken before the revocation, because the reading was cached and refreshed asynchronously. `docs/TECHNICAL_SPECIFICATION.md` section 3 says daily limits cannot trigger without usage access, and a block from stale data is exactly the kind of unexplainable interruption this product must not produce. The permission is now re-checked at the moment of the decision, and the reading is fetched only when a visit to a restricted application begins, so the check costs one `AppOps` call per launch rather than one per window event.
 
 **Rotation, carried over from phase 13, is closed.** Three tests drive the shell through `StateRestorationTester`: the selected tab, the dashboard, and a tab switch all survive a saved-instance-state restore, which is the same mechanism a rotation uses.
 

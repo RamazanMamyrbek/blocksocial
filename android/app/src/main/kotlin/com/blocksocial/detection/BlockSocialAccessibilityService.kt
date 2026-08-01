@@ -131,7 +131,7 @@ class BlockSocialAccessibilityService : AccessibilityService() {
             packageName = event.packageName?.toString(),
             className = event.className?.toString(),
             snapshot = current,
-            usage = usage,
+            readUsage = ::measurementStillPermitted,
         )
 
         DetectionLog.decision(result, SystemClock.uptimeMillis() - event.eventTime)
@@ -171,6 +171,9 @@ class BlockSocialAccessibilityService : AccessibilityService() {
             }
         }
     }
+
+    private fun measurementStillPermitted(): UsageReading =
+        if (usageStats.hasUsageAccess()) usage else UsageReading.Unavailable
 
     private fun refreshUsage(current: ProtectionSnapshot) {
         scope?.launch {

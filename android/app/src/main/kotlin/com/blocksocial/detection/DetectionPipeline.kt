@@ -28,7 +28,7 @@ class DetectionPipeline(
         packageName: String?,
         className: String?,
         snapshot: ProtectionSnapshot,
-        usage: UsageReading = UsageReading.Unavailable,
+        readUsage: () -> UsageReading = { UsageReading.Unavailable },
     ): DetectionResult {
         val app = packageName?.let(snapshot.packageToApp::get)
         val transition = tracker.onWindowStateChanged(
@@ -41,6 +41,7 @@ class DetectionPipeline(
             return DetectionResult(transition, app, decision = null)
         }
 
+        val usage = readUsage()
         val decision = RuleEvaluator.evaluate(
             rules = snapshot.rulesByApp[app].orEmpty(),
             grant = snapshot.grantsByApp[app],

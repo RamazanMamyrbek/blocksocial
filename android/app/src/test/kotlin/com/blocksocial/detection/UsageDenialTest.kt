@@ -8,6 +8,7 @@ import com.blocksocial.core.model.UsageSession
 import com.blocksocial.usage.UsageReading
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.DayOfWeek
@@ -51,7 +52,7 @@ class UsageDenialTest {
             packageName = "com.google.android.youtube",
             className = "Main",
             snapshot = snapshot(listOf(eveningSchedule)),
-            usage = UsageReading.Unavailable,
+            readUsage = { UsageReading.Unavailable },
         )
 
         assertTrue(result.shouldBlock)
@@ -64,7 +65,7 @@ class UsageDenialTest {
             packageName = "com.google.android.youtube",
             className = "Main",
             snapshot = snapshot(listOf(tightLimit)),
-            usage = UsageReading.Unavailable,
+            readUsage = { UsageReading.Unavailable },
         )
 
         assertFalse(result.shouldBlock)
@@ -86,12 +87,40 @@ class UsageDenialTest {
             measurementAvailable = true,
         )
 
-        val withUsage = pipeline().onWindowStateChanged("com.google.android.youtube", "Main", both, measured)
-        val withoutUsage = pipeline().onWindowStateChanged("com.google.android.youtube", "Main", both, UsageReading.Unavailable)
+        val withUsage = pipeline().onWindowStateChanged("com.google.android.youtube", "Main", both) { measured }
+        val withoutUsage = pipeline().onWindowStateChanged("com.google.android.youtube", "Main", both) { UsageReading.Unavailable }
 
         assertEquals(listOf(RuleMode.SCHEDULE, RuleMode.DAILY_LIMIT), withUsage.decision?.allReasons)
         assertEquals(listOf(RuleMode.SCHEDULE), withoutUsage.decision?.allReasons)
         assertTrue(withoutUsage.shouldBlock)
+    }
+
+    @Test
+    fun noMinuteCountIsReportedWhenThereIsNothingToMeasureWith() {
+        val result = pipeline().onWindowStateChanged(
+            packageName = "com.google.android.youtube",
+            className = "Main",
+            snapshot = snapshot(listOf(tightLimit)),
+            readUsage = { UsageReading.Unavailable },
+        )
+
+        assertNull(result.decision?.dailyLimit?.measuredMinutesToday)
+    }
+
+    @Test
+    fun theMeasurementIsReadOnlyWhenAVisitToARestrictedApplicationBegins() {
+        var reads = 0
+        val readUsage = { reads++; UsageReading.Unavailable }
+        val pipeline = pipeline()
+        val restricted = snapshot(listOf(tightLimit))
+
+        pipeline.onWindowStateChanged("com.android.settings", "Main", restricted, readUsage)
+        pipeline.onWindowStateChanged("com.android.chrome", "Main", restricted, readUsage)
+        assertEquals(0, reads)
+
+        pipeline.onWindowStateChanged("com.google.android.youtube", "Main", restricted, readUsage)
+        pipeline.onWindowStateChanged("com.google.android.youtube", "Main", restricted, readUsage)
+        assertEquals(1, reads)
     }
 
     @Test
@@ -113,7 +142,7 @@ class UsageDenialTest {
             packageName = "com.google.android.youtube",
             className = "Main",
             snapshot = snapshot(listOf(tightLimit)),
-            usage = measured,
+            readUsage = { measured },
         )
 
         assertTrue(result.shouldBlock)
