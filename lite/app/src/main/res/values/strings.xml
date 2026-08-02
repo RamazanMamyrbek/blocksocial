@@ -42,6 +42,10 @@
     <string name="permissions_title">What this needs</string>
     <string name="permissions_working">Working</string>
     <string name="permissions_off">Off</string>
+    <string name="permissions_stopped">Switched on, but not running</string>
+    <string name="permissions_stopped_advice">Android says this is on, yet the service is not answering. Some phones stop accessibility services in the background. Switch it off and on again in system settings, and if it keeps happening, allow BlockSocial Lite to run unrestricted in the battery settings of your phone.</string>
+    <string name="permissions_overlay_failed">The warning could not be drawn on top of the other application (%1$s). Your phone may be blocking it.</string>
+    <string name="permissions_no_notifications">BlockSocial Lite sends no notifications and asks for no notification permission, so the notification switch for it in system settings stays greyed out. That is expected and does not affect limits.</string>
     <string name="permissions_open_settings">Open settings</string>
     <string name="permissions_accessibility_title">Accessibility access</string>
     <string name="permissions_accessibility_body">Lets BlockSocial Lite notice the moment a limited application comes to the front. It reads the name of that application and the moment it happened. Not the text on your screen, not your messages, not what you type.</string>

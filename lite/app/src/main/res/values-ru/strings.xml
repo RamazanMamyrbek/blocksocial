@@ -44,6 +44,10 @@
     <string name="permissions_title">Что для этого нужно</string>
     <string name="permissions_working">Работает</string>
     <string name="permissions_off">Выключено</string>
+    <string name="permissions_stopped">Включено, но не работает</string>
+    <string name="permissions_stopped_advice">Android считает, что служба включена, но она не отвечает. Некоторые телефоны останавливают службы специальных возможностей в фоне. Выключите и снова включите её в системных настройках, а если повторяется — разрешите BlockSocial Lite работать без ограничений в настройках батареи.</string>
+    <string name="permissions_overlay_failed">Предупреждение не удалось показать поверх другого приложения (%1$s). Возможно, телефон это запрещает.</string>
+    <string name="permissions_no_notifications">BlockSocial Lite не отправляет уведомлений и не запрашивает разрешение на них, поэтому переключатель уведомлений для него в системных настройках остаётся серым. Так и задумано, на лимиты это не влияет.</string>
     <string name="permissions_open_settings">Открыть настройки</string>
     <string name="permissions_accessibility_title">Специальные возможности</string>
     <string name="permissions_accessibility_body">Позволяет заметить момент, когда приложение с лимитом выходит на передний план. Читается имя этого приложения и время события. Не текст на экране, не сообщения, не то, что вы набираете.</string>

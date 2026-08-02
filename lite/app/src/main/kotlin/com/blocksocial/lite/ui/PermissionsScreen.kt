@@ -19,10 +19,19 @@ object PermissionsTags {
     const val USAGE = "permissions-usage"
 }
 
+enum class ServiceState { WORKING, SWITCHED_ON_BUT_STOPPED, OFF }
+
+fun serviceStateOf(switchedOn: Boolean, running: Boolean): ServiceState = when {
+    running -> ServiceState.WORKING
+    switchedOn -> ServiceState.SWITCHED_ON_BUT_STOPPED
+    else -> ServiceState.OFF
+}
+
 @Composable
 fun PermissionsScreen(
-    accessibilityGranted: Boolean,
+    serviceState: ServiceState,
     usageAccessGranted: Boolean,
+    overlayFailure: String?,
     onOpenAccessibilitySettings: () -> Unit,
     onOpenUsageAccessSettings: () -> Unit,
 ) {
@@ -39,17 +48,48 @@ fun PermissionsScreen(
         Requirement(
             tag = PermissionsTags.ACCESSIBILITY,
             title = stringResource(R.string.permissions_accessibility_title),
+            state = when (serviceState) {
+                ServiceState.WORKING -> stringResource(R.string.permissions_working)
+                ServiceState.SWITCHED_ON_BUT_STOPPED -> stringResource(R.string.permissions_stopped)
+                ServiceState.OFF -> stringResource(R.string.permissions_off)
+            },
+            good = serviceState == ServiceState.WORKING,
             body = stringResource(R.string.permissions_accessibility_body),
-            granted = accessibilityGranted,
+            extra = when (serviceState) {
+                ServiceState.SWITCHED_ON_BUT_STOPPED -> stringResource(R.string.permissions_stopped_advice)
+                else -> null
+            },
+            actionNeeded = serviceState != ServiceState.WORKING,
             onOpenSettings = onOpenAccessibilitySettings,
         )
 
         Requirement(
             tag = PermissionsTags.USAGE,
             title = stringResource(R.string.permissions_usage_title),
+            state = stringResource(
+                if (usageAccessGranted) R.string.permissions_working else R.string.permissions_off,
+            ),
+            good = usageAccessGranted,
             body = stringResource(R.string.permissions_usage_body),
-            granted = usageAccessGranted,
+            extra = null,
+            actionNeeded = !usageAccessGranted,
             onOpenSettings = onOpenUsageAccessSettings,
+        )
+
+        if (overlayFailure != null) {
+            SoftCard {
+                Text(
+                    text = stringResource(R.string.permissions_overlay_failed, overlayFailure),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = LocalBlockSocialPalette.current.danger,
+                )
+            }
+        }
+
+        Text(
+            text = stringResource(R.string.permissions_no_notifications),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -58,8 +98,11 @@ fun PermissionsScreen(
 private fun Requirement(
     tag: String,
     title: String,
+    state: String,
+    good: Boolean,
     body: String,
-    granted: Boolean,
+    extra: String?,
+    actionNeeded: Boolean,
     onOpenSettings: () -> Unit,
 ) {
     val palette = LocalBlockSocialPalette.current
@@ -70,16 +113,23 @@ private fun Requirement(
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = stringResource(if (granted) R.string.permissions_working else R.string.permissions_off),
+            text = state,
             style = MaterialTheme.typography.labelLarge,
-            color = if (granted) palette.success else palette.warning,
+            color = if (good) palette.success else palette.warning,
         )
         Text(
             text = body,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        if (!granted) {
+        if (extra != null) {
+            Text(
+                text = extra,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        if (actionNeeded) {
             Button(
                 onClick = onOpenSettings,
                 modifier = Modifier

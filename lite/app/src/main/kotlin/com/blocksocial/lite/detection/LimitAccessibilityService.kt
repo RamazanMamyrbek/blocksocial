@@ -23,9 +23,6 @@ class LimitAccessibilityService : AccessibilityService() {
     @Volatile
     private var snapshot: LimitSnapshot = LimitSnapshot.Empty
 
-    @Volatile
-    private var usage: UsageToday = UsageToday.Unavailable
-
     private var pipeline: DetectionPipeline? = null
     private var overlay: WarningOverlayController? = null
     private var scope: CoroutineScope? = null
@@ -48,7 +45,7 @@ class LimitAccessibilityService : AccessibilityService() {
         overlay = WarningOverlayController(
             context = this,
             windowManager = getSystemService(WindowManager::class.java),
-            onDismissed = {},
+            onFailure = container.heartbeat::onOverlayFailed,
         )
         registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
 
@@ -61,23 +58,24 @@ class LimitAccessibilityService : AccessibilityService() {
                     displayNames = catalog.displayNames(),
                     limits = limits,
                 )
-                refreshUsage()
             }
         }
+
+        container.heartbeat.onConnected(this, System.currentTimeMillis())
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
+        container.heartbeat.onEvent(System.currentTimeMillis())
         val activePipeline = pipeline ?: return
 
         val result = activePipeline.onWindowStateChanged(
             packageName = event.packageName?.toString(),
             snapshot = snapshot,
-            readUsage = ::measurementStillPermitted,
+            readUsage = ::measureNow,
         )
 
         if (result.transition.movesTheForeground()) overlay?.dismissIfForegroundLeft(result.app)
-        if (result.transition.endsAVisit()) refreshUsage()
 
         val status = result.status
         if (result.shouldWarn && result.app != null && status != null) {
@@ -100,19 +98,14 @@ class LimitAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun measurementStillPermitted(): UsageToday =
-        if (container.usage.hasUsageAccess()) usage else UsageToday.Unavailable
-
-    private fun refreshUsage() {
+    private fun measureNow(): UsageToday {
         val current = snapshot
-        scope?.launch {
-            usage = runCatching {
-                container.usage.readToday(
-                    packageToApp = current.packageToApp,
-                    countFromByApp = current.limits.mapValues { (_, limit) -> limit.countingFromMillis },
-                )
-            }.getOrDefault(UsageToday.Unavailable)
-        }
+        return runCatching {
+            container.usage.readToday(
+                packageToApp = current.packageToApp,
+                countFromByApp = current.limits.mapValues { (_, limit) -> limit.countingFromMillis },
+            )
+        }.getOrDefault(UsageToday.Unavailable)
     }
 
     override fun onInterrupt() = Unit
@@ -125,21 +118,9 @@ class LimitAccessibilityService : AccessibilityService() {
         pipeline = null
         overlay = null
         snapshot = LimitSnapshot.Empty
+        container.heartbeat.onDisconnected(this)
         return super.onUnbind(intent)
     }
-}
-
-private fun TransitionOutcome.endsAVisit(): Boolean = when (this) {
-    TransitionOutcome.IGNORED_SYSTEM,
-    TransitionOutcome.IGNORED_NOT_A_TARGET,
-    -> true
-
-    TransitionOutcome.TARGET_ENTERED,
-    TransitionOutcome.IGNORED_UNKNOWN_PACKAGE,
-    TransitionOutcome.IGNORED_SELF,
-    TransitionOutcome.IGNORED_OVERLAY,
-    TransitionOutcome.IGNORED_ALREADY_FOREGROUND,
-    -> false
 }
 
 private fun TransitionOutcome.movesTheForeground(): Boolean = when (this) {

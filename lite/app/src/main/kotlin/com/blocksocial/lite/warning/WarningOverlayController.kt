@@ -10,7 +10,7 @@ import com.blocksocial.lite.R
 class WarningOverlayController(
     private val context: Context,
     private val windowManager: WindowManager,
-    private val onDismissed: () -> Unit,
+    private val onFailure: (String) -> Unit = {},
 ) {
 
     private var host: OverlayViewHost? = null
@@ -25,7 +25,11 @@ class WarningOverlayController(
         }
         val newHost = OverlayViewHost(context) { dismiss() }
         newHost.composeView.setContent(content)
-        windowManager.addView(newHost, layoutParams())
+        val attached = runCatching { windowManager.addView(newHost, layoutParams()) }
+        if (attached.isFailure) {
+            onFailure(attached.exceptionOrNull()?.javaClass?.simpleName ?: "unknown")
+            return
+        }
         newHost.onAttachedToWindowManager()
         host = newHost
         shownFor = app
@@ -37,7 +41,6 @@ class WarningOverlayController(
         shownFor = null
         attached.onDetachedFromWindowManager()
         runCatching { windowManager.removeView(attached) }
-        onDismissed()
     }
 
     fun dismissIfForegroundLeft(app: String?) {

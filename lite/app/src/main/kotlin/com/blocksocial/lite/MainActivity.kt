@@ -36,6 +36,8 @@ import com.blocksocial.lite.ui.HomeScreen
 import com.blocksocial.lite.ui.HomeState
 import com.blocksocial.lite.ui.LiteTheme
 import com.blocksocial.lite.ui.PermissionsScreen
+import com.blocksocial.lite.ui.ServiceState
+import com.blocksocial.lite.ui.serviceStateOf
 import com.blocksocial.lite.ui.Spacing
 import com.blocksocial.lite.usage.UsageToday
 import kotlinx.coroutines.delay
@@ -98,7 +100,8 @@ private fun LiteApp(
     var screen by remember { mutableStateOf<Screen>(Screen.Home) }
     var typedMinutes by remember { mutableStateOf(LimitStore.DEFAULT_MINUTES.toString()) }
     var usage by remember { mutableStateOf(UsageToday.Unavailable) }
-    var accessibility by remember { mutableStateOf(accessibilityRunning()) }
+    var service by remember { mutableStateOf(ServiceState.OFF) }
+    var overlayFailure by remember { mutableStateOf<String?>(null) }
 
     val limits by container.limits.limits.collectAsState(initial = emptyMap())
     val installed = remember { container.catalog.installed() }
@@ -111,7 +114,11 @@ private fun LiteApp(
                     packageToApp = container.catalog.packageToApp(),
                     countFromByApp = limits.mapValues { (_, limit) -> limit.countingFromMillis },
                 )
-                accessibility = accessibilityRunning()
+                service = serviceStateOf(
+                    switchedOn = accessibilityRunning(),
+                    running = container.heartbeat.running,
+                )
+                overlayFailure = container.heartbeat.lastOverlayFailure
                 delay(REFRESH_INTERVAL_MILLIS)
             }
         }
@@ -129,7 +136,7 @@ private fun LiteApp(
         Screen.Home -> HomeScreen(
             state = HomeState(
                 rows = rows,
-                protectionWorking = accessibility && usage.measurementAvailable,
+                protectionWorking = service == ServiceState.WORKING && usage.measurementAvailable,
             ),
             onOpenApp = { row ->
                 typedMinutes = (row.status?.limitMinutes ?: LimitStore.DEFAULT_MINUTES).toString()
@@ -141,8 +148,9 @@ private fun LiteApp(
         Screen.Permissions -> {
             BackHandler { screen = Screen.Home }
             PermissionsScreen(
-                accessibilityGranted = accessibility,
+                serviceState = service,
                 usageAccessGranted = usage.measurementAvailable,
+                overlayFailure = overlayFailure,
                 onOpenAccessibilitySettings = openAccessibilitySettings,
                 onOpenUsageAccessSettings = openUsageAccessSettings,
             )

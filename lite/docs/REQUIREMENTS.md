@@ -70,10 +70,12 @@ Someone who already knows which application is eating their day and roughly how 
 
 ### Permissions
 
-- **R-23.** The application needs accessibility access to notice an application coming to the front, and usage access to measure time. It needs nothing else, and requests nothing else.
+- **R-23.** The application needs accessibility access to notice an application coming to the front, and usage access to measure time. It needs nothing else, and requests nothing else. In particular it declares **no notification permission and sends no notifications**, so the notification switch for it in system settings is inert. That is a consequence of R-28, not a fault.
 - **R-24.** When either is missing, the main screen says so at the top and offers a route to the relevant system settings screen.
 - **R-25.** Each permission is explained in terms of what it enables, what is read, and what is never read, before the user is sent to grant it.
 - **R-26.** Revoking usage access takes effect on the very next launch of a limited application, not the one after it.
+- **R-38.** The accessibility row reports whether the service is **answering**, not whether its switch is on. A service that Android lists as enabled but that has been stopped by the system reads as *switched on, but not running*, and says what to do about it. Reporting a dead service as working is the worst failure this product can have, because the user stops watching for the thing that is broken.
+- **R-39.** If the warning cannot be drawn over the other application, that failure is surfaced on the permissions screen rather than swallowed.
 
 ### Storage
 
@@ -117,7 +119,7 @@ Two places where a reasonable person would choose differently, recorded with the
 
 **Entering an application is decided by the package that raised the window, without checking that the window is a recognisable activity.** The stricter check was tried and it cost a real, reported failure: on some firmware the return into an application reports a window whose class does not resolve to an activity, and the warning never appeared. The looser rule can in principle warn about an application appearing in a floating or picture-in-picture window while the user is looking at something else. A warning at a slightly wrong moment is a nuisance; a limit that silently stops enforcing is the product not working. The nuisance was chosen.
 
-**The measurement is cached and refreshed when the foreground leaves a limited application, rather than read fresh on every window change.** A figure can therefore be a few seconds stale. Reading usage events on every window change would put a system query on the path that has to produce a warning within a second. The one thing not allowed to be stale is permission: that is re-checked at the moment of the decision, per R-26.
+**The measurement is read fresh at the moment of the decision, not from a cache.** It was cached at first, refreshed asynchronously when the foreground left a limited application. That saved a system query on a rare code path and cost a whole class of missed warnings: cross the limit while inside the application, leave, and come back before the refresh lands, and the decision is taken against a reading from before the crossing. The query runs only when a visit to a limited application begins — once per launch, not once per window change — so paying for it is cheap and being wrong about it is not.
 
 ## 8. How each requirement is checked
 
@@ -127,6 +129,7 @@ Two places where a reasonable person would choose differently, recorded with the
 | R-15, R-16, R-20, R-21, R-26 | `DetectionPipelineTest` — including the warning returning on every fresh entry and the measurement being read only when a visit begins |
 | R-05, R-06 | `DailyLimitTest` |
 | R-07, R-08 | `TypedMinutesTest` |
+| R-38, R-39 | `ServiceStateTest` |
 | R-01 to R-04, R-17 to R-19, R-22 to R-25 | Driven over `adb` on an emulator; the current results are in `../README.md` |
 | R-29 to R-33 | The manifest, `accessibility_service_config.xml`, and the absence of any network dependency |
 | R-34, R-35 | String resources in `values/` and `values-ru/`; font scaling by inspection |

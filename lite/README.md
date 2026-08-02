@@ -64,9 +64,15 @@ On an Android 16 emulator (`blocksocial_a01`), with the **signed release APK**:
 | "Leave it for today" | warning gone, launcher in front |
 | Application screen after the limit | used today, left today "Nothing left" |
 | Typing a limit | accepted; out of range refused with the range named and the save button unavailable |
+| Crossing the limit while inside, then leaving and returning within a second | warning, and again on three further fast returns |
+| Accessibility service stopped underneath a running app | main screen says limits are not running within one refresh, and goes back to silence when the service returns |
 | Crashes | none |
 
-39 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone; manufacturer firmware alters both mechanisms this product stands on, and an emulator cannot show that.
+45 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone; manufacturer firmware alters both mechanisms this product stands on, and an emulator cannot show that.
+
+## Notifications
+
+There are none, and there is no notification permission. The switch for this application in the system notification settings is therefore inert on some phones — greyed out and unresponsive. That is the expected consequence of R-28 and does not affect limits.
 
 ## Verifying it by hand, from the host
 
