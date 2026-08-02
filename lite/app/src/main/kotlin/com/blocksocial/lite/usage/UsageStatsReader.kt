@@ -44,6 +44,7 @@ class UsageStatsReader(private val context: Context) {
 
     fun readToday(
         packageToApp: Map<String, String>,
+        countFromByApp: Map<String, Long> = emptyMap(),
         now: Instant = Instant.now(),
         zone: ZoneId = ZoneId.systemDefault(),
     ): UsageToday {
@@ -61,6 +62,7 @@ class UsageStatsReader(private val context: Context) {
                 windowStartMillis = dayStart.toEpochMilli(),
                 windowEndMillis = now.toEpochMilli(),
                 deviceBootedAtMillis = System.currentTimeMillis() - SystemClock.elapsedRealtime(),
+                countFromByApp = countFromByApp,
             ),
             measurementAvailable = true,
         )
@@ -86,6 +88,7 @@ class UsageStatsReader(private val context: Context) {
             if (type != null) {
                 collected += UsageEvent(
                     packageName = event.packageName.orEmpty(),
+                    className = event.className,
                     timestampMillis = event.timeStamp,
                     type = type,
                 )

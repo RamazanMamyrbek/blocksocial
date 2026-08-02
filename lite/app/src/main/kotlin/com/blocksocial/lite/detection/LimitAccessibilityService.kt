@@ -2,11 +2,9 @@ package com.blocksocial.lite.detection
 
 import android.accessibilityservice.AccessibilityService
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import com.blocksocial.lite.container
@@ -46,7 +44,6 @@ class LimitAccessibilityService : AccessibilityService() {
         pipeline = DetectionPipeline(
             selfPackage = packageName,
             systemPackages = SystemPackages.resolve(this),
-            isActivityWindow = ::isActivityWindow,
         )
         overlay = WarningOverlayController(
             context = this,
@@ -75,7 +72,6 @@ class LimitAccessibilityService : AccessibilityService() {
 
         val result = activePipeline.onWindowStateChanged(
             packageName = event.packageName?.toString(),
-            className = event.className?.toString(),
             snapshot = snapshot,
             readUsage = ::measurementStillPermitted,
         )
@@ -110,8 +106,12 @@ class LimitAccessibilityService : AccessibilityService() {
     private fun refreshUsage() {
         val current = snapshot
         scope?.launch {
-            usage = runCatching { container.usage.readToday(current.packageToApp) }
-                .getOrDefault(UsageToday.Unavailable)
+            usage = runCatching {
+                container.usage.readToday(
+                    packageToApp = current.packageToApp,
+                    countFromByApp = current.limits.mapValues { (_, limit) -> limit.countingFromMillis },
+                )
+            }.getOrDefault(UsageToday.Unavailable)
         }
     }
 
@@ -127,16 +127,6 @@ class LimitAccessibilityService : AccessibilityService() {
         snapshot = LimitSnapshot.Empty
         return super.onUnbind(intent)
     }
-
-    private fun isActivityWindow(packageName: String, className: String?): Boolean {
-        if (packageName.isBlank() || className.isNullOrBlank()) return false
-        return try {
-            packageManager.getActivityInfo(ComponentName(packageName, className), 0)
-            true
-        } catch (notAnActivity: PackageManager.NameNotFoundException) {
-            false
-        }
-    }
 }
 
 private fun TransitionOutcome.endsAVisit(): Boolean = when (this) {
@@ -148,7 +138,6 @@ private fun TransitionOutcome.endsAVisit(): Boolean = when (this) {
     TransitionOutcome.IGNORED_UNKNOWN_PACKAGE,
     TransitionOutcome.IGNORED_SELF,
     TransitionOutcome.IGNORED_OVERLAY,
-    TransitionOutcome.IGNORED_NOT_AN_ACTIVITY,
     TransitionOutcome.IGNORED_ALREADY_FOREGROUND,
     -> false
 }
@@ -162,7 +151,6 @@ private fun TransitionOutcome.movesTheForeground(): Boolean = when (this) {
     TransitionOutcome.IGNORED_UNKNOWN_PACKAGE,
     TransitionOutcome.IGNORED_SELF,
     TransitionOutcome.IGNORED_OVERLAY,
-    TransitionOutcome.IGNORED_NOT_AN_ACTIVITY,
     TransitionOutcome.IGNORED_ALREADY_FOREGROUND,
     -> false
 }

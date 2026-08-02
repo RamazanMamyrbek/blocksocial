@@ -4,6 +4,7 @@ enum class UsageEventType { MOVED_TO_FOREGROUND, LEFT_FOREGROUND, SCREEN_NON_INT
 
 data class UsageEvent(
     val packageName: String,
+    val className: String?,
     val timestampMillis: Long,
     val type: UsageEventType,
 )
@@ -16,16 +17,19 @@ object ForegroundSessions {
         windowStartMillis: Long,
         windowEndMillis: Long,
         deviceBootedAtMillis: Long,
+        countFromByApp: Map<String, Long> = emptyMap(),
     ): Map<String, Int> {
         val millisByApp = mutableMapOf<String, Long>()
-        val earliestCountableMillis = maxOf(windowStartMillis, deviceBootedAtMillis)
+        val floor = maxOf(windowStartMillis, deviceBootedAtMillis)
         var openApp: String? = null
+        var openClass: String? = null
         var openSinceMillis = 0L
 
         fun close(atMillis: Long) {
             val app = openApp ?: return
             openApp = null
-            val from = openSinceMillis.coerceAtLeast(earliestCountableMillis)
+            openClass = null
+            val from = openSinceMillis.coerceAtLeast(maxOf(floor, countFromByApp[app] ?: Long.MIN_VALUE))
             val to = atMillis.coerceAtMost(windowEndMillis)
             if (to > from) millisByApp[app] = (millisByApp[app] ?: 0L) + (to - from)
         }
@@ -42,10 +46,13 @@ object ForegroundSessions {
                             openApp = app
                             openSinceMillis = event.timestampMillis
                         }
+                        openClass = event.className
                     }
 
                     UsageEventType.LEFT_FOREGROUND ->
-                        if (packageToApp[event.packageName] == openApp) close(event.timestampMillis)
+                        if (packageToApp[event.packageName] == openApp && event.className == openClass) {
+                            close(event.timestampMillis)
+                        }
 
                     UsageEventType.SCREEN_NON_INTERACTIVE -> close(event.timestampMillis)
                 }

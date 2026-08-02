@@ -1,42 +1,40 @@
 # BlockSocial Lite
 
-A second, deliberately smaller application built from the same parts as the one in `../android`. It does one thing: a daily time limit per application, and a warning when that limit is spent.
+A daily time limit for individual applications, and a warning when a limit is spent. That is the whole product.
 
-It installs alongside the full application rather than replacing it — different `applicationId` (`com.blocksocial.lite`), different data, different launcher entry. Both can sit on the same phone at the same time.
+`docs/REQUIREMENTS.md` is the specification; this file is the short version and the record of what has actually been run.
+
+This is its own application — package `com.blocksocial.lite`, its own storage, its own launcher entry, its own release, and its own scope decided in its own requirements document. It happens to share a git repository with the application in `../android` and reuses source from it the way any two projects share a library, but it is not a variant, edition or subset of that one and owes it no alignment. Both install on the same phone at once.
 
 ## What it does
 
-1. Lists the supported applications that are installed on the phone.
-2. Lets you set a daily limit in minutes on any of them.
-3. Measures how long each of them was in the foreground today.
-4. When you open one whose limit is spent, it covers the screen and asks whether you are sure you want to carry on.
-5. It asks again on the next entry, and the one after that. There is no grace period and nothing is remembered between entries.
+1. Lists the supported applications that are installed on the phone, split into those with a limit and those without.
+2. Lets you type a daily limit in minutes for any of them.
+3. Measures how long each was in the foreground today.
+4. When you open one whose limit is spent, it covers the screen with the figures and one question.
+5. It asks again on the next entry, and the one after that. Answering buys no grace period.
 
-Tapping an application shows the two figures that matter: minutes used today, and minutes left.
+Tapping an application shows the two figures that matter: used today and left today.
+
+**Saving a limit starts the count from that moment.** Time you spent in the application earlier the same day does not carry into a limit that did not exist yet. From the next local midnight it counts the whole day.
 
 ## What it deliberately does not do
 
-No history. No statistics beyond today's two figures. No streaks, no refusal rates, no "hours saved". No schedules, no always-on blocking, no focus sessions. No timed bypass grant. No onboarding carousel — just the two permissions and what each one is for.
+No history. No statistics beyond those two figures. No streaks, no refusal rates, no "hours saved". No schedules, no always-on blocking, no focus sessions. No timed pass after carrying on. No onboarding carousel — just the two permissions and what each one is for.
 
-Nothing is stored except the limits themselves. There is no record of when you were warned or what you chose, because nothing in the product needs one.
+Nothing is stored except, per application, the limit and the moment it was set. There is no record of when you were warned or what you chose, because nothing here needs one.
 
-## How it differs structurally from `../android`
+`docs/REQUIREMENTS.md` section 6 lists what is out of scope and why each was refused.
 
-| | `../android` | here |
-|---|---|---|
-| Modules | eleven | one |
-| Storage | Room and DataStore | DataStore only, one integer per application |
-| Dependency injection | Hilt | a `Container` built in `Application` |
-| Rules | always-on, schedule, daily limit | daily limit |
-| After a warning | a five-minute bypass grant | nothing; the next entry asks again |
+## How it is built
 
-Hilt and Room were dropped rather than copied. Neither earns its place in an application with one screen of state and one integer per application to persist, and both cost build time and indirection that would be the largest thing in this source tree. That is a deviation from the stack named in `../AGENTS.md`, which describes the full application; it is recorded here rather than left to be discovered.
+One Gradle module. DataStore for two values per application, no database. Dependencies are constructed in a `Container` held by `Application`; there is no dependency-injection framework. Neither Room nor Hilt earns its place in an application with one screen of state, and both would have been the largest thing in this source tree. `../AGENTS.md` names a different stack for the application it describes; this one is recorded here so the difference is deliberate rather than discovered.
 
-The parts that were copied nearly verbatim are the ones that were expensive to get right: `usage/ForegroundSessions.kt`, `usage/UsageStatsReader.kt`, `detection/ForegroundTransitionTracker.kt`, `detection/SystemPackages.kt` and `warning/OverlayViewHost.kt`. They carry the fixes those files earned, including counting no minute earlier than the last boot and treating `MOVE_TO_BACKGROUND` as the end of a visit.
+The parts taken from `../android` are the ones that were expensive to get right: foreground-session accumulation, the usage reader, the transition tracker, the never-blocked system package list, and the overlay host. They carry the fixes those files earned — counting no minute earlier than the last boot among them — plus the ones found here and not yet carried back.
 
 ## Privacy
 
-Unchanged from the full application, and narrower. The accessibility service reads the package name of whatever came to the front and the moment it happened. It never reads screen content — `canRetrieveWindowContent` is `false` in `accessibility_service_config.xml`, so the system enforces that rather than the code. Usage access supplies foreground durations for the catalog applications only. Nothing leaves the phone; there is no network permission at all.
+The accessibility service reads the package name of whatever came to the front and the moment it happened. It never reads screen content: `canRetrieveWindowContent` is `false` in `accessibility_service_config.xml`, so the system enforces that rather than the code promising it. Usage access supplies foreground durations for the catalog applications only. Nothing leaves the phone; there is no network permission at all.
 
 ## Building
 
@@ -54,19 +52,21 @@ The release build is signed with the same hand-testing keystore as the full appl
 
 ## What has been verified
 
-On an Android 16 emulator (`blocksocial_a01`), with the **signed release APK**, YouTube restricted to five minutes a day:
+On an Android 16 emulator (`blocksocial_a01`), with the **signed release APK**:
 
 | | |
 |---|---|
-| Under the limit | 0 of 5 minutes shown on the list, no warning on entry |
-| Five minutes held in the foreground | measured 6, warning on the next entry |
-| Warning contents | "About 6 minutes in YouTube today, against a limit of 5." |
-| "Carry on anyway", then leave and return | warning again — three times in a row, debug and release |
+| A limit saved after ten minutes already spent in YouTube today | list shows 0 of 2 minutes — the count restarts, per R-14 |
+| Opening the application straight after saving | no warning |
+| Two minutes held in the foreground, then leave and return | warning |
+| Warning contents | "About 10 minutes in YouTube today, against a limit of 1." — the figure that caused it, per R-17 |
+| "Carry on anyway", then leave and return | warning again, three times in a row on release and five on debug |
 | "Leave it for today" | warning gone, launcher in front |
-| Application screen after the limit | used today 8 min, left today "Nothing left" |
+| Application screen after the limit | used today, left today "Nothing left" |
+| Typing a limit | accepted; out of range refused with the range named and the save button unavailable |
 | Crashes | none |
 
-24 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone, and the note in `../docs/COMPATIBILITY.md` about manufacturer firmware applies to this application unchanged — it uses the same two Android mechanisms.
+39 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone; manufacturer firmware alters both mechanisms this product stands on, and an emulator cannot show that.
 
 ## Verifying it by hand, from the host
 

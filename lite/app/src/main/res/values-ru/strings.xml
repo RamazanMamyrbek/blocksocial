@@ -10,8 +10,18 @@
     <string name="home_no_apps">Ни одно из поддерживаемых приложений не установлено на этом телефоне.</string>
     <string name="home_tap_to_set">Нажмите, чтобы задать дневной лимит</string>
     <string name="home_not_measured">Без доступа к статистике время не измерить</string>
-    <string name="home_used">%1$d из %2$d минут сегодня</string>
-    <string name="home_reached">%1$d из %2$d минут — лимит израсходован</string>
+    <plurals name="home_used">
+        <item quantity="one">%1$d из %2$d минуты сегодня</item>
+        <item quantity="few">%1$d из %2$d минут сегодня</item>
+        <item quantity="many">%1$d из %2$d минут сегодня</item>
+        <item quantity="other">%1$d из %2$d минут сегодня</item>
+    </plurals>
+    <plurals name="home_reached">
+        <item quantity="one">%1$d из %2$d минуты — лимит израсходован</item>
+        <item quantity="few">%1$d из %2$d минут — лимит израсходован</item>
+        <item quantity="many">%1$d из %2$d минут — лимит израсходован</item>
+        <item quantity="other">%1$d из %2$d минут — лимит израсходован</item>
+    </plurals>
 
     <string name="limit_used_label">Использовано сегодня</string>
     <string name="limit_remaining_label">Осталось сегодня</string>
@@ -20,8 +30,9 @@
     <string name="limit_not_measured">Время не измеряется, пока не выдан доступ к статистике.</string>
     <string name="limit_editor_header">Дневной лимит</string>
     <string name="limit_minutes_per_day">Минут в день</string>
-    <string name="limit_lower">Уменьшить дневной лимит на 5 минут</string>
-    <string name="limit_raise">Увеличить дневной лимит на 5 минут</string>
+    <string name="limit_minutes_suffix">мин</string>
+    <string name="limit_out_of_range">Введите число от %1$d до %2$d.</string>
+    <string name="limit_starts_now">Сохранение начинает отсчёт с этого момента. Время, проведённое сегодня раньше, не переносится.</string>
     <string name="limit_set">Задать лимит</string>
     <string name="limit_save">Сохранить лимит</string>
     <string name="limit_remove">Убрать лимит</string>
@@ -41,7 +52,12 @@
 
     <string name="warning_app_line">Вы открыли %1$s</string>
     <string name="warning_headline">Ваш лимит на сегодня израсходован</string>
-    <string name="warning_measurement">Около %1$d мин в приложении %2$s сегодня при лимите %3$d.</string>
+    <plurals name="warning_measurement">
+        <item quantity="one">Около %1$d минуты в приложении %2$s сегодня при лимите %3$d.</item>
+        <item quantity="few">Около %1$d минут в приложении %2$s сегодня при лимите %3$d.</item>
+        <item quantity="many">Около %1$d минут в приложении %2$s сегодня при лимите %3$d.</item>
+        <item quantity="other">Около %1$d минут в приложении %2$s сегодня при лимите %3$d.</item>
+    </plurals>
     <string name="warning_question">Точно продолжить?</string>
     <string name="warning_leave">Оставить на сегодня</string>
     <string name="warning_continue">Всё равно продолжить</string>

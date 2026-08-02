@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -111,8 +112,19 @@ private fun AppRowCard(row: AppRow, onOpenApp: (AppRow) -> Unit) {
     val summary = when {
         status == null -> stringResource(R.string.home_tap_to_set)
         !status.measured -> stringResource(R.string.home_not_measured)
-        status.reached -> stringResource(R.string.home_reached, status.usedMinutes ?: 0, status.limitMinutes)
-        else -> stringResource(R.string.home_used, status.usedMinutes ?: 0, status.limitMinutes)
+        status.reached -> pluralStringResource(
+            R.plurals.home_reached,
+            status.limitMinutes,
+            status.usedMinutes ?: 0,
+            status.limitMinutes,
+        )
+
+        else -> pluralStringResource(
+            R.plurals.home_used,
+            status.limitMinutes,
+            status.usedMinutes ?: 0,
+            status.limitMinutes,
+        )
     }
 
     SoftRow(

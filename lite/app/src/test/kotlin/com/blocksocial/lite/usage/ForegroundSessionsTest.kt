@@ -16,17 +16,20 @@ class ForegroundSessionsTest {
 
     private fun at(text: String) = Instant.parse(text).toEpochMilli()
 
-    private fun foreground(packageName: String, text: String) =
-        UsageEvent(packageName, at(text), UsageEventType.MOVED_TO_FOREGROUND)
+    private fun foreground(packageName: String, text: String, className: String = "Main") =
+        UsageEvent(packageName, className, at(text), UsageEventType.MOVED_TO_FOREGROUND)
 
-    private fun leftForeground(packageName: String, text: String) =
-        UsageEvent(packageName, at(text), UsageEventType.LEFT_FOREGROUND)
+    private fun leftForeground(packageName: String, text: String, className: String = "Main") =
+        UsageEvent(packageName, className, at(text), UsageEventType.LEFT_FOREGROUND)
 
     private fun screenOff(text: String) =
-        UsageEvent("android", at(text), UsageEventType.SCREEN_NON_INTERACTIVE)
+        UsageEvent("android", null, at(text), UsageEventType.SCREEN_NON_INTERACTIVE)
 
-    private fun minutes(events: List<UsageEvent>, bootedAt: Long = bootedYesterday) =
-        ForegroundSessions.minutesByApp(events, packageToApp, dayStart, now, bootedAt)
+    private fun minutes(
+        events: List<UsageEvent>,
+        bootedAt: Long = bootedYesterday,
+        countFrom: Map<String, Long> = emptyMap(),
+    ) = ForegroundSessions.minutesByApp(events, packageToApp, dayStart, now, bootedAt, countFrom)
 
     @Test
     fun aVisitIsMeasuredFromEntryToTheNextForegroundChange() {
@@ -141,6 +144,69 @@ class ForegroundSessionsTest {
         )
 
         assertEquals(setOf(youtube), measured.keys)
+    }
+
+    @Test
+    fun movingBetweenScreensInsideTheApplicationIsStillOneUninterruptedVisit() {
+        val measured = minutes(
+            listOf(
+                foreground("com.google.android.youtube", "2026-07-28T09:00:00+09:00", "Home"),
+                foreground("com.google.android.youtube", "2026-07-28T09:01:00+09:00", "Watch"),
+                leftForeground("com.google.android.youtube", "2026-07-28T09:01:01+09:00", "Home"),
+                foreground("com.google.android.youtube", "2026-07-28T09:20:00+09:00", "Fullscreen"),
+                leftForeground("com.google.android.youtube", "2026-07-28T09:20:01+09:00", "Watch"),
+                foreground("com.android.chrome", "2026-07-28T09:40:00+09:00"),
+            ),
+        )
+
+        assertEquals(40, measured[youtube])
+    }
+
+    @Test
+    fun theVisitEndsWhenTheScreenTheUserIsActuallyOnLeavesTheForeground() {
+        val measured = minutes(
+            listOf(
+                foreground("com.google.android.youtube", "2026-07-28T09:00:00+09:00", "Home"),
+                foreground("com.google.android.youtube", "2026-07-28T09:01:00+09:00", "Watch"),
+                leftForeground("com.google.android.youtube", "2026-07-28T09:11:00+09:00", "Watch"),
+            ),
+        )
+
+        assertEquals(11, measured[youtube])
+    }
+
+    @Test
+    fun aLimitSetPartWayThroughTheDayCountsOnlyFromTheMomentItWasSet() {
+        val measured = minutes(
+            listOf(
+                foreground("com.google.android.youtube", "2026-07-28T08:00:00+09:00"),
+                foreground("com.android.chrome", "2026-07-28T09:00:00+09:00"),
+                foreground("com.google.android.youtube", "2026-07-28T09:30:00+09:00"),
+            ),
+            countFrom = mapOf(youtube to at("2026-07-28T09:20:00+09:00")),
+        )
+
+        assertEquals(30, measured[youtube])
+    }
+
+    @Test
+    fun aLimitSetDuringAVisitCountsFromThatMomentRatherThanFromTheStartOfTheVisit() {
+        val measured = minutes(
+            listOf(foreground("com.google.android.youtube", "2026-07-28T08:00:00+09:00")),
+            countFrom = mapOf(youtube to at("2026-07-28T09:00:00+09:00")),
+        )
+
+        assertEquals(60, measured[youtube])
+    }
+
+    @Test
+    fun aLimitSetOnAnEarlierDayDoesNotHoldBackTodaysCount() {
+        val measured = minutes(
+            listOf(foreground("com.google.android.youtube", "2026-07-28T09:00:00+09:00")),
+            countFrom = mapOf(youtube to at("2026-07-26T15:00:00+09:00")),
+        )
+
+        assertEquals(60, measured[youtube])
     }
 
     @Test

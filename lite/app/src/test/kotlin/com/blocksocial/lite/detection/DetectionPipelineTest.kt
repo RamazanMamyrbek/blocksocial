@@ -1,5 +1,6 @@
 package com.blocksocial.lite.detection
 
+import com.blocksocial.lite.data.Limit
 import com.blocksocial.lite.usage.UsageToday
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -15,7 +16,6 @@ class DetectionPipelineTest {
     private fun pipeline() = DetectionPipeline(
         selfPackage = "com.blocksocial.lite",
         systemPackages = setOf("com.android.settings", "com.android.launcher"),
-        isActivityWindow = { _, _ -> true },
     )
 
     private fun snapshot(limits: Map<String, Int>) = LimitSnapshot(
@@ -24,7 +24,7 @@ class DetectionPipelineTest {
             "com.instagram.android" to instagram,
         ),
         displayNames = mapOf(youtube to "YouTube", instagram to "Instagram"),
-        limits = limits,
+        limits = limits.mapValues { (_, minutes) -> Limit(minutes, countingFromMillis = 0L) },
     )
 
     private fun used(minutes: Map<String, Int>) = { UsageToday(minutes, measurementAvailable = true) }
@@ -33,7 +33,6 @@ class DetectionPipelineTest {
     fun anApplicationOverItsLimitIsWarnedAbout() {
         val result = pipeline().onWindowStateChanged(
             "com.google.android.youtube",
-            "Main",
             snapshot(mapOf(youtube to 30)),
             used(mapOf(youtube to 47)),
         )
@@ -48,7 +47,6 @@ class DetectionPipelineTest {
     fun anApplicationUnderItsLimitIsLeftAlone() {
         val result = pipeline().onWindowStateChanged(
             "com.google.android.youtube",
-            "Main",
             snapshot(mapOf(youtube to 30)),
             used(mapOf(youtube to 12)),
         )
@@ -61,7 +59,6 @@ class DetectionPipelineTest {
     fun anApplicationWithoutALimitIsNotEvenTracked() {
         val result = pipeline().onWindowStateChanged(
             "com.instagram.android",
-            "Main",
             snapshot(mapOf(youtube to 30)),
             used(mapOf(instagram to 200)),
         )
@@ -74,7 +71,6 @@ class DetectionPipelineTest {
     fun withoutAMeasurementNothingIsWarnedAbout() {
         val result = pipeline().onWindowStateChanged(
             "com.google.android.youtube",
-            "Main",
             snapshot(mapOf(youtube to 5)),
             { UsageToday.Unavailable },
         )
@@ -87,16 +83,61 @@ class DetectionPipelineTest {
     fun theWarningIsRaisedAgainOnEveryFreshEntry() {
         val pipeline = pipeline()
         val over = snapshot(mapOf(youtube to 30))
+        val spent = used(mapOf(youtube to 47))
 
-        val first = pipeline.onWindowStateChanged("com.google.android.youtube", "Main", over, used(mapOf(youtube to 47)))
-        val staying = pipeline.onWindowStateChanged("com.google.android.youtube", "Main", over, used(mapOf(youtube to 47)))
-        pipeline.onWindowStateChanged("com.android.launcher", "Home", over, used(mapOf(youtube to 47)))
-        val second = pipeline.onWindowStateChanged("com.google.android.youtube", "Main", over, used(mapOf(youtube to 47)))
+        val first = pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+        val staying = pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+        pipeline.onWindowStateChanged("com.android.launcher", over, spent)
+        val second = pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+        pipeline.onWindowStateChanged("com.instagram.android", over, spent)
+        val third = pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
 
         assertTrue(first.shouldWarn)
         assertEquals(TransitionOutcome.IGNORED_ALREADY_FOREGROUND, staying.transition)
         assertFalse(staying.shouldWarn)
         assertTrue(second.shouldWarn)
+        assertTrue(third.shouldWarn)
+    }
+
+    @Test
+    fun aWindowThatIsNotARecognisableActivityStillCountsAsEnteringTheApplication() {
+        val pipeline = pipeline()
+        val over = snapshot(mapOf(youtube to 30))
+        val spent = used(mapOf(youtube to 47))
+
+        pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+        pipeline.onWindowStateChanged("com.android.launcher", over, spent)
+        val returning = pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+
+        assertTrue(returning.shouldWarn)
+    }
+
+    @Test
+    fun ourOwnWarningWindowDoesNotEndTheVisitAndCauseItToReappear() {
+        val pipeline = pipeline()
+        val over = snapshot(mapOf(youtube to 30))
+        val spent = used(mapOf(youtube to 47))
+
+        pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+        val ours = pipeline.onWindowStateChanged("com.blocksocial.lite", over, spent)
+        val back = pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+
+        assertEquals(TransitionOutcome.IGNORED_SELF, ours.transition)
+        assertEquals(TransitionOutcome.IGNORED_ALREADY_FOREGROUND, back.transition)
+    }
+
+    @Test
+    fun theStatusBarComingDownDoesNotEndTheVisit() {
+        val pipeline = pipeline()
+        val over = snapshot(mapOf(youtube to 30))
+        val spent = used(mapOf(youtube to 47))
+
+        pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+        val shade = pipeline.onWindowStateChanged("com.android.systemui", over, spent)
+        val back = pipeline.onWindowStateChanged("com.google.android.youtube", over, spent)
+
+        assertEquals(TransitionOutcome.IGNORED_OVERLAY, shade.transition)
+        assertEquals(TransitionOutcome.IGNORED_ALREADY_FOREGROUND, back.transition)
     }
 
     @Test
@@ -106,12 +147,12 @@ class DetectionPipelineTest {
         val pipeline = pipeline()
         val limited = snapshot(mapOf(youtube to 30))
 
-        pipeline.onWindowStateChanged("com.android.settings", "Main", limited, readUsage)
-        pipeline.onWindowStateChanged("com.instagram.android", "Main", limited, readUsage)
+        pipeline.onWindowStateChanged("com.android.settings", limited, readUsage)
+        pipeline.onWindowStateChanged("com.instagram.android", limited, readUsage)
         assertEquals(0, reads)
 
-        pipeline.onWindowStateChanged("com.google.android.youtube", "Main", limited, readUsage)
-        pipeline.onWindowStateChanged("com.google.android.youtube", "Main", limited, readUsage)
+        pipeline.onWindowStateChanged("com.google.android.youtube", limited, readUsage)
+        pipeline.onWindowStateChanged("com.google.android.youtube", limited, readUsage)
         assertEquals(1, reads)
     }
 
@@ -119,7 +160,6 @@ class DetectionPipelineTest {
     fun blockSocialLiteNeverWarnsAboutItself() {
         val result = pipeline().onWindowStateChanged(
             "com.blocksocial.lite",
-            "Main",
             snapshot(mapOf(youtube to 30)),
             used(mapOf(youtube to 47)),
         )
@@ -131,7 +171,6 @@ class DetectionPipelineTest {
     fun aCriticalSystemApplicationIsNeverWarnedAbout() {
         val result = pipeline().onWindowStateChanged(
             "com.android.settings",
-            "Main",
             snapshot(mapOf(youtube to 30)),
             used(mapOf(youtube to 47)),
         )

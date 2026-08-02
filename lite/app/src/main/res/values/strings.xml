@@ -12,8 +12,14 @@
     <string name="home_no_apps">None of the supported applications is installed on this phone.</string>
     <string name="home_tap_to_set">Tap to set a daily limit</string>
     <string name="home_not_measured">Time cannot be measured without usage access</string>
-    <string name="home_used">%1$d of %2$d minutes today</string>
-    <string name="home_reached">%1$d of %2$d minutes — limit spent</string>
+    <plurals name="home_used">
+        <item quantity="one">%1$d of %2$d minute today</item>
+        <item quantity="other">%1$d of %2$d minutes today</item>
+    </plurals>
+    <plurals name="home_reached">
+        <item quantity="one">%1$d of %2$d minute — limit spent</item>
+        <item quantity="other">%1$d of %2$d minutes — limit spent</item>
+    </plurals>
 
     <string name="limit_used_label">Used today</string>
     <string name="limit_remaining_label">Left today</string>
@@ -22,8 +28,9 @@
     <string name="limit_not_measured">Time cannot be measured until usage access is granted.</string>
     <string name="limit_editor_header">Daily limit</string>
     <string name="limit_minutes_per_day">Minutes per day</string>
-    <string name="limit_lower">Lower the daily limit by 5 minutes</string>
-    <string name="limit_raise">Raise the daily limit by 5 minutes</string>
+    <string name="limit_minutes_suffix">min</string>
+    <string name="limit_out_of_range">Enter a number between %1$d and %2$d.</string>
+    <string name="limit_starts_now">Saving starts the count from now. Time spent earlier today does not come with it.</string>
     <string name="limit_set">Set the limit</string>
     <string name="limit_save">Save the limit</string>
     <string name="limit_remove">Remove the limit</string>
@@ -44,7 +51,10 @@
     <string name="warning_window_title" translatable="false">BlockSocial Lite warning</string>
     <string name="warning_app_line">You opened %1$s</string>
     <string name="warning_headline">Your limit for today is spent</string>
-    <string name="warning_measurement">About %1$d minutes in %2$s today, against a limit of %3$d.</string>
+    <plurals name="warning_measurement">
+        <item quantity="one">About %1$d minute in %2$s today, against a limit of %3$d.</item>
+        <item quantity="other">About %1$d minutes in %2$s today, against a limit of %3$d.</item>
+    </plurals>
     <string name="warning_question">Are you sure you want to carry on?</string>
     <string name="warning_leave">Leave it for today</string>
     <string name="warning_continue">Carry on anyway</string>

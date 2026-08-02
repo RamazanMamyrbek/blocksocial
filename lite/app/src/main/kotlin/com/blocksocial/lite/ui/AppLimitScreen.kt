@@ -2,23 +2,21 @@ package com.blocksocial.lite.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.blocksocial.lite.R
 import com.blocksocial.lite.data.LimitStore
@@ -27,20 +25,26 @@ import com.blocksocial.lite.domain.LimitStatus
 object AppLimitTags {
     const val USED = "limit-used"
     const val REMAINING = "limit-remaining"
-    const val VALUE = "limit-value"
+    const val FIELD = "limit-field"
+    const val ERROR = "limit-error"
     const val SAVE = "limit-save"
     const val REMOVE = "limit-remove"
 }
+
+fun minutesTypedIn(text: String): Int? = text.trim().toIntOrNull()
+    ?.takeIf { it in LimitStore.MINIMUM_MINUTES..LimitStore.MAXIMUM_MINUTES }
 
 @Composable
 fun AppLimitScreen(
     displayName: String,
     status: LimitStatus?,
-    draftMinutes: Int,
-    onDraftChange: (Int) -> Unit,
-    onSave: () -> Unit,
+    typedMinutes: String,
+    onTypedMinutesChange: (String) -> Unit,
+    onSave: (Int) -> Unit,
     onRemove: () -> Unit,
 ) {
+    val accepted = minutesTypedIn(typedMinutes)
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
@@ -84,21 +88,45 @@ fun AppLimitScreen(
 
         SectionHeader(stringResource(R.string.limit_editor_header))
 
-        SoftRow {
+        OutlinedTextField(
+            value = typedMinutes,
+            onValueChange = { typed -> onTypedMinutesChange(typed.filter { it.isDigit() }.take(4)) },
+            label = { Text(stringResource(R.string.limit_minutes_per_day)) },
+            suffix = { Text(stringResource(R.string.limit_minutes_suffix)) },
+            singleLine = true,
+            isError = typedMinutes.isNotEmpty() && accepted == null,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            textStyle = TextStyle(fontFamily = Numeric.fontFamily),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(AppLimitTags.FIELD),
+        )
+
+        if (typedMinutes.isNotEmpty() && accepted == null) {
             Text(
-                text = stringResource(R.string.limit_minutes_per_day),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f),
-            )
-            Stepper(
-                minutes = draftMinutes,
-                onChange = onDraftChange,
+                text = stringResource(
+                    R.string.limit_out_of_range,
+                    LimitStore.MINIMUM_MINUTES,
+                    LimitStore.MAXIMUM_MINUTES,
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = LocalBlockSocialPalette.current.danger,
+                modifier = Modifier.testTag(AppLimitTags.ERROR),
             )
         }
 
+        Text(
+            text = stringResource(R.string.limit_starts_now),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
         Button(
-            onClick = onSave,
+            onClick = { accepted?.let(onSave) },
+            enabled = accepted != null,
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = 56.dp)
@@ -141,43 +169,6 @@ private fun Figure(tag: String, label: String, value: String) {
         color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.testTag(tag),
     )
-}
-
-@Composable
-private fun Stepper(minutes: Int, onChange: (Int) -> Unit) {
-    val lower = stringResource(R.string.limit_lower)
-    val raise = stringResource(R.string.limit_raise)
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        FilledTonalButton(
-            onClick = { onChange((minutes - LimitStore.STEP_MINUTES).coerceAtLeast(LimitStore.MINIMUM_MINUTES)) },
-            modifier = Modifier
-                .size(48.dp)
-                .semantics { contentDescription = lower },
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-        ) {
-            Icon(LiteIcons.Pause, contentDescription = null, modifier = Modifier.size(16.dp))
-        }
-        Text(
-            text = minutes.toString(),
-            style = Numeric.copy(fontSize = MaterialTheme.typography.titleLarge.fontSize),
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .defaultMinSize(minWidth = 48.dp)
-                .testTag(AppLimitTags.VALUE),
-        )
-        FilledTonalButton(
-            onClick = { onChange((minutes + LimitStore.STEP_MINUTES).coerceAtMost(LimitStore.MAXIMUM_MINUTES)) },
-            modifier = Modifier
-                .size(48.dp)
-                .semantics { contentDescription = raise },
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-        ) {
-            Icon(LiteIcons.Plus, contentDescription = null, modifier = Modifier.size(16.dp))
-        }
-    }
 }
 
 @Composable

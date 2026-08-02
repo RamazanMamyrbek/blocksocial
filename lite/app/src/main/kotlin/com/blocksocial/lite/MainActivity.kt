@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,7 +37,11 @@ import com.blocksocial.lite.ui.HomeState
 import com.blocksocial.lite.ui.LiteTheme
 import com.blocksocial.lite.ui.PermissionsScreen
 import com.blocksocial.lite.ui.Spacing
+import com.blocksocial.lite.usage.UsageToday
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private const val REFRESH_INTERVAL_MILLIS = 20_000L
 
 class MainActivity : ComponentActivity() {
 
@@ -93,18 +96,24 @@ private fun LiteApp(
     val work = rememberCoroutineScope()
 
     var screen by remember { mutableStateOf<Screen>(Screen.Home) }
-    var draftMinutes by remember { mutableIntStateOf(LimitStore.DEFAULT_MINUTES) }
-    var usage by remember { mutableStateOf(container.usage.readToday(container.catalog.packageToApp())) }
+    var typedMinutes by remember { mutableStateOf(LimitStore.DEFAULT_MINUTES.toString()) }
+    var usage by remember { mutableStateOf(UsageToday.Unavailable) }
     var accessibility by remember { mutableStateOf(accessibilityRunning()) }
 
     val limits by container.limits.limits.collectAsState(initial = emptyMap())
     val installed = remember { container.catalog.installed() }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner) {
+    LaunchedEffect(lifecycleOwner, limits) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            usage = container.usage.readToday(container.catalog.packageToApp())
-            accessibility = accessibilityRunning()
+            while (true) {
+                usage = container.usage.readToday(
+                    packageToApp = container.catalog.packageToApp(),
+                    countFromByApp = limits.mapValues { (_, limit) -> limit.countingFromMillis },
+                )
+                accessibility = accessibilityRunning()
+                delay(REFRESH_INTERVAL_MILLIS)
+            }
         }
     }
 
@@ -112,7 +121,7 @@ private fun LiteApp(
         AppRow(
             id = app.id,
             displayName = app.displayName,
-            status = DailyLimit.statusOf(limits[app.id], usage.minutesFor(app.id)),
+            status = DailyLimit.statusOf(limits[app.id]?.minutes, usage.minutesFor(app.id)),
         )
     }
 
@@ -123,7 +132,7 @@ private fun LiteApp(
                 protectionWorking = accessibility && usage.measurementAvailable,
             ),
             onOpenApp = { row ->
-                draftMinutes = row.status?.limitMinutes ?: LimitStore.DEFAULT_MINUTES
+                typedMinutes = (row.status?.limitMinutes ?: LimitStore.DEFAULT_MINUTES).toString()
                 screen = Screen.Limit(row.id)
             },
             onFixProtection = { screen = Screen.Permissions },
@@ -145,10 +154,12 @@ private fun LiteApp(
             AppLimitScreen(
                 displayName = row.displayName,
                 status = row.status,
-                draftMinutes = draftMinutes,
-                onDraftChange = { draftMinutes = it },
-                onSave = {
-                    work.launch { container.limits.setLimit(current.appId, draftMinutes) }
+                typedMinutes = typedMinutes,
+                onTypedMinutesChange = { typedMinutes = it },
+                onSave = { minutes ->
+                    work.launch {
+                        container.limits.setLimit(current.appId, minutes, System.currentTimeMillis())
+                    }
                     screen = Screen.Home
                 },
                 onRemove = {
