@@ -52,6 +52,22 @@ The release build is signed with the same hand-testing keystore as the full appl
 ./gradlew :app:assembleRelease
 ```
 
+## What has been verified
+
+On an Android 16 emulator (`blocksocial_a01`), with the **signed release APK**, YouTube restricted to five minutes a day:
+
+| | |
+|---|---|
+| Under the limit | 0 of 5 minutes shown on the list, no warning on entry |
+| Five minutes held in the foreground | measured 6, warning on the next entry |
+| Warning contents | "About 6 minutes in YouTube today, against a limit of 5." |
+| "Carry on anyway", then leave and return | warning again — three times in a row, debug and release |
+| "Leave it for today" | warning gone, launcher in front |
+| Application screen after the limit | used today 8 min, left today "Nothing left" |
+| Crashes | none |
+
+24 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone, and the note in `../docs/COMPATIBILITY.md` about manufacturer firmware applies to this application unchanged — it uses the same two Android mechanisms.
+
 ## Verifying it by hand, from the host
 
 No phone is touched. Everything is driven over `adb`:
