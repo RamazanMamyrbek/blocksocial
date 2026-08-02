@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">BlockSocial Lite</string>
+
+    <string name="accessibility_service_label">BlockSocial Lite limits</string>
+    <string name="accessibility_service_description">Notices when an application you set a daily limit for comes to the front, so BlockSocial Lite can tell you the limit is spent. It reads the name of that application and nothing else.</string>
+
+    <string name="home_permissions_title">Limits are not running</string>
+    <string name="home_permissions_body">Two permissions are missing. Tap to fix.</string>
+    <string name="home_with_limit">With a daily limit</string>
+    <string name="home_without_limit">No limit yet</string>
+    <string name="home_no_apps">None of the supported applications is installed on this phone.</string>
+    <string name="home_tap_to_set">Tap to set a daily limit</string>
+    <string name="home_not_measured">Time cannot be measured without usage access</string>
+    <string name="home_used">%1$d of %2$d minutes today</string>
+    <string name="home_reached">%1$d of %2$d minutes — limit spent</string>
+
+    <string name="limit_used_label">Used today</string>
+    <string name="limit_remaining_label">Left today</string>
+    <string name="limit_none_left">Nothing left</string>
+    <string name="limit_no_limit_yet">No daily limit yet. Set one and BlockSocial Lite will tell you when it is spent.</string>
+    <string name="limit_not_measured">Time cannot be measured until usage access is granted.</string>
+    <string name="limit_editor_header">Daily limit</string>
+    <string name="limit_minutes_per_day">Minutes per day</string>
+    <string name="limit_lower">Lower the daily limit by 5 minutes</string>
+    <string name="limit_raise">Raise the daily limit by 5 minutes</string>
+    <string name="limit_set">Set the limit</string>
+    <string name="limit_save">Save the limit</string>
+    <string name="limit_remove">Remove the limit</string>
+
+    <string name="duration_minutes">%1$d min</string>
+    <string name="duration_hours">%1$d h</string>
+    <string name="duration_hours_minutes">%1$d h %2$d min</string>
+
+    <string name="permissions_title">What this needs</string>
+    <string name="permissions_working">Working</string>
+    <string name="permissions_off">Off</string>
+    <string name="permissions_open_settings">Open settings</string>
+    <string name="permissions_accessibility_title">Accessibility access</string>
+    <string name="permissions_accessibility_body">Lets BlockSocial Lite notice the moment a limited application comes to the front. It reads the name of that application and the moment it happened. Not the text on your screen, not your messages, not what you type.</string>
+    <string name="permissions_usage_title">Usage access</string>
+    <string name="permissions_usage_body">Lets BlockSocial Lite measure how long a limited application was in front today. Without it there is no daily limit, because there is nothing to count.</string>
+
+    <string name="warning_window_title" translatable="false">BlockSocial Lite warning</string>
+    <string name="warning_app_line">You opened %1$s</string>
+    <string name="warning_headline">Your limit for today is spent</string>
+    <string name="warning_measurement">About %1$d minutes in %2$s today, against a limit of %3$d.</string>
+    <string name="warning_question">Are you sure you want to carry on?</string>
+    <string name="warning_leave">Leave it for today</string>
+    <string name="warning_continue">Carry on anyway</string>
+</resources>

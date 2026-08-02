@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Лимиты BlockSocial Lite</string>
+    <string name="accessibility_service_description">Замечает момент, когда приложение с дневным лимитом выходит на передний план, чтобы BlockSocial Lite мог сказать, что лимит израсходован. Читает только имя этого приложения и ничего больше.</string>
+
+    <string name="home_permissions_title">Лимиты не работают</string>
+    <string name="home_permissions_body">Не хватает двух разрешений. Нажмите, чтобы исправить.</string>
+    <string name="home_with_limit">С дневным лимитом</string>
+    <string name="home_without_limit">Без лимита</string>
+    <string name="home_no_apps">Ни одно из поддерживаемых приложений не установлено на этом телефоне.</string>
+    <string name="home_tap_to_set">Нажмите, чтобы задать дневной лимит</string>
+    <string name="home_not_measured">Без доступа к статистике время не измерить</string>
+    <string name="home_used">%1$d из %2$d минут сегодня</string>
+    <string name="home_reached">%1$d из %2$d минут — лимит израсходован</string>
+
+    <string name="limit_used_label">Использовано сегодня</string>
+    <string name="limit_remaining_label">Осталось сегодня</string>
+    <string name="limit_none_left">Ничего не осталось</string>
+    <string name="limit_no_limit_yet">Дневного лимита пока нет. Задайте его, и BlockSocial Lite скажет, когда он израсходован.</string>
+    <string name="limit_not_measured">Время не измеряется, пока не выдан доступ к статистике.</string>
+    <string name="limit_editor_header">Дневной лимит</string>
+    <string name="limit_minutes_per_day">Минут в день</string>
+    <string name="limit_lower">Уменьшить дневной лимит на 5 минут</string>
+    <string name="limit_raise">Увеличить дневной лимит на 5 минут</string>
+    <string name="limit_set">Задать лимит</string>
+    <string name="limit_save">Сохранить лимит</string>
+    <string name="limit_remove">Убрать лимит</string>
+
+    <string name="duration_minutes">%1$d мин</string>
+    <string name="duration_hours">%1$d ч</string>
+    <string name="duration_hours_minutes">%1$d ч %2$d мин</string>
+
+    <string name="permissions_title">Что для этого нужно</string>
+    <string name="permissions_working">Работает</string>
+    <string name="permissions_off">Выключено</string>
+    <string name="permissions_open_settings">Открыть настройки</string>
+    <string name="permissions_accessibility_title">Специальные возможности</string>
+    <string name="permissions_accessibility_body">Позволяет заметить момент, когда приложение с лимитом выходит на передний план. Читается имя этого приложения и время события. Не текст на экране, не сообщения, не то, что вы набираете.</string>
+    <string name="permissions_usage_title">Доступ к статистике</string>
+    <string name="permissions_usage_body">Позволяет измерить, сколько приложение с лимитом было на переднем плане сегодня. Без него дневного лимита нет, потому что нечего считать.</string>
+
+    <string name="warning_app_line">Вы открыли %1$s</string>
+    <string name="warning_headline">Ваш лимит на сегодня израсходован</string>
+    <string name="warning_measurement">Около %1$d мин в приложении %2$s сегодня при лимите %3$d.</string>
+    <string name="warning_question">Точно продолжить?</string>
+    <string name="warning_leave">Оставить на сегодня</string>
+    <string name="warning_continue">Всё равно продолжить</string>
+</resources>
