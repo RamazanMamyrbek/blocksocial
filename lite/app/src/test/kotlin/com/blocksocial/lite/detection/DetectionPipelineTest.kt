@@ -1,6 +1,5 @@
 package com.blocksocial.lite.detection
 
-import com.blocksocial.lite.data.Limit
 import com.blocksocial.lite.usage.UsageToday
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -24,7 +23,7 @@ class DetectionPipelineTest {
             "com.instagram.android" to instagram,
         ),
         displayNames = mapOf(youtube to "YouTube", instagram to "Instagram"),
-        limits = limits.mapValues { (_, minutes) -> Limit(minutes, countingFromMillis = 0L) },
+        limits = limits,
     )
 
     private fun used(minutes: Map<String, Int>) = { UsageToday(minutes, measurementAvailable = true) }

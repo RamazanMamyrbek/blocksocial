@@ -30,7 +30,7 @@
     <string name="limit_minutes_per_day">Minutes per day</string>
     <string name="limit_minutes_suffix">min</string>
     <string name="limit_out_of_range">Enter a number between %1$d and %2$d.</string>
-    <string name="limit_starts_now">Saving starts the count from now. Time spent earlier today does not come with it.</string>
+    <string name="limit_counts_the_whole_day">The limit covers the whole day from midnight, including the time already spent today.</string>
     <string name="limit_set">Set the limit</string>
     <string name="limit_save">Save the limit</string>
     <string name="limit_remove">Remove the limit</string>
@@ -47,6 +47,19 @@
     <string name="permissions_overlay_failed">The warning could not be drawn on top of the other application (%1$s). Your phone may be blocking it.</string>
     <string name="permissions_no_notifications">BlockSocial Lite sends no notifications and asks for no notification permission, so the notification switch for it in system settings stays greyed out. That is expected and does not affect limits.</string>
     <string name="permissions_open_settings">Open settings</string>
+    <string name="permissions_diagnostics">What the app is seeing</string>
+
+    <string name="diagnostics_title">What the app is seeing</string>
+    <string name="diagnostics_intro">Everything below is read live from this phone. If a limit did not stop you, this page says why.</string>
+    <string name="diagnostics_service" translatable="false">service</string>
+    <string name="diagnostics_connected_at" translatable="false">connected</string>
+    <string name="diagnostics_last_event" translatable="false">last screen change</string>
+    <string name="diagnostics_usage_access" translatable="false">usage access</string>
+    <string name="diagnostics_overlay_failure" translatable="false">overlay failure</string>
+    <string name="diagnostics_measured">Minutes measured today</string>
+    <string name="diagnostics_nothing_measured">Nothing measured yet.</string>
+    <string name="diagnostics_decisions">Recent screen changes</string>
+    <string name="diagnostics_no_decisions">Nothing seen yet. Open a limited application and come back.</string>
     <string name="permissions_accessibility_title">Accessibility access</string>
     <string name="permissions_accessibility_body">Lets BlockSocial Lite notice the moment a limited application comes to the front. It reads the name of that application and the moment it happened. Not the text on your screen, not your messages, not what you type.</string>
     <string name="permissions_usage_title">Usage access</string>

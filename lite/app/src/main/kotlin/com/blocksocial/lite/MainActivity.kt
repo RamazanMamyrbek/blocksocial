@@ -28,11 +28,14 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.blocksocial.lite.data.LimitStore
+import com.blocksocial.lite.detection.DecisionRecord
 import com.blocksocial.lite.detection.LimitAccessibilityService
 import com.blocksocial.lite.domain.DailyLimit
 import com.blocksocial.lite.ui.AppLimitScreen
 import com.blocksocial.lite.ui.AppRow
 import com.blocksocial.lite.ui.HomeScreen
+import com.blocksocial.lite.ui.DiagnosticsScreen
+import com.blocksocial.lite.ui.DiagnosticsState
 import com.blocksocial.lite.ui.HomeState
 import com.blocksocial.lite.ui.LiteTheme
 import com.blocksocial.lite.ui.PermissionsScreen
@@ -43,7 +46,7 @@ import com.blocksocial.lite.usage.UsageToday
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val REFRESH_INTERVAL_MILLIS = 20_000L
+private const val REFRESH_INTERVAL_MILLIS = 2_000L
 
 class MainActivity : ComponentActivity() {
 
@@ -85,6 +88,7 @@ class MainActivity : ComponentActivity() {
 private sealed interface Screen {
     data object Home : Screen
     data object Permissions : Screen
+    data object Diagnostics : Screen
     data class Limit(val appId: String) : Screen
 }
 
@@ -102,6 +106,7 @@ private fun LiteApp(
     var usage by remember { mutableStateOf(UsageToday.Unavailable) }
     var service by remember { mutableStateOf(ServiceState.OFF) }
     var overlayFailure by remember { mutableStateOf<String?>(null) }
+    var decisions by remember { mutableStateOf(emptyList<DecisionRecord>()) }
 
     val limits by container.limits.limits.collectAsState(initial = emptyMap())
     val installed = remember { container.catalog.installed() }
@@ -110,10 +115,8 @@ private fun LiteApp(
     LaunchedEffect(lifecycleOwner, limits) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             while (true) {
-                usage = container.usage.readToday(
-                    packageToApp = container.catalog.packageToApp(),
-                    countFromByApp = limits.mapValues { (_, limit) -> limit.countingFromMillis },
-                )
+                usage = container.usage.readToday(container.catalog.packageToApp())
+                decisions = container.decisions.newestFirst()
                 service = serviceStateOf(
                     switchedOn = accessibilityRunning(),
                     running = container.heartbeat.running,
@@ -128,7 +131,7 @@ private fun LiteApp(
         AppRow(
             id = app.id,
             displayName = app.displayName,
-            status = DailyLimit.statusOf(limits[app.id]?.minutes, usage.minutesFor(app.id)),
+            status = DailyLimit.statusOf(limits[app.id], usage.minutesFor(app.id)),
         )
     }
 
@@ -153,6 +156,24 @@ private fun LiteApp(
                 overlayFailure = overlayFailure,
                 onOpenAccessibilitySettings = openAccessibilitySettings,
                 onOpenUsageAccessSettings = openUsageAccessSettings,
+                onOpenDiagnostics = { screen = Screen.Diagnostics },
+            )
+        }
+
+        Screen.Diagnostics -> {
+            BackHandler { screen = Screen.Permissions }
+            DiagnosticsScreen(
+                DiagnosticsState(
+                    serviceState = service,
+                    connectedAtMillis = container.heartbeat.connectedAtMillis,
+                    lastEventAtMillis = container.heartbeat.lastEventAtMillis,
+                    overlayFailure = overlayFailure,
+                    usageAccessGranted = usage.measurementAvailable,
+                    measuredMinutes = rows.mapNotNull { row ->
+                        usage.minutesFor(row.id)?.let { row.displayName to it }
+                    },
+                    decisions = decisions,
+                ),
             )
         }
 
@@ -165,9 +186,7 @@ private fun LiteApp(
                 typedMinutes = typedMinutes,
                 onTypedMinutesChange = { typedMinutes = it },
                 onSave = { minutes ->
-                    work.launch {
-                        container.limits.setLimit(current.appId, minutes, System.currentTimeMillis())
-                    }
+                    work.launch { container.limits.setLimit(current.appId, minutes) }
                     screen = Screen.Home
                 },
                 onRemove = {

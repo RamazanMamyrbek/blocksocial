@@ -49,15 +49,21 @@ class LimitAccessibilityService : AccessibilityService() {
         )
         registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
 
+        fun snapshotOf(limits: Map<String, Int>) = LimitSnapshot(
+            packageToApp = catalog.packageToApp(),
+            displayNames = catalog.displayNames(),
+            limits = limits,
+        )
+
+        snapshot = container.lastKnownSnapshot
+
         val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         scope = serviceScope
         serviceScope.launch {
             container.limits.limits.collect { limits ->
-                snapshot = LimitSnapshot(
-                    packageToApp = catalog.packageToApp(),
-                    displayNames = catalog.displayNames(),
-                    limits = limits,
-                )
+                val fresh = snapshotOf(limits)
+                snapshot = fresh
+                container.lastKnownSnapshot = fresh
             }
         }
 
@@ -78,6 +84,16 @@ class LimitAccessibilityService : AccessibilityService() {
         if (result.transition.movesTheForeground()) overlay?.dismissIfForegroundLeft(result.app)
 
         val status = result.status
+        container.decisions.record(
+            DecisionRecord(
+                atMillis = System.currentTimeMillis(),
+                app = result.app,
+                transition = result.transition,
+                usedMinutes = status?.usedMinutes,
+                limitMinutes = status?.limitMinutes,
+                warned = result.shouldWarn,
+            ),
+        )
         if (result.shouldWarn && result.app != null && status != null) {
             val app = result.app
             val name = snapshot.displayNames[app] ?: app
@@ -103,7 +119,6 @@ class LimitAccessibilityService : AccessibilityService() {
         return runCatching {
             container.usage.readToday(
                 packageToApp = current.packageToApp,
-                countFromByApp = current.limits.mapValues { (_, limit) -> limit.countingFromMillis },
             )
         }.getOrDefault(UsageToday.Unavailable)
     }
@@ -117,7 +132,6 @@ class LimitAccessibilityService : AccessibilityService() {
         scope = null
         pipeline = null
         overlay = null
-        snapshot = LimitSnapshot.Empty
         container.heartbeat.onDisconnected(this)
         return super.onUnbind(intent)
     }

@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import com.blocksocial.lite.data.AppCatalog
 import com.blocksocial.lite.data.LimitStore
+import com.blocksocial.lite.detection.DecisionLog
+import com.blocksocial.lite.detection.LimitSnapshot
 import com.blocksocial.lite.detection.ServiceHeartbeat
 import com.blocksocial.lite.usage.UsageStatsReader
 
@@ -12,6 +14,10 @@ class Container(context: Context) {
     val limits = LimitStore(context)
     val usage = UsageStatsReader(context)
     val heartbeat = ServiceHeartbeat()
+    val decisions = DecisionLog()
+
+    @Volatile
+    var lastKnownSnapshot: LimitSnapshot = LimitSnapshot.Empty
 }
 
 class LiteApplication : Application() {

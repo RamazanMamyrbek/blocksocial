@@ -16,13 +16,13 @@ This is its own application — package `com.blocksocial.lite`, its own storage,
 
 Tapping an application shows the two figures that matter: used today and left today.
 
-**Saving a limit starts the count from that moment.** Time you spent in the application earlier the same day does not carry into a limit that did not exist yet. From the next local midnight it counts the whole day.
+**A limit covers the whole day from midnight**, including time already spent before you set it — the same rule Digital Wellbeing uses. Creating, changing or removing a limit never resets the count.
 
 ## What it deliberately does not do
 
 No history. No statistics beyond those two figures. No streaks, no refusal rates, no "hours saved". No schedules, no always-on blocking, no focus sessions. No timed pass after carrying on. No onboarding carousel — just the two permissions and what each one is for.
 
-Nothing is stored except, per application, the limit and the moment it was set. There is no record of when you were warned or what you chose, because nothing here needs one.
+Nothing is stored except the limit, one number per application. There is no record of when you were warned or what you chose, because nothing here needs one. The diagnostics page keeps the last thirty foreground changes in memory only; closing the process forgets them.
 
 `docs/REQUIREMENTS.md` section 6 lists what is out of scope and why each was refused.
 
@@ -56,19 +56,18 @@ On an Android 16 emulator (`blocksocial_a01`), with the **signed release APK**:
 
 | | |
 |---|---|
-| A limit saved after ten minutes already spent in YouTube today | list shows 0 of 2 minutes — the count restarts, per R-14 |
-| Opening the application straight after saving | no warning |
-| Two minutes held in the foreground, then leave and return | warning |
-| Warning contents | "About 10 minutes in YouTube today, against a limit of 1." — the figure that caused it, per R-17 |
-| "Carry on anyway", then leave and return | warning again, three times in a row on release and five on debug |
+| A one-minute limit saved after six minutes already spent in YouTube today | list reads 6 of 1 — limit spent, immediately, with no reset |
+| Opening YouTube with the limit spent | warning |
+| "Carry on anyway", leave, return | warning again, every time |
+| Crossing the limit while inside, leaving and returning within a second | warning |
 | "Leave it for today" | warning gone, launcher in front |
-| Application screen after the limit | used today, left today "Nothing left" |
+| Application screen | used today 6 min, left today "Nothing left" |
 | Typing a limit | accepted; out of range refused with the range named and the save button unavailable |
-| Crossing the limit while inside, then leaving and returning within a second | warning, and again on three further fast returns |
-| Accessibility service stopped underneath a running app | main screen says limits are not running within one refresh, and goes back to silence when the service returns |
+| Accessibility service stopped underneath a running app | main screen says limits are not running, and clears when it returns |
+| "What the app is seeing" | service WORKING, connect time, last screen change, minutes measured, recent decisions |
 | Crashes | none |
 
-45 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone; manufacturer firmware alters both mechanisms this product stands on, and an emulator cannot show that.
+43 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone; manufacturer firmware alters both mechanisms this product stands on, and an emulator cannot show that.
 
 ## Notifications
 

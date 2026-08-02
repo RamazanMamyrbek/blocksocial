@@ -1,6 +1,5 @@
 package com.blocksocial.lite.detection
 
-import com.blocksocial.lite.data.Limit
 import com.blocksocial.lite.domain.DailyLimit
 import com.blocksocial.lite.domain.LimitStatus
 import com.blocksocial.lite.usage.UsageToday
@@ -8,7 +7,7 @@ import com.blocksocial.lite.usage.UsageToday
 data class LimitSnapshot(
     val packageToApp: Map<String, String> = emptyMap(),
     val displayNames: Map<String, String> = emptyMap(),
-    val limits: Map<String, Limit> = emptyMap(),
+    val limits: Map<String, Int> = emptyMap(),
 ) {
     companion object {
         val Empty = LimitSnapshot()
@@ -47,7 +46,7 @@ class DetectionPipeline(
         return DetectionResult(
             transition = transition,
             app = app,
-            status = DailyLimit.statusOf(snapshot.limits[app]?.minutes, usage.minutesFor(app)),
+            status = DailyLimit.statusOf(snapshot.limits[app], usage.minutesFor(app)),
         )
     }
 

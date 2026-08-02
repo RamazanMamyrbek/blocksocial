@@ -34,6 +34,7 @@ fun PermissionsScreen(
     overlayFailure: String?,
     onOpenAccessibilitySettings: () -> Unit,
     onOpenUsageAccessSettings: () -> Unit,
+    onOpenDiagnostics: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -84,6 +85,16 @@ fun PermissionsScreen(
                     color = LocalBlockSocialPalette.current.danger,
                 )
             }
+        }
+
+        SoftRow(onClick = onOpenDiagnostics) {
+            Text(
+                text = stringResource(R.string.permissions_diagnostics),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            Chevron()
         }
 
         Text(

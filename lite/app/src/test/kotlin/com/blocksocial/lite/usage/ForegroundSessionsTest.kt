@@ -25,11 +25,8 @@ class ForegroundSessionsTest {
     private fun screenOff(text: String) =
         UsageEvent("android", null, at(text), UsageEventType.SCREEN_NON_INTERACTIVE)
 
-    private fun minutes(
-        events: List<UsageEvent>,
-        bootedAt: Long = bootedYesterday,
-        countFrom: Map<String, Long> = emptyMap(),
-    ) = ForegroundSessions.minutesByApp(events, packageToApp, dayStart, now, bootedAt, countFrom)
+    private fun minutes(events: List<UsageEvent>, bootedAt: Long = bootedYesterday) =
+        ForegroundSessions.minutesByApp(events, packageToApp, dayStart, now, bootedAt)
 
     @Test
     fun aVisitIsMeasuredFromEntryToTheNextForegroundChange() {
@@ -176,37 +173,16 @@ class ForegroundSessionsTest {
     }
 
     @Test
-    fun aLimitSetPartWayThroughTheDayCountsOnlyFromTheMomentItWasSet() {
+    fun aLimitCoversTheWholeDayIncludingTimeSpentBeforeItWasCreated() {
         val measured = minutes(
             listOf(
                 foreground("com.google.android.youtube", "2026-07-28T08:00:00+09:00"),
                 foreground("com.android.chrome", "2026-07-28T09:00:00+09:00"),
                 foreground("com.google.android.youtube", "2026-07-28T09:30:00+09:00"),
             ),
-            countFrom = mapOf(youtube to at("2026-07-28T09:20:00+09:00")),
         )
 
-        assertEquals(30, measured[youtube])
-    }
-
-    @Test
-    fun aLimitSetDuringAVisitCountsFromThatMomentRatherThanFromTheStartOfTheVisit() {
-        val measured = minutes(
-            listOf(foreground("com.google.android.youtube", "2026-07-28T08:00:00+09:00")),
-            countFrom = mapOf(youtube to at("2026-07-28T09:00:00+09:00")),
-        )
-
-        assertEquals(60, measured[youtube])
-    }
-
-    @Test
-    fun aLimitSetOnAnEarlierDayDoesNotHoldBackTodaysCount() {
-        val measured = minutes(
-            listOf(foreground("com.google.android.youtube", "2026-07-28T09:00:00+09:00")),
-            countFrom = mapOf(youtube to at("2026-07-26T15:00:00+09:00")),
-        )
-
-        assertEquals(60, measured[youtube])
+        assertEquals(90, measured[youtube])
     }
 
     @Test

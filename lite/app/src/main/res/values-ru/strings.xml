@@ -32,7 +32,7 @@
     <string name="limit_minutes_per_day">Минут в день</string>
     <string name="limit_minutes_suffix">мин</string>
     <string name="limit_out_of_range">Введите число от %1$d до %2$d.</string>
-    <string name="limit_starts_now">Сохранение начинает отсчёт с этого момента. Время, проведённое сегодня раньше, не переносится.</string>
+    <string name="limit_counts_the_whole_day">Лимит считает весь день с полуночи, включая уже потраченное сегодня время.</string>
     <string name="limit_set">Задать лимит</string>
     <string name="limit_save">Сохранить лимит</string>
     <string name="limit_remove">Убрать лимит</string>
@@ -49,6 +49,14 @@
     <string name="permissions_overlay_failed">Предупреждение не удалось показать поверх другого приложения (%1$s). Возможно, телефон это запрещает.</string>
     <string name="permissions_no_notifications">BlockSocial Lite не отправляет уведомлений и не запрашивает разрешение на них, поэтому переключатель уведомлений для него в системных настройках остаётся серым. Так и задумано, на лимиты это не влияет.</string>
     <string name="permissions_open_settings">Открыть настройки</string>
+    <string name="permissions_diagnostics">Что видит приложение</string>
+
+    <string name="diagnostics_title">Что видит приложение</string>
+    <string name="diagnostics_intro">Всё ниже читается с этого телефона прямо сейчас. Если лимит вас не остановил, здесь написано почему.</string>
+    <string name="diagnostics_measured">Минут насчитано сегодня</string>
+    <string name="diagnostics_nothing_measured">Пока ничего не насчитано.</string>
+    <string name="diagnostics_decisions">Последние смены экрана</string>
+    <string name="diagnostics_no_decisions">Пока ничего не видели. Откройте приложение с лимитом и вернитесь.</string>
     <string name="permissions_accessibility_title">Специальные возможности</string>
     <string name="permissions_accessibility_body">Позволяет заметить момент, когда приложение с лимитом выходит на передний план. Читается имя этого приложения и время события. Не текст на экране, не сообщения, не то, что вы набираете.</string>
     <string name="permissions_usage_title">Доступ к статистике</string>

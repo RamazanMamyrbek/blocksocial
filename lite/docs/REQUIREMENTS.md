@@ -55,7 +55,7 @@ Someone who already knows which application is eating their day and roughly how 
 - **R-11.** A visit continues across screens *within* the same application. Moving from a list to a detail screen to a full-screen player is one visit, not three, and does not stop the count.
 - **R-12.** A visit ends when another application comes to the front, when the screen turns off, or when the screen the user was actually on leaves the foreground.
 - **R-13.** No minute earlier than the device's last boot is ever counted. Time with the phone switched off is not time in an application.
-- **R-14.** **Saving a limit starts the count from that moment.** Time spent in the application earlier the same day does not carry into a limit that did not exist yet. From the following local midnight the limit counts the whole day as normal. Changing an existing limit restarts the count the same way.
+- **R-14.** **A limit covers the whole day from local midnight**, including time spent before the limit was created or last changed. Creating, changing or removing a limit never resets the count. This is Digital Wellbeing's behaviour and it is deliberate: see section 7.
 - **R-15.** Without usage access there is no measurement. The product says so where a figure would otherwise be, and no limit is treated as spent.
 
 ### Warning
@@ -76,6 +76,8 @@ Someone who already knows which application is eating their day and roughly how 
 - **R-26.** Revoking usage access takes effect on the very next launch of a limited application, not the one after it.
 - **R-38.** The accessibility row reports whether the service is **answering**, not whether its switch is on. A service that Android lists as enabled but that has been stopped by the system reads as *switched on, but not running*, and says what to do about it. Reporting a dead service as working is the worst failure this product can have, because the user stops watching for the thing that is broken.
 - **R-39.** If the warning cannot be drawn over the other application, that failure is surfaced on the permissions screen rather than swallowed.
+- **R-40.** The application can show, on the phone itself, what it is currently seeing: whether the service is connected, when it last saw a screen change, whether usage access is granted, the minutes it has measured for each application today, and the last thirty foreground changes with the decision taken for each. A limit that does not fire must be explainable by its owner without a cable, a laptop or a debug build.
+- **R-41.** That page names only catalog applications. Anything else that comes to the front is recorded as an outcome with no name attached, so the page cannot become an inventory of what is installed.
 
 ### Storage
 
@@ -115,7 +117,9 @@ Nothing here is a promise that these will arrive later. They are refused, and re
 
 ## 7. Deliberate trade-offs
 
-Two places where a reasonable person would choose differently, recorded with the reasoning so the choice can be revisited rather than rediscovered.
+Places where a reasonable person would choose differently, recorded with the reasoning so the choice can be revisited rather than rediscovered.
+
+**A limit counts the whole day, and touching the limit does not reset it (R-14).** The opposite was tried: the count started from the moment the limit was saved. It was built to answer a real complaint — setting a five-minute limit at noon and being stopped on the spot feels like the product inventing a reason. But it made the counter reset every time the number was edited, which turns a daily limit into a stopwatch you can restart by opening the settings screen, and a limit you can reset by tapping twice is not a limit. Digital Wellbeing counts the whole day, the owner asked for Digital Wellbeing's behaviour, and that is what this now does. The original complaint is answered differently: the measurement was simply wrong at the time — see the defects in the README — and the warning now states the figure that produced it, so an immediate stop is checkable rather than arbitrary.
 
 **Entering an application is decided by the package that raised the window, without checking that the window is a recognisable activity.** The stricter check was tried and it cost a real, reported failure: on some firmware the return into an application reports a window whose class does not resolve to an activity, and the warning never appeared. The looser rule can in principle warn about an application appearing in a floating or picture-in-picture window while the user is looking at something else. A warning at a slightly wrong moment is a nuisance; a limit that silently stops enforcing is the product not working. The nuisance was chosen.
 

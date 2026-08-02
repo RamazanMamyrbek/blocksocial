@@ -20,6 +20,7 @@ import com.blocksocial.lite.domain.LimitStatus
 object HomeTags {
     const val PERMISSIONS = "home-permissions"
     const val EMPTY = "home-empty"
+    const val SETTINGS = "home-settings"
     fun app(id: String) = "home-app-$id"
 }
 
@@ -101,6 +102,19 @@ fun HomeScreen(
         if (state.unlimited.isNotEmpty()) {
             SectionHeader(stringResource(R.string.home_without_limit))
             state.unlimited.forEach { AppRowCard(it, onOpenApp) }
+        }
+
+        SoftRow(
+            onClick = onFixProtection,
+            modifier = Modifier.testTag(HomeTags.SETTINGS),
+        ) {
+            Text(
+                text = stringResource(R.string.permissions_title),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            Chevron()
         }
     }
 }

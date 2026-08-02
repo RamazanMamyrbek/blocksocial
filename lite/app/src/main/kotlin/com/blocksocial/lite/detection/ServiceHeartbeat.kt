@@ -27,6 +27,7 @@ class ServiceHeartbeat {
     }
 
     fun onEvent(nowMillis: Long) {
+        if (connectedAtMillis == null) connectedAtMillis = nowMillis
         lastEventAtMillis = nowMillis
     }
 

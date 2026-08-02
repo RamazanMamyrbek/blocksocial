@@ -119,7 +119,7 @@ fun AppLimitScreen(
         }
 
         Text(
-            text = stringResource(R.string.limit_starts_now),
+            text = stringResource(R.string.limit_counts_the_whole_day),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

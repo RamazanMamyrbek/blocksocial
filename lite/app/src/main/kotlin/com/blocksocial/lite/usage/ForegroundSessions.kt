@@ -17,7 +17,6 @@ object ForegroundSessions {
         windowStartMillis: Long,
         windowEndMillis: Long,
         deviceBootedAtMillis: Long,
-        countFromByApp: Map<String, Long> = emptyMap(),
     ): Map<String, Int> {
         val millisByApp = mutableMapOf<String, Long>()
         val floor = maxOf(windowStartMillis, deviceBootedAtMillis)
@@ -29,7 +28,7 @@ object ForegroundSessions {
             val app = openApp ?: return
             openApp = null
             openClass = null
-            val from = openSinceMillis.coerceAtLeast(maxOf(floor, countFromByApp[app] ?: Long.MIN_VALUE))
+            val from = openSinceMillis.coerceAtLeast(floor)
             val to = atMillis.coerceAtMost(windowEndMillis)
             if (to > from) millisByApp[app] = (millisByApp[app] ?: 0L) + (to - from)
         }
