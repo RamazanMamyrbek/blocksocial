@@ -62,6 +62,8 @@
     <string name="diagnostics_no_decisions">Nothing seen yet. Open a limited application and come back.</string>
     <string name="permissions_accessibility_title">Accessibility access</string>
     <string name="permissions_accessibility_body">Lets BlockSocial Lite notice the moment a limited application comes to the front. It reads the name of that application and the moment it happened. Not the text on your screen, not your messages, not what you type.</string>
+    <string name="permissions_battery_title">Running without battery limits</string>
+    <string name="permissions_battery_body">Lets the phone keep BlockSocial Lite awake in the background. Without it, Android and especially Xiaomi firmware freeze the process after a while: the accessibility switch still says on, no screen changes reach the app, and limits silently stop stopping you. This is the single most common reason blocking does not work.</string>
     <string name="permissions_usage_title">Usage access</string>
     <string name="permissions_usage_body">Lets BlockSocial Lite measure how long a limited application was in front today. Without it there is no daily limit, because there is nothing to count.</string>
 

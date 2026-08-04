@@ -17,6 +17,7 @@ import com.blocksocial.lite.R
 object PermissionsTags {
     const val ACCESSIBILITY = "permissions-accessibility"
     const val USAGE = "permissions-usage"
+    const val BATTERY = "permissions-battery"
 }
 
 enum class ServiceState { WORKING, SWITCHED_ON_BUT_STOPPED, OFF }
@@ -31,9 +32,11 @@ fun serviceStateOf(switchedOn: Boolean, running: Boolean): ServiceState = when {
 fun PermissionsScreen(
     serviceState: ServiceState,
     usageAccessGranted: Boolean,
+    batteryExemptionGranted: Boolean,
     overlayFailure: String?,
     onOpenAccessibilitySettings: () -> Unit,
     onOpenUsageAccessSettings: () -> Unit,
+    onOpenBatterySettings: () -> Unit,
     onOpenDiagnostics: () -> Unit,
 ) {
     Column(
@@ -75,6 +78,19 @@ fun PermissionsScreen(
             extra = null,
             actionNeeded = !usageAccessGranted,
             onOpenSettings = onOpenUsageAccessSettings,
+        )
+
+        Requirement(
+            tag = PermissionsTags.BATTERY,
+            title = stringResource(R.string.permissions_battery_title),
+            state = stringResource(
+                if (batteryExemptionGranted) R.string.permissions_working else R.string.permissions_off,
+            ),
+            good = batteryExemptionGranted,
+            body = stringResource(R.string.permissions_battery_body),
+            extra = null,
+            actionNeeded = !batteryExemptionGranted,
+            onOpenSettings = onOpenBatterySettings,
         )
 
         if (overlayFailure != null) {

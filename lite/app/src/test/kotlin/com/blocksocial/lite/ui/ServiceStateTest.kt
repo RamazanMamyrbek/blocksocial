@@ -31,13 +31,32 @@ class ServiceStateTest {
         val heartbeat = ServiceHeartbeat()
         val service = Any()
 
-        assertFalse(heartbeat.running)
+        assertFalse(heartbeat.answering(1_000L))
 
         heartbeat.onConnected(service, 1_000L)
-        assertTrue(heartbeat.running)
+        assertTrue(heartbeat.answering(1_000L))
 
         heartbeat.onDisconnected(service)
-        assertFalse(heartbeat.running)
+        assertFalse(heartbeat.answering(1_000L))
+    }
+
+    @Test
+    fun aServiceThatStoppedBeingSentEventsIsNotCalledWorking() {
+        val heartbeat = ServiceHeartbeat()
+        val service = Any()
+        heartbeat.onConnected(service, 0L)
+        heartbeat.onEvent(1_000L)
+
+        assertTrue(heartbeat.answering(30_000L))
+        assertFalse(heartbeat.answering(1_000L + ServiceHeartbeat.SILENCE_THAT_MEANS_STOPPED_MILLIS))
+    }
+
+    @Test
+    fun aFreshlyConnectedServiceIsGivenTimeBeforeTheFirstEventArrives() {
+        val heartbeat = ServiceHeartbeat()
+        heartbeat.onConnected(Any(), 5_000L)
+
+        assertTrue(heartbeat.answering(20_000L))
     }
 
     @Test
@@ -50,7 +69,7 @@ class ServiceStateTest {
         heartbeat.onConnected(started, 2_000L)
         heartbeat.onDisconnected(stopping)
 
-        assertTrue(heartbeat.running)
+        assertTrue(heartbeat.answering(2_000L))
         assertEquals(2_000L, heartbeat.connectedAtMillis)
     }
 

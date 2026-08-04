@@ -43,8 +43,10 @@ import com.blocksocial.lite.ui.ServiceState
 import com.blocksocial.lite.ui.serviceStateOf
 import com.blocksocial.lite.ui.Spacing
 import com.blocksocial.lite.usage.UsageToday
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val REFRESH_INTERVAL_MILLIS = 2_000L
 
@@ -68,6 +70,7 @@ class MainActivity : ComponentActivity() {
                         accessibilityRunning = ::accessibilityRunning,
                         openAccessibilitySettings = { open(Settings.ACTION_ACCESSIBILITY_SETTINGS) },
                         openUsageAccessSettings = { open(Settings.ACTION_USAGE_ACCESS_SETTINGS) },
+                        openBatterySettings = ::askToRunWithoutBatteryLimits,
                     )
                 }
             }
@@ -76,6 +79,15 @@ class MainActivity : ComponentActivity() {
 
     private fun open(action: String) {
         runCatching { startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+    }
+
+    private fun askToRunWithoutBatteryLimits() {
+        container.battery.requestIntents().forEach { intent ->
+            val started = runCatching {
+                startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }.isSuccess
+            if (started) return
+        }
     }
 
     private fun accessibilityRunning(): Boolean {
@@ -98,6 +110,7 @@ private fun LiteApp(
     accessibilityRunning: () -> Boolean,
     openAccessibilitySettings: () -> Unit,
     openUsageAccessSettings: () -> Unit,
+    openBatterySettings: () -> Unit,
 ) {
     val work = rememberCoroutineScope()
 
@@ -106,6 +119,7 @@ private fun LiteApp(
     var usage by remember { mutableStateOf(UsageToday.Unavailable) }
     var service by remember { mutableStateOf(ServiceState.OFF) }
     var overlayFailure by remember { mutableStateOf<String?>(null) }
+    var batteryExempt by remember { mutableStateOf(false) }
     var decisions by remember { mutableStateOf(emptyList<DecisionRecord>()) }
 
     val limits by container.limits.limits.collectAsState(initial = emptyMap())
@@ -115,12 +129,15 @@ private fun LiteApp(
     LaunchedEffect(lifecycleOwner, limits) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             while (true) {
-                usage = container.usage.readToday(container.catalog.packageToApp())
+                usage = withContext(Dispatchers.IO) {
+                    container.usage.readToday(container.catalog.packageToApp())
+                }
                 decisions = container.decisions.newestFirst()
                 service = serviceStateOf(
                     switchedOn = accessibilityRunning(),
-                    running = container.heartbeat.running,
+                    running = container.heartbeat.answering(System.currentTimeMillis()),
                 )
+                batteryExempt = container.battery.granted()
                 overlayFailure = container.heartbeat.lastOverlayFailure
                 delay(REFRESH_INTERVAL_MILLIS)
             }
@@ -139,7 +156,9 @@ private fun LiteApp(
         Screen.Home -> HomeScreen(
             state = HomeState(
                 rows = rows,
-                protectionWorking = service == ServiceState.WORKING && usage.measurementAvailable,
+                protectionWorking = service == ServiceState.WORKING &&
+                    usage.measurementAvailable &&
+                    batteryExempt,
             ),
             onOpenApp = { row ->
                 typedMinutes = (row.status?.limitMinutes ?: LimitStore.DEFAULT_MINUTES).toString()
@@ -153,9 +172,11 @@ private fun LiteApp(
             PermissionsScreen(
                 serviceState = service,
                 usageAccessGranted = usage.measurementAvailable,
+                batteryExemptionGranted = batteryExempt,
                 overlayFailure = overlayFailure,
                 onOpenAccessibilitySettings = openAccessibilitySettings,
                 onOpenUsageAccessSettings = openUsageAccessSettings,
+                onOpenBatterySettings = openBatterySettings,
                 onOpenDiagnostics = { screen = Screen.Diagnostics },
             )
         }

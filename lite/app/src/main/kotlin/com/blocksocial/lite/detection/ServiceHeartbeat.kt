@@ -17,7 +17,15 @@ class ServiceHeartbeat {
     var lastOverlayFailure: String? = null
         private set
 
-    val running: Boolean get() = connectedAtMillis != null
+    fun answering(nowMillis: Long): Boolean {
+        val connected = connectedAtMillis ?: return false
+        val lastHeard = lastEventAtMillis ?: connected
+        return nowMillis - lastHeard < SILENCE_THAT_MEANS_STOPPED_MILLIS
+    }
+
+    companion object {
+        const val SILENCE_THAT_MEANS_STOPPED_MILLIS = 60_000L
+    }
 
     fun onConnected(owner: Any, nowMillis: Long) {
         this.owner = owner

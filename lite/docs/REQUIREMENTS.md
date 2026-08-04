@@ -28,7 +28,7 @@ Someone who already knows which application is eating their day and roughly how 
 | **Limited application** | A catalog application the user has given a daily limit. |
 | **Visit** | One continuous stretch with an application in the foreground. It begins when the application comes to the front and ends when it stops being the front application. |
 | **Used today** | The sum of a limited application's visits, from the counting start to now. |
-| **Counting start** | Normally local midnight. On the day a limit is created or changed, the moment it was saved. See R-14. |
+| **Counting start** | Local midnight, always. See R-14. |
 | **Limit spent** | Used today is greater than or equal to the limit. |
 | **Warning** | The full-screen question shown when a limited application is opened with its limit spent. |
 
@@ -70,12 +70,13 @@ Someone who already knows which application is eating their day and roughly how 
 
 ### Permissions
 
-- **R-23.** The application needs accessibility access to notice an application coming to the front, and usage access to measure time. It needs nothing else, and requests nothing else. In particular it declares **no notification permission and sends no notifications**, so the notification switch for it in system settings is inert. That is a consequence of R-28, not a fault.
-- **R-24.** When either is missing, the main screen says so at the top and offers a route to the relevant system settings screen.
+- **R-23.** The application needs accessibility access to notice an application coming to the front, usage access to measure time, and exemption from battery optimisation so the phone does not freeze it. It needs nothing else, and requests nothing else. In particular it declares **no notification permission and sends no notifications**, so the notification switch for it in system settings is inert. That is a consequence of R-28, not a fault.
+- **R-24.** When any of them is missing, the main screen says so at the top and offers a route to the relevant system settings screen.
 - **R-25.** Each permission is explained in terms of what it enables, what is read, and what is never read, before the user is sent to grant it.
 - **R-26.** Revoking usage access takes effect on the very next launch of a limited application, not the one after it.
 - **R-38.** The accessibility row reports whether the service is **answering**, not whether its switch is on. A service that Android lists as enabled but that has been stopped by the system reads as *switched on, but not running*, and says what to do about it. Reporting a dead service as working is the worst failure this product can have, because the user stops watching for the thing that is broken.
 - **R-39.** If the warning cannot be drawn over the other application, that failure is surfaced on the permissions screen rather than swallowed.
+- **R-42.** Exemption from battery optimisation is a **requirement, not a suggestion**, and is reported next to the other two. Without it Xiaomi firmware closes the application after ten minutes in the background: the accessibility switch still reads on, events stop arriving, and limits stop stopping anyone. Measured on a Poco X7 Pro, HyperOS, Android 15 — see the README.
 - **R-40.** The application can show, on the phone itself, what it is currently seeing: whether the service is connected, when it last saw a screen change, whether usage access is granted, the minutes it has measured for each application today, and the last thirty foreground changes with the decision taken for each. A limit that does not fire must be explainable by its owner without a cable, a laptop or a debug build.
 - **R-41.** That page names only catalog applications. Anything else that comes to the front is recorded as an outcome with no name attached, so the page cannot become an inventory of what is installed.
 

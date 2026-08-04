@@ -20,7 +20,7 @@ Tapping an application shows the two figures that matter: used today and left to
 
 ## What it deliberately does not do
 
-No history. No statistics beyond those two figures. No streaks, no refusal rates, no "hours saved". No schedules, no always-on blocking, no focus sessions. No timed pass after carrying on. No onboarding carousel — just the two permissions and what each one is for.
+No history. No statistics beyond those two figures. No streaks, no refusal rates, no "hours saved". No schedules, no always-on blocking, no focus sessions. No timed pass after carrying on. No onboarding carousel — just the three permissions and what each one is for.
 
 Nothing is stored except the limit, one number per application. There is no record of when you were warned or what you chose, because nothing here needs one. The diagnostics page keeps the last thirty foreground changes in memory only; closing the process forgets them.
 
@@ -67,7 +67,22 @@ On an Android 16 emulator (`blocksocial_a01`), with the **signed release APK**:
 | "What the app is seeing" | service WORKING, connect time, last screen change, minutes measured, recent decisions |
 | Crashes | none |
 
-43 unit tests, no failures. Lint clean. Nothing here has been run on a physical phone; manufacturer firmware alters both mechanisms this product stands on, and an emulator cannot show that.
+And on a **Poco X7 Pro, HyperOS, Android 15**, over USB, with the signed release APK: a one-minute limit on Instagram against 48 minutes already spent warns on entry, and again on the entry after that. See the section below for what had to be true first.
+
+45 unit tests, no failures. Lint clean.
+
+## The thing that stops this working, on a real phone
+
+Verified on a **Poco X7 Pro, HyperOS, Android 15**, over USB.
+
+The accessibility service was bound, `dumpsys` said so, and the app's own diagnostics said `service: WORKING` — while `last screen change` was **seventeen minutes old**. No events were reaching it. HyperOS had frozen the process. Its battery screen states the rule outright: *Экономия энергии — закрывать приложения после 10 минут активности в фоновом режиме.*
+
+Setting that application to **no restrictions** made the warning appear on the very next launch, and on every launch after it.
+
+Two things came out of that:
+
+- The application now asks for the battery exemption as a **third requirement**, alongside accessibility and usage access, with the reason written out. Without it the main screen says limits are not running.
+- The health indicator no longer trusts "the service connected once". A service that has not been sent a screen change for a minute is reported as **switched on, but not running**, which is what was actually true for those seventeen minutes.
 
 ## Notifications
 
