@@ -1,6 +1,9 @@
 package com.blocksocial.lite
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
@@ -24,12 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.blocksocial.lite.data.LimitStore
 import com.blocksocial.lite.detection.DecisionRecord
 import com.blocksocial.lite.detection.LimitAccessibilityService
+import com.blocksocial.lite.detection.LimitGuardService
 import com.blocksocial.lite.domain.DailyLimit
 import com.blocksocial.lite.ui.AppLimitScreen
 import com.blocksocial.lite.ui.AppRow
@@ -77,6 +82,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            runCatching { requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1) }
+        }
+        LimitGuardService.keepRunning(this)
+    }
+
     private fun open(action: String) {
         runCatching { startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
     }
@@ -113,6 +128,7 @@ private fun LiteApp(
     openBatterySettings: () -> Unit,
 ) {
     val work = rememberCoroutineScope()
+    val appContext = LocalContext.current.applicationContext
 
     var screen by remember { mutableStateOf<Screen>(Screen.Home) }
     var typedMinutes by remember { mutableStateOf(LimitStore.DEFAULT_MINUTES.toString()) }
@@ -207,7 +223,10 @@ private fun LiteApp(
                 typedMinutes = typedMinutes,
                 onTypedMinutesChange = { typedMinutes = it },
                 onSave = { minutes ->
-                    work.launch { container.limits.setLimit(current.appId, minutes) }
+                    work.launch {
+                        container.limits.setLimit(current.appId, minutes)
+                        LimitGuardService.keepRunning(appContext)
+                    }
                     screen = Screen.Home
                 },
                 onRemove = {

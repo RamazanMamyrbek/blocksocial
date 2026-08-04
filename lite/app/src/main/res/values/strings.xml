@@ -6,7 +6,7 @@
     <string name="accessibility_service_description">Notices when an application you set a daily limit for comes to the front, so BlockSocial Lite can tell you the limit is spent. It reads the name of that application and nothing else.</string>
 
     <string name="home_permissions_title">Limits are not running</string>
-    <string name="home_permissions_body">Two permissions are missing. Tap to fix.</string>
+    <string name="home_permissions_body">Something this needs is missing. Tap to fix.</string>
     <string name="home_with_limit">With a daily limit</string>
     <string name="home_without_limit">No limit yet</string>
     <string name="home_no_apps">None of the supported applications is installed on this phone.</string>
@@ -45,7 +45,7 @@
     <string name="permissions_stopped">Switched on, but not running</string>
     <string name="permissions_stopped_advice">Android says this is on, yet the service is not answering. Some phones stop accessibility services in the background. Switch it off and on again in system settings, and if it keeps happening, allow BlockSocial Lite to run unrestricted in the battery settings of your phone.</string>
     <string name="permissions_overlay_failed">The warning could not be drawn on top of the other application (%1$s). Your phone may be blocking it.</string>
-    <string name="permissions_no_notifications">BlockSocial Lite sends no notifications and asks for no notification permission, so the notification switch for it in system settings stays greyed out. That is expected and does not affect limits.</string>
+    <string name="permissions_no_notifications">The one notification BlockSocial Lite shows is the quiet "limits are running" line. It is what stops the phone freezing the app in the background, and it is the only notification there is.</string>
     <string name="permissions_open_settings">Open settings</string>
     <string name="permissions_diagnostics">What the app is seeing</string>
 
@@ -66,6 +66,11 @@
     <string name="permissions_battery_body">Lets the phone keep BlockSocial Lite awake in the background. Without it, Android and especially Xiaomi firmware freeze the process after a while: the accessibility switch still says on, no screen changes reach the app, and limits silently stop stopping you. This is the single most common reason blocking does not work.</string>
     <string name="permissions_usage_title">Usage access</string>
     <string name="permissions_usage_body">Lets BlockSocial Lite measure how long a limited application was in front today. Without it there is no daily limit, because there is nothing to count.</string>
+
+    <string name="guard_channel_name">Limits are running</string>
+    <string name="guard_channel_description">A quiet, permanent line that keeps the phone from freezing BlockSocial Lite while it watches for limited applications.</string>
+    <string name="guard_title">Limits are running</string>
+    <string name="guard_text">Keeping watch so your daily limits still stop you.</string>
 
     <string name="warning_window_title" translatable="false">BlockSocial Lite warning</string>
     <string name="warning_app_line">You opened %1$s</string>

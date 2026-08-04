@@ -15,6 +15,10 @@ class LimitStore(context: Context) {
 
     private val store = context.applicationContext.limitDataStore
 
+    @Volatile
+    var lastKnownCount: Int = 0
+        private set
+
     val limits: Flow<Map<String, Int>> = store.data.map { preferences ->
         preferences.asMap()
             .mapNotNull { (key, value) ->
@@ -24,6 +28,7 @@ class LimitStore(context: Context) {
                 if (minutes in MINIMUM_MINUTES..MAXIMUM_MINUTES) app to minutes else null
             }
             .toMap()
+            .also { lastKnownCount = it.size }
     }
 
     suspend fun setLimit(app: String, minutes: Int) {

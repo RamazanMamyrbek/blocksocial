@@ -84,9 +84,19 @@ Two things came out of that:
 - The application now asks for the battery exemption as a **third requirement**, alongside accessibility and usage access, with the reason written out. Without it the main screen says limits are not running.
 - The health indicator no longer trusts "the service connected once". A service that has not been sent a screen change for a minute is reported as **switched on, but not running**, which is what was actually true for those seventeen minutes.
 
-## Notifications
+## The one notification
 
-There are none, and there is no notification permission. The switch for this application in the system notification settings is therefore inert on some phones — greyed out and unresponsive. That is the expected consequence of R-28 and does not affect limits.
+There is exactly one: a silent, ongoing line saying limits are running. It exists because the phone will otherwise freeze the process, and a frozen process is not sent screen changes.
+
+The owner's phone made the case unanswerable. Held on screen in split-screen mode, limits worked. Backgrounded, the accessibility service went quiet within minutes and blocking stopped, while every switch still read as on. Exempting the app from battery optimisation helped and was not enough on its own.
+
+What the notification actually buys, measured on the emulator with the signed release APK, is the process's own importance. Backgrounded with a limit set:
+
+```
+Proc # 3: fg +50 F/S/FGS  ---NFUAT  6054:com.blocksocial.lite (fg-service-act)
+```
+
+`fg-service-act` at adjustment 50 is the band the system keeps music players in. Without it the process drops to the cached list, which is where a manufacturer's "close after ten minutes in the background" rule finds it. Blocking, the notification, and the process band were all confirmed on the release build; removing the last limit takes the service and the notification away again.
 
 ## Verifying it by hand, from the host
 
