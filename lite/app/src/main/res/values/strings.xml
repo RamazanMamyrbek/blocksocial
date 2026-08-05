@@ -45,7 +45,9 @@
     <string name="permissions_stopped">Switched on, but not running</string>
     <string name="permissions_stopped_advice">Android says this is on, yet the service is not answering. Some phones stop accessibility services in the background. Switch it off and on again in system settings, and if it keeps happening, allow BlockSocial Lite to run unrestricted in the battery settings of your phone.</string>
     <string name="permissions_overlay_failed">The warning could not be drawn on top of the other application (%1$s). Your phone may be blocking it.</string>
-    <string name="permissions_no_notifications">The one notification BlockSocial Lite shows is the quiet "limits are running" line. It is what stops the phone freezing the app in the background, and it is the only notification there is.</string>
+    <string name="permissions_guard_title">Keep limits running</string>
+    <string name="permissions_guard_on">A permanent line sits at the bottom of the notification shade, under Silent: no sound, no pop-up, nothing to dismiss. Android keeps a small icon for it in the status bar and does not let an application remove that; this switch is the only way. The line is what stops the phone freezing BlockSocial Lite in the background, and it is the only notification there is.</string>
+    <string name="permissions_guard_off">The notification is gone, and so is what kept the phone from freezing BlockSocial Lite in the background. On some phones, especially Xiaomi, limits then stop stopping you after a few minutes. If one lets you through, turn this back on.</string>
     <string name="permissions_open_settings">Open settings</string>
     <string name="permissions_diagnostics">What the app is seeing</string>
 
@@ -68,7 +70,7 @@
     <string name="permissions_usage_body">Lets BlockSocial Lite measure how long a limited application was in front today. Without it there is no daily limit, because there is nothing to count.</string>
 
     <string name="guard_channel_name">Limits are running</string>
-    <string name="guard_channel_description">A quiet, permanent line that keeps the phone from freezing BlockSocial Lite while it watches for limited applications.</string>
+    <string name="guard_channel_description">A quiet, permanent line that keeps the phone from freezing BlockSocial Lite while it watches for limited applications. It can be switched off inside the application.</string>
     <string name="guard_title">Limits are running</string>
     <string name="guard_text">Keeping watch so your daily limits still stop you.</string>
 

@@ -67,6 +67,18 @@ class DetectionPipelineTest {
     }
 
     @Test
+    fun anApplicationOutsideTheCatalogIsNeverGivenAName() {
+        val result = pipeline().onWindowStateChanged(
+            "com.some.banking.app",
+            snapshot(mapOf(youtube to 30)),
+            used(mapOf(youtube to 47)),
+        )
+
+        assertNull(result.app)
+        assertNull(result.status)
+    }
+
+    @Test
     fun withoutAMeasurementNothingIsWarnedAbout() {
         val result = pipeline().onWindowStateChanged(
             "com.google.android.youtube",

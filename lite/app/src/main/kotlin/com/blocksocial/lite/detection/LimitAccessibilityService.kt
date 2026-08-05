@@ -77,13 +77,9 @@ class LimitAccessibilityService : AccessibilityService() {
                 )
                 snapshot = fresh
                 container.lastKnownSnapshot = fresh
-                if (fresh.limits.isEmpty()) {
-                    LimitGuardService.stop(this@LimitAccessibilityService)
-                } else {
-                    LimitGuardService.keepRunning(this@LimitAccessibilityService)
-                }
             }
         }
+        serviceScope.launch { LimitGuardService.follow(this@LimitAccessibilityService) }
         serviceScope.launch {
             while (isActive) {
                 measure()
@@ -92,7 +88,6 @@ class LimitAccessibilityService : AccessibilityService() {
         }
 
         container.heartbeat.onConnected(this, System.currentTimeMillis())
-        LimitGuardService.keepRunning(this)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {

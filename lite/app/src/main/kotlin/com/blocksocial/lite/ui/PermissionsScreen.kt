@@ -2,12 +2,15 @@ package com.blocksocial.lite.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -18,6 +21,7 @@ object PermissionsTags {
     const val ACCESSIBILITY = "permissions-accessibility"
     const val USAGE = "permissions-usage"
     const val BATTERY = "permissions-battery"
+    const val GUARD = "permissions-guard"
 }
 
 enum class ServiceState { WORKING, SWITCHED_ON_BUT_STOPPED, OFF }
@@ -33,7 +37,9 @@ fun PermissionsScreen(
     serviceState: ServiceState,
     usageAccessGranted: Boolean,
     batteryExemptionGranted: Boolean,
+    guardEnabled: Boolean,
     overlayFailure: String?,
+    onGuardEnabledChange: (Boolean) -> Unit,
     onOpenAccessibilitySettings: () -> Unit,
     onOpenUsageAccessSettings: () -> Unit,
     onOpenBatterySettings: () -> Unit,
@@ -93,6 +99,33 @@ fun PermissionsScreen(
             onOpenSettings = onOpenBatterySettings,
         )
 
+        SoftCard(modifier = Modifier.testTag(PermissionsTags.GUARD)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.permissions_guard_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(checked = guardEnabled, onCheckedChange = onGuardEnabledChange)
+            }
+            Text(
+                text = stringResource(
+                    if (guardEnabled) R.string.permissions_guard_on else R.string.permissions_guard_off,
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (guardEnabled) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    LocalBlockSocialPalette.current.warning
+                },
+            )
+        }
+
         if (overlayFailure != null) {
             SoftCard {
                 Text(
@@ -112,12 +145,6 @@ fun PermissionsScreen(
             )
             Chevron()
         }
-
-        Text(
-            text = stringResource(R.string.permissions_no_notifications),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

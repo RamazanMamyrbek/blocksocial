@@ -65,11 +65,15 @@ On an Android 16 emulator (`blocksocial_a01`), with the **signed release APK**:
 | Typing a limit | accepted; out of range refused with the range named and the save button unavailable |
 | Accessibility service stopped underneath a running app | main screen says limits are not running, and clears when it returns |
 | "What the app is seeing" | service WORKING, connect time, last screen change, minutes measured, recent decisions |
+| "Keep limits running" switched off | foreground service gone, notification gone, status-bar icon gone, and the card turns amber and says what was given up |
+| The same switch after a force-stop and relaunch | still off, and no notification flashes up on the way |
+| Switched back on | service and notification return |
+| Removing the last limit | service and notification go away; creating one brings them back |
 | Crashes | none |
 
 And on a **Poco X7 Pro, HyperOS, Android 15**, over USB, with the signed release APK: a one-minute limit on Instagram against 48 minutes already spent warns on entry, and again on the entry after that. See the section below for what had to be true first.
 
-45 unit tests, no failures. Lint clean.
+56 unit tests, no failures. Lint clean.
 
 ## The thing that stops this working, on a real phone
 
@@ -84,9 +88,13 @@ Two things came out of that:
 - The application now asks for the battery exemption as a **third requirement**, alongside accessibility and usage access, with the reason written out. Without it the main screen says limits are not running.
 - The health indicator no longer trusts "the service connected once". A service that has not been sent a screen change for a minute is reported as **switched on, but not running**, which is what was actually true for those seventeen minutes.
 
-## The one notification
+## The one notification, and the switch that removes it
 
 There is exactly one: a silent, ongoing line saying limits are running. It exists because the phone will otherwise freeze the process, and a frozen process is not sent screen changes.
+
+It is posted on a channel that asks for **minimum importance**. Measured on an Android 16 emulator, that buys no sound, no heads-up, and one collapsed line at the bottom of the shade under *Silent*. It does not buy the status-bar icon: Android floors any foreground-service notification at low importance — `mOriginalImp=1, mImportance=2, mImportanceExplanation=system` — and keeps the icon. No application can remove it.
+
+So the permissions screen carries a **Keep limits running** switch, on by default. Off takes the service, the notification and the icon away in one go, and the card turns amber and says plainly what has been given up: the phone is then free to freeze the app in the background, which on HyperOS it does after ten minutes. The choice is the owner's; the honest description of it is the product's job.
 
 The owner's phone made the case unanswerable. Held on screen in split-screen mode, limits worked. Backgrounded, the accessibility service went quiet within minutes and blocking stopped, while every switch still read as on. Exempting the app from battery optimisation helped and was not enough on its own.
 

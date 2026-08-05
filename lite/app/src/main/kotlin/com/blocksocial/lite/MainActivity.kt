@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.blocksocial.lite.data.GuardSetting
 import com.blocksocial.lite.data.LimitStore
 import com.blocksocial.lite.detection.DecisionRecord
 import com.blocksocial.lite.detection.LimitAccessibilityService
@@ -89,7 +90,6 @@ class MainActivity : ComponentActivity() {
         ) {
             runCatching { requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1) }
         }
-        LimitGuardService.keepRunning(this)
     }
 
     private fun open(action: String) {
@@ -139,8 +139,11 @@ private fun LiteApp(
     var decisions by remember { mutableStateOf(emptyList<DecisionRecord>()) }
 
     val limits by container.limits.limits.collectAsState(initial = emptyMap())
+    val guardEnabled by container.guard.enabled.collectAsState(initial = GuardSetting.DEFAULT_ENABLED)
     val installed = remember { container.catalog.installed() }
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(Unit) { LimitGuardService.follow(appContext) }
 
     LaunchedEffect(lifecycleOwner, limits) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -189,7 +192,9 @@ private fun LiteApp(
                 serviceState = service,
                 usageAccessGranted = usage.measurementAvailable,
                 batteryExemptionGranted = batteryExempt,
+                guardEnabled = guardEnabled,
                 overlayFailure = overlayFailure,
+                onGuardEnabledChange = { wanted -> work.launch { container.guard.setEnabled(wanted) } },
                 onOpenAccessibilitySettings = openAccessibilitySettings,
                 onOpenUsageAccessSettings = openUsageAccessSettings,
                 onOpenBatterySettings = openBatterySettings,
@@ -223,10 +228,7 @@ private fun LiteApp(
                 typedMinutes = typedMinutes,
                 onTypedMinutesChange = { typedMinutes = it },
                 onSave = { minutes ->
-                    work.launch {
-                        container.limits.setLimit(current.appId, minutes)
-                        LimitGuardService.keepRunning(appContext)
-                    }
+                    work.launch { container.limits.setLimit(current.appId, minutes) }
                     screen = Screen.Home
                 },
                 onRemove = {
