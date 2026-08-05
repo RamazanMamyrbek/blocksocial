@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">BlockSocial Spike A-05</string>
-    <string name="usage_title">Time in applications today</string>
-    <string name="usage_denied">Usage access has not been granted, so no time can be measured. Schedule and always-on blocking would keep working; only statistics and daily limits stop.</string>
-    <string name="usage_open_settings">Open usage access settings</string>
-    <string name="usage_granted">%1$d applications used today, since local midnight</string>
-    <string name="usage_row_detail">%1$d s · %2$d sessions · %3$s</string>
-</resources>

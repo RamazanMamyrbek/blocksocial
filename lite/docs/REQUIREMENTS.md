@@ -14,7 +14,7 @@ That sentence is the whole product. It is written first because every requiremen
 
 The user picks an application, says how many minutes a day they want to spend in it, and gets a full-screen question when they open it after the time is gone. The question can be answered either way. Nothing is forced, nothing is locked, and nothing is hidden from them.
 
-This is a standalone application with its own package name, its own storage, its own launcher entry and its own release. It shares a git repository with another application, and reuses source from it in the way any two projects share a library, but it is not a configuration, variant, edition or subset of that one, and it has no obligation to stay aligned with it. Its scope is decided here.
+This is a standalone application with its own package name, its own storage, its own launcher entry and its own release. It is the only product in this repository. Its scope is decided here.
 
 ## 2. Who it is for
 

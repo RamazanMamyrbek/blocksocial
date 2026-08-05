@@ -25,8 +25,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    sourceSets["main"].assets.srcDir("../../shared/supported-app-catalog")
-
     buildFeatures {
         buildConfig = true
         compose = true

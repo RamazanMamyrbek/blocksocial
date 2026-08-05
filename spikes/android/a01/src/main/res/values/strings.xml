@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">BlockSocial Spike A-01</string>
-    <string name="accessibility_service_label">BlockSocial Spike A-01 launch detection</string>
-    <string name="accessibility_service_description">Detects when one of the target applications comes to the foreground. Reads only the package name of the foreground application. Does not read screen text, messages, or input.</string>
-</resources>

@@ -1,74 +1,22 @@
-# BlockSocial
+# BlockSocial Lite
 
-Native Android and iOS attention-management application. It interrupts the automatic launch of a social-media application, gives the user a deliberate choice, and records that choice locally.
+A daily time limit for individual applications on Android, and a warning when a limit is spent. That is the whole product.
 
-> System timers measure time. BlockSocial measures decisions.
+You pick an application, type how many minutes a day you want to spend in it, and get a full-screen question when you open it after the time is gone. The question can be answered either way. Nothing is forced, nothing is locked, and nothing is hidden from you.
 
-## Status
+Everything lives in [`lite/`](lite/). Start with:
 
-Documentation stage. No application source code yet, deliberately.
+- [`lite/README.md`](lite/README.md) — what it does, how it is built, and what has actually been run on a phone
+- [`lite/docs/REQUIREMENTS.md`](lite/docs/REQUIREMENTS.md) — the specification, the scope boundary, and the reasoning behind every refusal
 
-The central mechanisms are unverified: the Android accessibility overlay on API 36, Google Play acceptance of the Accessibility use case, the Apple Family Controls entitlement, and a predictable bypass on iOS. Feature implementation starts after those checks return results, listed in `docs/TECHNICAL_SPECIFICATION.md` section 8.
-
-## Structure
-
-```text
-blocksocial/
-├── AGENTS.md          how AI agents work in this repository
-├── CLAUDE.md          Claude Code entry point
-├── README.md
-├── docs/
-│   ├── PRODUCT.md                    what we build and why
-│   ├── TECHNICAL_SPECIFICATION.md    what must be true
-│   ├── ARCHITECTURE.md               how it is built
-│   └── PLAN.md                       phases, order, per-phase checklists
-└── design/
-    ├── UI_UX_BRIEF.md                design input and constraints
-    ├── DESIGN_EXPORT_ANALYSIS.md     first design pass, decisions and open items
-    └── files/                        the design export itself
+```
+cd lite
+./gradlew :app:assembleDebug
+./gradlew :app:test
 ```
 
-`docs/PLAN.md` holds 50 phases from git setup to two store submissions.
+## History
 
-**Android runs first, all the way to the Play Store, then iOS begins.** Phases 00 to 06 are complete: the Android mechanisms are validated on an emulator and the Play policy package is written. Phases 07 to 26 build and ship Android. Phases 27 to 49 do the same for iOS afterwards.
+This repository previously held a larger application — schedules, always-on blocking, timed bypass grants, an event history, a statistics tab, eleven Gradle modules — together with its plan, specification and design documents. It was replaced by the smaller one after the larger one turned out to be more machinery than its owner wanted to use.
 
-The iOS track opens with phase 27, the Apple Family Controls entitlement request. It is paperwork rather than development, and it comes first so that a refusal costs no Swift. It depends on nothing and can be pulled forward at any time.
-
-What this ordering costs is written down rather than discovered later. The domain contract in phase 07 is frozen from Android evidence alone, and phase 34 is where iOS gets its say and where any resulting Android rework is paid for. Apple's answer on the entitlement is not known during the Android cycle at all.
-
-Android uses no physical device at any point. What that costs, and who carries the risk instead, is stated in `docs/TECHNICAL_SPECIFICATION.md` section 9.
-
-## Branch Model
-
-| Branch | Purpose |
-|---|---|
-| `main` | stable release states only; never receives direct work |
-| `dev` | integration branch; every finished phase merges here |
-| `phase/<number>-<short-name>` | one branch per phase, created from `dev` |
-
-Branch from the current `dev`, never from `main`. One phase per branch. Merge into `dev` only when that phase's merge conditions in `docs/PLAN.md` are all true. Never rewrite published history.
-
-## Working on a Phase
-
-One phase is one session. Start it with a single instruction:
-
-```text
-Начни Phase 4
-```
-
-The agent creates the branch, does the work, runs the phase's automated checks, fills in the checkboxes in `docs/PLAN.md`, and reports. You then verify by hand using that phase's manual scenarios and approve the merge into `dev`. You never fill in a checkbox yourself.
-
-If a phase cannot be finished, the agent stops, says where and why, and leaves the remaining checkboxes unchecked. A partially finished phase is never reported as done.
-
-## Stack
-
-| Platform | Stack | Built and tested by |
-|---|---|---|
-| Android | Kotlin, Jetpack Compose, Material 3, `minSdk 26`, `targetSdk 36` | agent, on an Android emulator |
-| iOS | Swift, SwiftUI, iOS 17+, Screen Time frameworks | teammate, on macOS with a real iPhone |
-
-No backend, no accounts, no synchronization. Every feature works offline.
-
-## Working With Agents
-
-Read `AGENTS.md` first. The user may write in Russian or English; everything stored in the repository stays in English.
+Those files are gone from the working tree, not from the repository. Every commit up to and including `33c2226` still contains them, so `git log` and `git show` reach the whole of it.

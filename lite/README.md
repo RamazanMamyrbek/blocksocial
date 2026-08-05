@@ -4,7 +4,7 @@ A daily time limit for individual applications, and a warning when a limit is sp
 
 `docs/REQUIREMENTS.md` is the specification; this file is the short version and the record of what has actually been run.
 
-This is its own application — package `com.blocksocial.lite`, its own storage, its own launcher entry, its own release, and its own scope decided in its own requirements document. It happens to share a git repository with the application in `../android` and reuses source from it the way any two projects share a library, but it is not a variant, edition or subset of that one and owes it no alignment. Both install on the same phone at once.
+Package `com.blocksocial.lite`. One Gradle module, self-contained: everything it needs is under this directory.
 
 ## What it does
 
@@ -28,9 +28,9 @@ Nothing is stored except the limit, one number per application. There is no reco
 
 ## How it is built
 
-One Gradle module. DataStore for two values per application, no database. Dependencies are constructed in a `Container` held by `Application`; there is no dependency-injection framework. Neither Room nor Hilt earns its place in an application with one screen of state, and both would have been the largest thing in this source tree. `../AGENTS.md` names a different stack for the application it describes; this one is recorded here so the difference is deliberate rather than discovered.
+One Gradle module. DataStore for one number per application, no database. Dependencies are constructed in a `Container` held by `Application`; there is no dependency-injection framework. Neither a database nor a dependency graph earns its place in an application with one screen of state, and either would have been the largest thing in this source tree.
 
-The parts taken from `../android` are the ones that were expensive to get right: foreground-session accumulation, the usage reader, the transition tracker, the never-blocked system package list, and the overlay host. They carry the fixes those files earned — counting no minute earlier than the last boot among them — plus the ones found here and not yet carried back.
+Some of it began as source lifted from a larger application that used to live in this repository and has since been deleted — foreground-session accumulation, the usage reader, the transition tracker, the never-blocked system package list, the overlay host. Those files were the expensive ones to get right, and they carry every fix earned since, here and there. `git log` before commit `33c2226` reaches the original if you ever need it.
 
 ## Privacy
 
